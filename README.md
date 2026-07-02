@@ -4,11 +4,11 @@ Local static prototype for an Airport IT pre-sales operational readiness portal.
 
 ## How To Run
 
-Open the existing local preview:
+Live preview: https://werneck22.github.io/pre-sales-hub-/
 
-http://127.0.0.1:4173/index.html
+Or serve the folder locally with any static web server, e.g. `python3 -m http.server 4173`, then open http://127.0.0.1:4173/index.html.
 
-Or serve the folder with any static web server.
+Opportunity, sizing, validation, risk, and decision data is saved to the browser's `localStorage` so work survives a page reload. It stays local to that browser only.
 
 ## What The Prototype Demonstrates
 
@@ -35,7 +35,3 @@ The MVP uses mock rules only. It does not include real pricing, confidential for
 - `index.html` - prototype UI
 - `styles.css` - visual styling
 - `app.js` - mock data, readiness rules, sizing engine, and interactions
-- `docs/PRD.md` - product requirements
-- `docs/data_model.md` - entity model
-- `docs/readiness_rules.md` - BCM/SRM/BAB and sizing readiness rules
-- `docs/demo_script.md` - guided demo scenario

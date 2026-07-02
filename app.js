@@ -666,6 +666,28 @@ let mockDb = {
   notifications: [],
 };
 
+const PERSISTED_STATE_KEY = "presalesHub.state.v1";
+
+function loadPersistedState() {
+  try {
+    const raw = window.localStorage.getItem(PERSISTED_STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.mockDb?.opportunities) || !parsed.mockDb.opportunities.length) return null;
+    return parsed;
+  } catch (error) {
+    return null;
+  }
+}
+
+function persistState() {
+  try {
+    window.localStorage.setItem(PERSISTED_STATE_KEY, JSON.stringify({ mockDb, selectedId }));
+  } catch (error) {
+    // Storage unavailable (private browsing, quota) - the session keeps working in memory only.
+  }
+}
+
 let selectedId = mockDb.opportunities[0].id;
 let sortByReadiness = false;
 let selectedValidationRequestId = "";
@@ -4912,6 +4934,7 @@ function renderAll() {
   renderSelectedWorkspace();
   hydrateHelpTooltips();
   updateRouteChrome(activeRoute);
+  persistState();
 }
 
 function syncIntakeFromForm() {
@@ -5664,7 +5687,15 @@ elements.copyBusinessCaseBtn?.addEventListener("click", async () => {
 
 window.addEventListener("hashchange", () => applyRoute(routeFromHash()));
 
-initializeSizingEngine();
+const persisted = loadPersistedState();
+if (persisted) {
+  mockDb = persisted.mockDb;
+  selectedId = mockDb.opportunities.some((opportunity) => opportunity.id === persisted.selectedId)
+    ? persisted.selectedId
+    : mockDb.opportunities[0].id;
+} else {
+  initializeSizingEngine();
+}
 selectedValidationRequestId = defaultValidationRequestId(selectedId);
 mockDb.opportunities.forEach(readiness);
 activeRoute = routeFromHash();
