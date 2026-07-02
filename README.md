@@ -34,4 +34,11 @@ The MVP uses mock rules only. It does not include real pricing, confidential for
 
 - `index.html` - prototype UI
 - `styles.css` - visual styling
-- `app.js` - mock data, readiness rules, sizing engine, and interactions
+- `modules/` - app logic, loaded as native ES modules (no build step)
+  - `data.js` - constants, mock reference data, and pure formatting helpers
+  - `state.js` - the mock database, persistence, UI state, and DOM element cache
+  - `sizing-engine.js` - sizing rule calculations and the validation/notification workflow
+  - `readiness-rules.js` - BCM/SRM/BAB readiness scoring
+  - `render.js` - all screen rendering
+  - `actions.js` - form sync and mutation handlers
+  - `main.js` - event wiring and app bootstrap (entry point)
