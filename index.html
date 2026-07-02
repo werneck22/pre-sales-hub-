@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Airport IT Pre-Sales Readiness Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260622-43" />
+  </head>
+  <body data-active-route="dashboard">
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Hub navigation">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <p class="eyebrow">Airport IT</p>
+            <h1>Pre-Sales Readiness Hub</h1>
+          </div>
+        </div>
+
+        <nav class="section-nav" aria-label="Workspace sections">
+          <span class="nav-section-label">Portfolio</span>
+          <a href="#/dashboard" class="nav-link active" data-route-link="dashboard">Dashboard</a>
+          <span class="nav-section-label">Opportunity</span>
+          <a href="#/intake" class="nav-link" data-route-link="intake">Intake</a>
+          <a href="#/scope" class="nav-link" data-route-link="scope">Product Scope</a>
+          <a href="#/sizing" class="nav-link" data-route-link="sizing">Automated Sizing</a>
+          <span class="nav-section-label">Validation</span>
+          <a href="#/validation" class="nav-link" data-route-link="validation">Resource Validation</a>
+          <a href="#/stakeholders" class="nav-link" data-route-link="stakeholders">Stakeholders</a>
+          <span class="nav-section-label">Governance</span>
+          <a href="#/governance" class="nav-link" data-route-link="governance">Readiness</a>
+          <a href="#/risks" class="nav-link" data-route-link="risks">Risks &amp; Assumptions</a>
+          <a href="#/decisions" class="nav-link" data-route-link="decisions">Decision Log</a>
+          <a href="#/businessCase" class="nav-link" data-route-link="businessCase">Business Case Pack</a>
+          <span class="nav-section-label">Presentation</span>
+          <a href="#/demo" class="nav-link" data-route-link="demo">Guided Demo</a>
+        </nav>
+
+        <div class="sync-panel">
+          <span class="sync-dot"></span>
+          <div>
+            <strong>Mock data only</strong>
+            <span>Salesforce remains system of record</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p id="pageEyebrow" class="eyebrow">Portfolio</p>
+            <h2 id="pageTitle">Executive Dashboard</h2>
+          </div>
+          <div class="topbar-actions">
+            <label class="search-box">
+              <span aria-hidden="true">Search</span>
+              <input id="searchInput" type="search" placeholder="Airport, customer, region, product" />
+            </label>
+            <button id="demoModeBtn" class="secondary-button" type="button">Start guided demo</button>
+            <button id="newOpportunityBtn" class="primary-button" type="button">New opportunity</button>
+          </div>
+        </header>
+        <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+        <section id="routeContextBar" class="route-context-bar" aria-label="Current screen and workflow navigation">
+          <div class="route-context-heading">
+            <div class="route-breadcrumb" aria-label="Breadcrumb">
+              <span id="routeArea">Portfolio</span>
+              <span aria-hidden="true">/</span>
+              <strong id="routeBreadcrumb">Executive Dashboard</strong>
+            </div>
+            <div class="route-screen-actions">
+              <button id="routePreviousBtn" class="secondary-button" type="button">Previous</button>
+              <button id="routeNextBtn" class="primary-button" type="button">Next</button>
+            </div>
+          </div>
+          <nav id="routeWorkflowNav" class="route-workflow-nav" aria-label="Opportunity workflow">
+            <a href="#/intake" data-workflow-route="intake"><span>1</span>Intake</a>
+            <a href="#/scope" data-workflow-route="scope"><span>2</span>Scope</a>
+            <a href="#/sizing" data-workflow-route="sizing"><span>3</span>Sizing</a>
+            <a href="#/validation" data-workflow-route="validation"><span>4</span>Validate</a>
+            <a href="#/governance" data-workflow-route="governance"><span>5</span>Readiness</a>
+            <a href="#/decisions" data-workflow-route="decisions"><span>6</span>Decision</a>
+          </nav>
+          <div id="routeRecommendation" class="route-recommendation">
+            <div>
+              <span>Recommended next action</span>
+              <strong id="routeRecommendationText">Select an opportunity to begin.</strong>
+            </div>
+            <button id="routeRecommendationBtn" class="secondary-button" type="button">Open next action</button>
+          </div>
+        </section>
+
+        <section id="dashboard" class="dashboard-grid executive-dashboard-grid" data-route-screen="dashboard" aria-label="Executive dashboard">
+          <article class="summary-panel executive-panel">
+            <div class="section-heading dashboard-heading">
+              <div>
+                <p class="eyebrow">Executive dashboard</p>
+                <h3>Portfolio readiness cockpit</h3>
+                <p class="section-help">One-page view of active deals, SRM/BAB readiness, sizing deltas, validation bottlenecks, and executive attention items.</p>
+              </div>
+              <select id="stageFilter" aria-label="Filter by governance stage">
+                <option value="all">All stages</option>
+                <option value="BCM">BCM</option>
+                <option value="SRM">SRM</option>
+                <option value="BAB">BAB</option>
+              </select>
+            </div>
+
+            <div class="dashboard-card-grid" aria-label="Portfolio health metrics">
+              <div class="dashboard-card">
+                <span id="metricPipeline">0</span>
+                <label>Active Opportunities</label>
+                <small>Filtered portfolio count</small>
+              </div>
+              <div class="dashboard-card">
+                <span id="metricReadiness">0%</span>
+                <label>Average Readiness Score</label>
+                <small>BCM, SRM, BAB and validation weighted</small>
+              </div>
+              <div class="dashboard-card attention">
+                <span id="metricPendingSizing">0</span>
+                <label>Pending Validations</label>
+                <small>Owner action required</small>
+              </div>
+              <div class="dashboard-card critical">
+                <span id="metricOverdueValidations">0</span>
+                <label>Overdue Validations</label>
+                <small>Past validation due date</small>
+              </div>
+              <div class="dashboard-card attention">
+                <span id="metricSrmSizingBlock">0</span>
+                <label>Not Ready for SRM</label>
+                <small>Governance or sizing gaps</small>
+              </div>
+              <div class="dashboard-card attention">
+                <span id="metricBabSizingBlock">0</span>
+                <label>Not Ready for BAB</label>
+                <small>Business case or approval gaps</small>
+              </div>
+            </div>
+
+            <div class="dashboard-effort-strip" aria-label="Automated sizing effort metrics">
+              <p class="dashboard-strip-label">Automated sizing effort (MD)</p>
+              <div class="dashboard-effort-cards">
+                <div class="dashboard-card">
+                  <span id="metricInitialMd">0</span>
+                  <label>Total Initial MD</label>
+                  <small>Automated sizing baseline</small>
+                </div>
+                <div class="dashboard-card">
+                  <span id="metricValidatedMd">0</span>
+                  <label>Total Validated MD</label>
+                  <small>Current owner-adjusted estimate</small>
+                </div>
+                <div class="dashboard-card delta">
+                  <span id="metricMdDelta">0</span>
+                  <label>MD Delta</label>
+                  <small>Validated minus initial MD</small>
+                </div>
+              </div>
+            </div>
+
+            <div id="dashboardEmptyState"></div>
+
+            <div class="dashboard-section-grid">
+              <section class="dashboard-section dashboard-section-wide" aria-labelledby="executiveAttentionHeading">
+                <div class="dashboard-section-title">
+                  <div>
+                    <p class="eyebrow">Leadership focus</p>
+                    <h4 id="executiveAttentionHeading">Executive Attention Required</h4>
+                  </div>
+                  <span id="metricBlockers" class="section-count">0 blockers</span>
+                </div>
+                <div id="executiveAttentionList" class="dashboard-list"></div>
+              </section>
+
+              <section class="dashboard-section" aria-labelledby="pendingValidationsHeading">
+                <div class="dashboard-section-title">
+                  <div>
+                    <p class="eyebrow">Owner workflow</p>
+                    <h4 id="pendingValidationsHeading">Pending Resource Validations</h4>
+                  </div>
+                </div>
+                <div id="pendingValidationList" class="dashboard-list compact"></div>
+              </section>
+
+              <section class="dashboard-section" aria-labelledby="overdueValidationsHeading">
+                <div class="dashboard-section-title">
+                  <div>
+                    <p class="eyebrow">Escalation</p>
+                    <h4 id="overdueValidationsHeading">Overdue Validations</h4>
+                  </div>
+                </div>
+                <div id="overdueValidationList" class="dashboard-list compact"></div>
+              </section>
+
+              <section class="dashboard-section" aria-labelledby="deadlinesHeading">
+                <div class="dashboard-section-title">
+                  <div>
+                    <p class="eyebrow">Bid calendar</p>
+                    <h4 id="deadlinesHeading">Upcoming Submission Deadlines</h4>
+                  </div>
+                </div>
+                <div id="deadlineList" class="dashboard-list compact"></div>
+              </section>
+
+              <section class="dashboard-section" aria-labelledby="bottlenecksHeading">
+                <div class="dashboard-section-title">
+                  <div>
+                    <p class="eyebrow">Operational bottlenecks</p>
+                    <h4 id="bottlenecksHeading">Blockers by Function</h4>
+                  </div>
+                </div>
+                <div id="functionBottlenecks" class="bottleneck-list"></div>
+              </section>
+
+              <section class="dashboard-section" aria-labelledby="topReadinessGapsHeading">
+                <div class="dashboard-section-title">
+                  <div>
+                    <p class="eyebrow">Readiness drivers</p>
+                    <h4 id="topReadinessGapsHeading">Top Readiness Gaps</h4>
+                  </div>
+                </div>
+                <div id="topReadinessGaps" class="dashboard-list compact"></div>
+              </section>
+
+              <section class="dashboard-section dashboard-section-wide" aria-labelledby="forumReadinessHeading">
+                <div class="dashboard-section-title">
+                  <div>
+                    <p class="eyebrow">Governance readiness</p>
+                    <h4 id="forumReadinessHeading">Readiness by Governance Forum</h4>
+                  </div>
+                  <span id="metricGovernance" class="section-count">0 ready</span>
+                </div>
+                <div id="forumReadinessBoard" class="forum-readiness-board"></div>
+              </section>
+            </div>
+          </article>
+
+          <article class="opportunity-panel executive-opportunity-panel">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Opportunity list</p>
+                <h3>Pipeline readiness</h3>
+              </div>
+              <button id="sortReadinessBtn" class="secondary-button" type="button">Sort by readiness</button>
+            </div>
+            <div id="opportunityList" class="opportunity-list" aria-live="polite"></div>
+          </article>
+        </section>
+
+        <section class="workspace-grid routed-workspace" hidden>
+          <article class="workspace-main" aria-label="Opportunity workspace">
+            <div class="record-header" data-opportunity-context hidden>
+              <div>
+                <p id="recordCustomer" class="eyebrow">Selected opportunity</p>
+                <h2 id="recordName">Opportunity</h2>
+              </div>
+              <div class="record-badges">
+                <span id="stageBadge" class="status-pill">BCM</span>
+                <span id="readinessBadge" class="status-pill calm">0% readiness</span>
+                <span id="forumBadge" class="status-pill">Forum pending</span>
+              </div>
+            </div>
+            <section id="journeyPanel" class="journey-panel" data-route-screen="demo" aria-label="End-to-end demo journey" hidden>
+              <div class="journey-heading">
+                <div>
+                  <p id="journeyEyebrow" class="eyebrow">Demo journey</p>
+                  <h3 id="journeyTitle">From intake to validated SRM/BAB readiness</h3>
+                </div>
+                <span id="journeyProgressBadge" class="meta-chip">0 of 12 steps</span>
+              </div>
+              <div id="journeyStepper" class="journey-stepper"></div>
+              <div id="presenterNotes" class="presenter-notes" hidden></div>
+              <div id="nextActionPanel" class="next-action-panel"></div>
+            </section>
+
+            <section id="intake" class="panel route-panel" data-route-screen="intake" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Intake</p>
+                  <h3>Opportunity intake form</h3>
+                  <p class="section-help">Capture the commercial context and governance evidence needed before BCM, SRM, and BAB reviews.</p>
+                </div>
+                <button id="saveIntakeBtn" class="primary-button" type="submit" form="intakeForm">Save mock intake</button>
+              </div>
+              <form id="intakeForm" class="form-grid">
+                <label>
+                  Opportunity name
+                  <input name="name" type="text" required />
+                </label>
+                <label>
+                  Customer / airport group
+                  <input name="customer" type="text" required />
+                </label>
+                <label>
+                  Sales owner
+                  <input name="sales_owner" type="text" />
+                </label>
+                <label>
+                  Pre-sales owner
+                  <input name="presales_owner" type="text" />
+                </label>
+                <label>
+                  Region
+                  <select name="region">
+                    <option>AMS</option>
+                    <option>EMEA</option>
+                    <option>APAC</option>
+                    <option>NORAM</option>
+                    <option>LATAM</option>
+                  </select>
+                </label>
+                <label>
+                  Opportunity stage
+                  <select name="opportunity_stage">
+                    <option>Qualification</option>
+                    <option>Solutioning</option>
+                    <option>Proposal</option>
+                    <option>Negotiation</option>
+                  </select>
+                </label>
+                <label>
+                  Estimated value
+                  <input name="estimated_value" type="number" min="0" step="10000" />
+                </label>
+                <label>
+                  Close date
+                  <input name="close_date" type="date" />
+                </label>
+                <label>
+                  Submission deadline
+                  <input name="submission_deadline" type="date" />
+                </label>
+                <label>
+                  Strategic importance
+                  <select name="strategic_importance">
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Strategic</option>
+                  </select>
+                </label>
+                <label>
+                  <span class="field-label-with-help">
+                    Complexity
+                    <button type="button" class="help-tooltip" data-help-key="complexity" data-help-label="Complexity level"><span aria-hidden="true">i</span></button>
+                  </span>
+                  <select name="complexity">
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Very High</option>
+                  </select>
+                </label>
+                <label>
+                  Current governance stage
+                  <select name="current_governance_stage">
+                    <option>BCM</option>
+                    <option>SRM</option>
+                    <option>BAB</option>
+                  </select>
+                </label>
+                <label>
+                  BCM status
+                  <select name="bcm_status">
+                    <option>Not started</option>
+                    <option>In progress</option>
+                    <option>Ready</option>
+                    <option>Conditionally approved</option>
+                    <option>Approved</option>
+                    <option>Blocked</option>
+                  </select>
+                </label>
+                <label>
+                  SRM status
+                  <select name="srm_status">
+                    <option>Not started</option>
+                    <option>In progress</option>
+                    <option>Ready</option>
+                    <option>Conditionally approved</option>
+                    <option>Approved</option>
+                    <option>Blocked</option>
+                  </select>
+                </label>
+                <label>
+                  BAB status
+                  <select name="bab_status">
+                    <option>Not started</option>
+                    <option>In progress</option>
+                    <option>Ready</option>
+                    <option>Conditionally approved</option>
+                    <option>Approved</option>
+                    <option>Blocked</option>
+                  </select>
+                </label>
+                <label>
+                  Bid/no-bid recommendation
+                  <select name="bid_no_bid_recommendation">
+                    <option></option>
+                    <option>Bid</option>
+                    <option>No-bid</option>
+                    <option>Hold</option>
+                    <option>Escalate</option>
+                  </select>
+                </label>
+                <label>
+                  Business case status
+                  <select name="business_case_status">
+                    <option>Not documented</option>
+                    <option>Draft</option>
+                    <option>In review</option>
+                    <option>Validated</option>
+                  </select>
+                </label>
+                <label>
+                  Pricing readiness status
+                  <select name="pricing_readiness_status">
+                    <option>Not documented</option>
+                    <option>Draft</option>
+                    <option>In progress</option>
+                    <option>Ready</option>
+                    <option>Blocked</option>
+                  </select>
+                </label>
+                <div id="intakeNarrativeSummary" class="narrative-summary span-2"></div>
+                <details class="intake-detail-panel span-2">
+                  <summary>
+                    <span>Governance narrative</span>
+                    <small>Strategic rationale, architecture, dependencies, assumptions and approvals</small>
+                  </summary>
+                  <div class="narrative-field-grid">
+                    <label>
+                      Strategic rationale
+                      <textarea name="strategic_rationale" rows="2"></textarea>
+                    </label>
+                    <label>
+                      Preliminary architecture
+                      <textarea name="preliminary_architecture" rows="2"></textarea>
+                    </label>
+                    <label>
+                      Delivery dependency
+                      <textarea name="delivery_dependency" rows="2"></textarea>
+                    </label>
+                    <label>
+                      Integration assumptions
+                      <textarea name="integration_assumptions" rows="2"></textarea>
+                    </label>
+                    <label>
+                      Executive decision required
+                      <textarea name="executive_decision_required" rows="2"></textarea>
+                    </label>
+                    <label>
+                      Exceptions and approval conditions
+                      <textarea name="exceptions_approval_conditions" rows="2"></textarea>
+                    </label>
+                  </div>
+                </details>
+              </form>
+            </section>
+
+            <section id="scope" class="panel route-panel" data-route-screen="scope" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Solution scope</p>
+                  <div class="title-with-help">
+                    <h3>Product scope and sizing placeholders</h3>
+                    <button type="button" class="help-tooltip" data-help-key="productScope" data-help-label="Product scope"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p class="section-help">Select only the products included in the proposal baseline. Product choices determine sizing workstreams, owners, and validation requests.</p>
+                </div>
+                <span id="productCount" class="meta-chip">0 products</span>
+              </div>
+              <div id="productScope" class="product-grid"></div>
+            </section>
+
+            <section id="sizing" class="panel route-panel" data-route-screen="sizing validation" hidden>
+              <div class="section-heading" data-route-view="sizing">
+                <div>
+                  <p class="eyebrow">Automated sizing</p>
+                  <div class="title-with-help">
+                    <h3>Automated sizing engine</h3>
+                    <button type="button" class="help-tooltip" data-help-key="automatedSizing" data-help-label="Automated sizing"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p class="section-help">Initial MDs come from configurable mock rules using airport category, product scope, complexity, risk, and product-specific drivers. Owner validation is required before governance use.</p>
+                </div>
+                <div class="engine-actions">
+                  <span id="categoryBadge" class="meta-chip">Category pending</span>
+                  <button id="runSizingBtn" class="primary-button" type="button">Run sizing</button>
+                </div>
+              </div>
+
+              <div class="section-heading" data-route-view="validation" hidden>
+                <div>
+                  <p class="eyebrow">Resource owner workflow</p>
+                  <div class="title-with-help">
+                    <h3>Validation command center</h3>
+                    <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p class="section-help">Route sizing packages to the correct owners, capture responses, preview notifications, and close the validated MD baseline.</p>
+                </div>
+                <span class="meta-chip">Simulated workflow</span>
+              </div>
+
+              <form id="airportProfileForm" class="form-grid compact-form" data-route-view="sizing">
+                <div class="context-help span-2">
+                  <div class="context-help-title">
+                    <strong>Airport categorization</strong>
+                    <button type="button" class="help-tooltip" data-help-key="airportCategorization" data-help-label="Airport categorization"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p>The larger category produced by annual passengers or aircraft movements is used. An override requires a documented reason.</p>
+                </div>
+                <label>
+                  Airport name
+                  <input name="airport_name" type="text" />
+                </label>
+                <label>
+                  Annual passengers
+                  <input name="annual_passengers" type="number" min="0" step="1000" />
+                </label>
+                <label>
+                  Annual aircraft movements
+                  <input name="annual_movements" type="number" min="0" step="100" />
+                </label>
+                <label>
+                  Region
+                  <select name="region">
+                    <option>AMS</option>
+                    <option>EMEA</option>
+                    <option>APAC</option>
+                    <option>NORAM</option>
+                    <option>LATAM</option>
+                  </select>
+                </label>
+                <label>
+                  Override category
+                  <select name="categorization_override">
+                    <option></option>
+                    <option>Small</option>
+                    <option>Medium</option>
+                    <option>Large</option>
+                    <option>Extra Large</option>
+                  </select>
+                </label>
+                <label>
+                  Override reason
+                  <input name="override_reason" type="text" />
+                </label>
+              </form>
+
+              <div id="sizingSummary" class="sizing-summary" data-route-view="sizing"></div>
+
+              <div class="sizing-layout">
+                <div class="sizing-main">
+                  <div class="subsection-heading" data-route-view="sizing">
+                    <div>
+                      <div class="title-with-help compact-title">
+                        <h4>Generated sizing estimates</h4>
+                        <button type="button" class="help-tooltip" data-help-key="mdEstimates" data-help-label="MD estimates"><span aria-hidden="true">i</span></button>
+                      </div>
+                      <p class="subsection-help">Compare product totals first, then expand a product to review workstreams, rule context, owners, and validation exceptions.</p>
+                    </div>
+                    <span class="meta-chip">Mock default rules only</span>
+                  </div>
+                  <div class="estimate-toolbar" data-route-view="sizing" aria-label="Sizing estimate filters">
+                    <label>
+                      Product
+                      <select id="estimateProductFilter">
+                        <option value="all">All products</option>
+                      </select>
+                    </label>
+                    <label>
+                      Status
+                      <select id="estimateStatusFilter">
+                        <option value="all">All statuses</option>
+                      </select>
+                    </label>
+                    <span id="estimateResultCount" class="meta-chip">0 estimates</span>
+                  </div>
+                  <div id="sizingEstimateTable" class="matrix-wrap" data-route-view="sizing"></div>
+
+                  <div class="subsection-heading" data-route-view="validation">
+                    <div>
+                      <div class="title-with-help compact-title">
+                        <h4>Owner queues and responses</h4>
+                        <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
+                      </div>
+                      <p class="subsection-help">Prepare the validation plan, route work to resource owners, resolve exceptions, and confirm the final sizing baseline.</p>
+                    </div>
+                    <span class="meta-chip">Simulated workflow</span>
+                  </div>
+                  <div id="validationRequestList" class="request-list" data-route-view="validation"></div>
+
+                  <div class="subsection-heading notification-section-heading" data-route-view="validation">
+                    <div>
+                      <div class="title-with-help compact-title">
+                        <h4>Owner notification and activity</h4>
+                        <button type="button" class="help-tooltip" data-help-key="notificationPreview" data-help-label="Notification preview"><span aria-hidden="true">i</span></button>
+                      </div>
+                      <p class="subsection-help">Preview Email or Teams for the selected validation package and record local trigger activity. Nothing is sent externally.</p>
+                    </div>
+                    <span class="meta-chip">Preview only</span>
+                  </div>
+                  <div id="notificationPreview" data-route-view="validation"></div>
+
+                  <details class="reference-registry" data-route-view="validation">
+                    <summary>Resource owner registry</summary>
+                    <p>Reference data used to resolve owners by product, workstream, and region.</p>
+                    <div id="resourceOwnerRegistry" class="matrix-wrap"></div>
+                  </details>
+                </div>
+
+                <aside class="sizing-side" data-route-view="sizing">
+                  <div class="subsection-heading">
+                    <div>
+                      <div class="title-with-help compact-title">
+                        <h4>Classification rules</h4>
+                        <button type="button" class="help-tooltip" data-help-key="airportCategorization" data-help-label="Airport categorization"><span aria-hidden="true">i</span></button>
+                      </div>
+                      <p class="subsection-help">Mock thresholds remain visible so the assigned category can be explained and reviewed.</p>
+                    </div>
+                  </div>
+                  <div id="classificationRules" class="matrix-wrap"></div>
+
+                </aside>
+              </div>
+            </section>
+
+            <section id="governance" class="panel route-panel" data-route-screen="governance" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Governance readiness</p>
+                  <div class="title-with-help">
+                    <h3>BCM, SRM, and BAB checklist</h3>
+                    <button type="button" class="help-tooltip" data-help-key="srmReadiness" data-help-label="Governance readiness"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p class="section-help">Shows why the opportunity is or is not ready, including missing evidence, pending validation, risks, and blockers.</p>
+                </div>
+                <span id="checklistScore" class="meta-chip">0 of 0 complete</span>
+              </div>
+              <div class="governance-help-grid">
+                <div>
+                  <div class="context-help-title">
+                    <strong>SRM readiness</strong>
+                    <button type="button" class="help-tooltip" data-help-key="srmReadiness" data-help-label="SRM readiness"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p>Confirms whether validated technical and delivery inputs are sufficient for solution review.</p>
+                </div>
+                <div>
+                  <div class="context-help-title">
+                    <strong>BAB readiness</strong>
+                    <button type="button" class="help-tooltip" data-help-key="babReadiness" data-help-label="BAB readiness"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p>Confirms whether validated effort, business case inputs, risks, and executive decisions are prepared for approval.</p>
+                </div>
+              </div>
+              <div id="readinessBreakdown" class="readiness-breakdown"></div>
+              <div id="governanceChecklist" class="checklist-board"></div>
+            </section>
+
+            <section id="stakeholders" class="panel route-panel" data-route-screen="stakeholders" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Stakeholders</p>
+                  <h3>Validation matrix</h3>
+                  <p class="section-help">Track required stakeholder validation for product, delivery, pricing, support, legal, and governance readiness.</p>
+                </div>
+                <span class="meta-chip">Click a status to cycle</span>
+              </div>
+              <div id="validationMatrix" class="matrix-wrap"></div>
+            </section>
+
+            <section id="businessCase" class="panel route-panel" data-route-screen="businessCase" hidden>
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Business case</p>
+                  <div class="title-with-help">
+                    <h3>Business case pack</h3>
+                    <button type="button" class="help-tooltip" data-help-key="businessCasePack" data-help-label="Business case pack"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p class="section-help">A consolidated, read-only summary of the validated sizing baseline, scope, assumptions, open risks, approval conditions, decisions, and historical benchmark comparison for SRM and BAB.</p>
+                </div>
+                <button id="copyBusinessCaseBtn" class="secondary-button" type="button">Copy pack summary</button>
+              </div>
+              <div id="businessCasePack" class="business-case-pack"></div>
+            </section>
+          </article>
+
+          <aside class="workspace-side" aria-label="Logs and decisions">
+            <section id="risk-log" class="panel side-panel route-panel" data-route-screen="risks" hidden>
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Risk register</p>
+                  <h3>Risks and assumptions</h3>
+                  <p class="section-help">Capture assumptions, exclusions, and risks that should travel into SRM, BAB, and the business case pack.</p>
+                </div>
+              </div>
+              <form id="riskForm" class="inline-form stacked">
+                <select name="category" aria-label="Risk category">
+                  <option>Technical</option>
+                  <option>Delivery</option>
+                  <option>Commercial</option>
+                  <option>Governance</option>
+                  <option>Exclusion</option>
+                </select>
+                <input name="description" type="text" placeholder="Risk description" />
+                <select name="severity" aria-label="Severity">
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+                <input name="mitigation" type="text" placeholder="Mitigation" />
+                <input name="owner" type="text" placeholder="Owner" />
+                <select name="status" aria-label="Risk status">
+                  <option>Open</option>
+                  <option>Mitigating</option>
+                  <option>Closed</option>
+                </select>
+                <button class="secondary-button" type="submit">Add risk</button>
+              </form>
+              <div id="riskList" class="log-list"></div>
+
+              <h4 class="log-subheading">Assumptions</h4>
+              <form id="assumptionForm" class="inline-form stacked">
+                <input name="description" type="text" placeholder="Assumption description" />
+                <select name="category" aria-label="Assumption category">
+                  <option>Technical</option>
+                  <option>Delivery</option>
+                  <option>Integration</option>
+                  <option>Commercial</option>
+                  <option>Customer dependency</option>
+                </select>
+                <select name="impact" aria-label="Impact">
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+                <input name="owner" type="text" placeholder="Owner" />
+                <button class="secondary-button" type="submit">Add assumption</button>
+              </form>
+              <div id="assumptionList" class="log-list"></div>
+            </section>
+
+            <section id="decisions" class="panel side-panel route-panel" data-route-screen="decisions" hidden>
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Decisions</p>
+                  <div class="title-with-help">
+                    <h3>Decision log</h3>
+                    <button type="button" class="help-tooltip" data-help-key="decisionLog" data-help-label="Decision log"><span aria-hidden="true">i</span></button>
+                  </div>
+                  <p class="section-help">Preserve each forum outcome, decision owner, approval conditions, and next steps as traceable governance evidence.</p>
+                </div>
+              </div>
+              <form id="decisionForm" class="inline-form stacked">
+                <select name="forum" aria-label="Forum">
+                  <option>BCM</option>
+                  <option>SRM</option>
+                  <option>BAB</option>
+                </select>
+                <input name="decision_owner" type="text" placeholder="Decision owner" />
+                <input name="decision" type="text" placeholder="Decision" />
+                <input name="conditions" type="text" placeholder="Conditions" />
+                <input name="next_steps" type="text" placeholder="Next steps" />
+                <button class="primary-button" type="submit">Log decision</button>
+              </form>
+              <div id="decisionList" class="log-list"></div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js?v=20260622-43"></script>
+  </body>
+</html>
