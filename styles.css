@@ -739,21 +739,37 @@ textarea:focus-visible {
   grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
+.validation-row {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+
 .dashboard-row-main {
   display: grid;
   min-width: 0;
   gap: 3px;
 }
 
+.dashboard-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+}
+
 .dashboard-row-main strong,
-.dashboard-row-main small,
-.row-reason,
 .row-date,
 .row-metric {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.dashboard-row-main small {
+  min-width: 0;
+  color: var(--muted);
+  overflow-wrap: break-word;
 }
 
 .dashboard-row-main strong {
@@ -765,13 +781,6 @@ textarea:focus-visible {
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 720;
-}
-
-.row-reason {
-  max-width: 260px;
-  color: var(--muted);
-  font-size: 0.74rem;
-  font-weight: 760;
 }
 
 .row-metric {
@@ -2232,13 +2241,20 @@ body[data-active-route="validation"] #sizing .sizing-layout {
 }
 
 .bottleneck-copy strong,
-.bottleneck-copy small,
 .bottleneck-impact strong,
 .bottleneck-impact small {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.bottleneck-copy small {
+  display: block;
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-overflow: clip;
 }
 
 .bottleneck-copy strong {
@@ -2330,13 +2346,10 @@ body[data-active-route="validation"] #sizing .sizing-layout {
 }
 
 .readiness-driver-copy small {
-  overflow: hidden;
   color: var(--muted);
   font-size: 0.7rem;
   font-weight: 720;
   line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .readiness-driver-action {
@@ -4554,16 +4567,16 @@ tbody th {
 }
 
 .dashboard-effort-strip {
-  display: grid;
-  gap: 8px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  padding: 8px 14px;
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .dashboard-strip-label {
-  margin: 0;
   color: var(--muted);
   font-size: 0.67rem;
   font-weight: 850;
@@ -4571,21 +4584,20 @@ tbody th {
   text-transform: uppercase;
 }
 
-.dashboard-effort-cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+.dashboard-strip-stat b {
+  color: var(--ink);
+  font-weight: 840;
+  font-variant-numeric: tabular-nums;
 }
 
-.dashboard-effort-cards .dashboard-card {
-  min-height: 0;
-  background: var(--surface);
+.dashboard-strip-stat.delta b {
+  color: var(--blue);
 }
 
-@media (max-width: 720px) {
-  .dashboard-effort-cards {
-    grid-template-columns: 1fr;
-  }
+.dashboard-strip-divider {
+  width: 1px;
+  height: 12px;
+  background: var(--line);
 }
 
 .dashboard-section-grid {

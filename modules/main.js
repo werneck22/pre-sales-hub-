@@ -96,6 +96,19 @@ if (elements.blockerList) {
   });
 }
 
+if (elements.topReadinessGaps) {
+  elements.topReadinessGaps.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-id]");
+    if (!button) return;
+    setSelectedId(button.dataset.id);
+    setEstimateProductFilter("all");
+    setEstimateStatusFilter("all");
+    setSelectedValidationRequestId(defaultValidationRequestId(selectedId));
+    renderAll();
+    navigateToRoute("intake");
+  });
+}
+
 if (elements.dashboard) {
   elements.dashboard.addEventListener("click", (event) => {
     const row = event.target.closest(".dashboard-row[data-id], .executive-action-card[data-id]");

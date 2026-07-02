@@ -147,38 +147,27 @@
             </div>
 
             <div class="dashboard-effort-strip" aria-label="Automated sizing effort metrics">
-              <p class="dashboard-strip-label">Automated sizing effort (MD)</p>
-              <div class="dashboard-effort-cards">
-                <div class="dashboard-card">
-                  <span id="metricInitialMd">0</span>
-                  <label>Total Initial MD</label>
-                  <small>Automated sizing baseline</small>
-                </div>
-                <div class="dashboard-card">
-                  <span id="metricValidatedMd">0</span>
-                  <label>Total Validated MD</label>
-                  <small>Current owner-adjusted estimate</small>
-                </div>
-                <div class="dashboard-card delta">
-                  <span id="metricMdDelta">0</span>
-                  <label>MD Delta</label>
-                  <small>Validated minus initial MD</small>
-                </div>
-              </div>
+              <span class="dashboard-strip-label">Sizing effort (MD)</span>
+              <span class="dashboard-strip-stat"><b id="metricInitialMd">0</b> initial</span>
+              <span class="dashboard-strip-divider" aria-hidden="true"></span>
+              <span class="dashboard-strip-stat"><b id="metricValidatedMd">0</b> validated</span>
+              <span class="dashboard-strip-divider" aria-hidden="true"></span>
+              <span class="dashboard-strip-stat delta"><b id="metricMdDelta">0</b> delta</span>
             </div>
 
             <div id="dashboardEmptyState"></div>
 
             <div class="dashboard-section-grid">
-              <section class="dashboard-section dashboard-section-wide" aria-labelledby="executiveAttentionHeading">
+              <section class="dashboard-section dashboard-section-wide" aria-labelledby="topReadinessGapsHeading">
                 <div class="dashboard-section-title">
                   <div>
                     <p class="eyebrow">Leadership focus</p>
-                    <h4 id="executiveAttentionHeading">Executive Attention Required</h4>
+                    <h4 id="topReadinessGapsHeading">What Needs Attention</h4>
+                    <p class="section-help">The most urgent gap per opportunity, with the next action to close it.</p>
                   </div>
                   <span id="metricBlockers" class="section-count">0 blockers</span>
                 </div>
-                <div id="executiveAttentionList" class="dashboard-list"></div>
+                <div id="topReadinessGaps" class="dashboard-list"></div>
               </section>
 
               <section class="dashboard-section" aria-labelledby="pendingValidationsHeading">
@@ -219,16 +208,6 @@
                   </div>
                 </div>
                 <div id="functionBottlenecks" class="bottleneck-list"></div>
-              </section>
-
-              <section class="dashboard-section" aria-labelledby="topReadinessGapsHeading">
-                <div class="dashboard-section-title">
-                  <div>
-                    <p class="eyebrow">Readiness drivers</p>
-                    <h4 id="topReadinessGapsHeading">Top Readiness Gaps</h4>
-                  </div>
-                </div>
-                <div id="topReadinessGaps" class="dashboard-list compact"></div>
               </section>
 
               <section class="dashboard-section dashboard-section-wide" aria-labelledby="forumReadinessHeading">

@@ -167,33 +167,6 @@ function renderExecutiveDashboard() {
   if (elements.srmCount) elements.srmCount.textContent = visible.filter((opportunity) => opportunity.current_governance_stage === "SRM").length;
   if (elements.babCount) elements.babCount.textContent = visible.filter((opportunity) => opportunity.current_governance_stage === "BAB").length;
 
-  if (elements.executiveNextActions) {
-    const prioritized = visible
-      .map((opportunity) => ({
-        opportunity,
-        action: recommendedNextAction(opportunity),
-        pending: validationRequestsFor(opportunity.id).filter((request) => actionableValidationStatuses().includes(request.status)).length,
-        blockers: openBlockersFor(opportunity).length,
-        score: readiness(opportunity),
-      }))
-      .sort((a, b) => b.blockers - a.blockers || b.pending - a.pending || a.score - b.score)
-      .slice(0, 3);
-
-    elements.executiveNextActions.innerHTML = prioritized.length
-      ? prioritized
-          .map(
-            (item) => `
-        <button type="button" class="executive-action-card" data-id="${escapeHtml(item.opportunity.id)}">
-          <span>${escapeHtml(item.opportunity.current_governance_stage)} - ${readiness(item.opportunity)}% ready</span>
-          <strong>${escapeHtml(item.opportunity.name)}</strong>
-          <small>${escapeHtml(item.action.title)} - ${item.pending} pending validations</small>
-        </button>
-      `,
-          )
-          .join("")
-      : "";
-  }
-
   if (elements.dashboardEmptyState) {
     elements.dashboardEmptyState.innerHTML = visible.length
       ? ""
@@ -213,78 +186,16 @@ function renderExecutiveDashboard() {
         context.request.id,
       )}">
         <span class="dashboard-row-main">
-            <strong>${escapeHtml(requestActionLabel(context))}</strong>
-          <small>${escapeHtml(context.estimate.product_name)} - ${escapeHtml(context.estimate.workstream)} - ${escapeHtml(
-            context.owner?.email || ownerEmail(context.estimate.owner_id),
-          )}</small>
+          <strong>${escapeHtml(context.opportunity.name)}</strong>
+          <small>${escapeHtml(context.estimate.product_name)} - ${escapeHtml(context.estimate.workstream)} - ${escapeHtml(requestActionLabel(context))}</small>
         </span>
-        <span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span>
-        <span class="row-metric">${escapeHtml(priority)} - ${escapeHtml(requestGovernanceImpact(context))}</span>
-        <small class="row-date">${escapeHtml(formatShortDate(context.request.due_date))} - ${escapeHtml(dueLabel)}</small>
+        <span class="dashboard-row-meta">
+          <span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span>
+          <span class="row-metric">${escapeHtml(priority)} - ${escapeHtml(requestGovernanceImpact(context))}</span>
+          <small class="row-date">${escapeHtml(formatShortDate(context.request.due_date))} - ${escapeHtml(dueLabel)}</small>
+        </span>
       </button>`;
   };
-
-  if (elements.executiveAttentionList) {
-    const attentionItems = visible
-      .map((opportunity) => {
-        const opportunityTotals = dashboardTotalsForOpportunity(opportunity.id);
-        const opportunityBlockers = openBlockersFor(opportunity);
-        const opportunityPending = pendingRequests.filter((context) => context.opportunity.id === opportunity.id).length;
-        const opportunityOverdue = overdueRequests.filter((context) => context.opportunity.id === opportunity.id).length;
-        const srmReady = readyForumStatuses.includes(forumReadinessDetail(opportunity, "SRM").status);
-        const babReady = readyForumStatuses.includes(forumReadinessDetail(opportunity, "BAB").status);
-        const deadlineIn = daysUntil(opportunity.submission_deadline);
-        const score = readiness(opportunity);
-        const reasons = [];
-
-        if (opportunityBlockers.length) reasons.push(pluralize(opportunityBlockers.length, "blocker"));
-        if (!srmReady) reasons.push("SRM not ready");
-        if (!babReady) reasons.push("BAB not ready");
-        if (opportunityOverdue) reasons.push(pluralize(opportunityOverdue, "overdue validation"));
-        if (opportunityPending) reasons.push(pluralize(opportunityPending, "pending validation"));
-        if (deadlineIn <= 21) reasons.push(`deadline in ${deadlineIn}d`);
-        if (!reasons.length && score < 70) reasons.push("readiness below target");
-
-        return {
-          opportunity,
-          reasons,
-          score,
-          deadlineIn,
-          opportunityPending,
-          opportunityOverdue,
-          opportunityTotals,
-          priority:
-            opportunityBlockers.length * 8 +
-            opportunityOverdue * 6 +
-            (!srmReady ? 4 : 0) +
-            (!babReady ? 3 : 0) +
-            (deadlineIn <= 14 ? 4 : deadlineIn <= 21 ? 2 : 0) +
-            Math.max(0, 70 - score) / 10,
-        };
-      })
-      .filter((item) => item.reasons.length)
-      .sort((a, b) => b.priority - a.priority || a.deadlineIn - b.deadlineIn)
-      .slice(0, 5);
-
-    elements.executiveAttentionList.innerHTML = attentionItems.length
-      ? attentionItems
-          .map(
-            (item) => `
-        <button type="button" class="dashboard-row attention-row" data-id="${escapeHtml(item.opportunity.id)}">
-          <span class="dashboard-row-main">
-            <strong>${escapeHtml(item.opportunity.name)}</strong>
-            <small>${escapeHtml(item.opportunity.customer)} - ${escapeHtml(item.opportunity.current_governance_stage)} - ${
-              item.score
-            }% ready</small>
-          </span>
-          <span class="row-reason">${escapeHtml(item.reasons.slice(0, 3).join(" / "))}</span>
-          <span class="row-metric">${item.opportunityPending} pending</span>
-          <span class="row-metric">${item.opportunityTotals.delta > 0 ? "+" : ""}${formatNumber(item.opportunityTotals.delta)} MD</span>
-        </button>`,
-          )
-          .join("")
-      : emptyDashboard("No executive attention items in the current filter.");
-  }
 
   if (elements.pendingValidationList) {
     elements.pendingValidationList.innerHTML = pendingRequests
