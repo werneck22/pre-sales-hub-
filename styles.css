@@ -3731,8 +3731,30 @@ button:disabled {
   gap: 8px;
 }
 
-.scope-comment {
-  grid-column: span 2;
+.scope-readout {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.scope-readout.ready {
+  border-style: solid;
+  border-color: #b8d8c4;
+  color: var(--green);
+  background: #f0faf2;
+}
+
+.scope-readout.attention {
+  border-style: solid;
+  border-color: #e9bbb7;
+  color: var(--red);
+  background: #fff4f3;
 }
 
 .readiness-breakdown {
@@ -5201,10 +5223,6 @@ tbody th {
     grid-template-columns: 1fr;
   }
 
-  .scope-comment {
-    grid-column: auto;
-  }
-
   .section-heading {
     align-items: flex-start;
     flex-direction: column;
@@ -5640,6 +5658,68 @@ tbody th {
   margin-top: 6px;
   padding-top: 14px;
   border-top: 1px solid var(--line);
+}
+
+.notification-section-details {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+}
+
+.notification-section-details > summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  list-style: none;
+}
+
+.notification-section-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.notification-section-details > summary::after {
+  content: "Show";
+  flex: 0 0 auto;
+  align-self: center;
+  color: var(--teal-dark);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.notification-section-details[open] > summary::after {
+  content: "Hide";
+}
+
+.notification-section-details > div {
+  padding: 0 14px 14px;
+}
+
+.validation-queue-details {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+}
+
+.validation-queue-details > summary {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.validation-queue-details > summary strong {
+  font-size: 0.86rem;
+}
+
+.validation-queue-details > summary small {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.validation-queue-details .validation-workflow-board {
+  padding: 0 14px 14px;
 }
 
 .reference-registry {

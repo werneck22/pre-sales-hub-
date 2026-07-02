@@ -306,9 +306,6 @@ function openBlockersFor(opportunity) {
   validationsFor(opportunity.id)
     .filter((item) => item.required && item.status === "Blocked")
     .forEach((validation) => blockers.push(`Stakeholder blocked: ${validation.function}`));
-  productScopesFor(opportunity.id)
-    .filter((item) => item.validation_status === "Blocked")
-    .forEach((scope) => blockers.push(`Product blocked: ${scope.product_name}`));
   sizingEstimatesFor(opportunity.id)
     .filter((item) => ["Rejected", "Overdue"].includes(item.status))
     .forEach((estimate) => blockers.push(`Sizing ${estimate.status.toLowerCase()}: ${estimate.product_name} ${estimate.workstream}`));
@@ -324,16 +321,19 @@ function openBlockersFor(opportunity) {
 }
 
 function productValidationReadiness(opportunity) {
-  const scopes = productScopesFor(opportunity.id);
+  // Scored from real sizing-estimate/owner-validation status only. The manual
+  // scope-level Sizing/Validation fields were removed from Product Scope
+  // (see renderProductScope) because they let readiness be marked complete
+  // without any resource owner actually validating anything.
   const estimates = sizingEstimatesFor(opportunity.id);
-  const scopeScores = scopes.map((scope) => (validationScore(scope.validation_status) + validationScore(scope.sizing_status)) / 2);
   const contexts = validationRequestContexts([opportunity]);
   const estimateScores = estimates.map((estimate) => {
     const context = contexts.find((item) => item.estimate.id === estimate.id);
     return validationScore(context?.effectiveStatus || estimate.status);
   });
-  const scores = [...scopeScores, ...estimateScores];
-  const score = scores.length ? Math.round((scores.reduce((sum, value) => sum + value, 0) / scores.length) * 100) : 0;
+  const score = estimateScores.length
+    ? Math.round((estimateScores.reduce((sum, value) => sum + value, 0) / estimateScores.length) * 100)
+    : 0;
   const pending = contexts.filter(requestNeedsOwnerAction).length;
   const overdue = contexts.filter(requestIsOverdue).length;
   const needsAdjustment = contexts.filter((context) => context.effectiveStatus === "Needs Adjustment").length;

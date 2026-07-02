@@ -504,7 +504,7 @@
                     <h3>Validation command center</h3>
                     <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Route sizing packages to the correct owners, capture responses, preview notifications, and close the validated MD baseline.</p>
+                  <p class="section-help">Route sizing packages to the correct owners, capture responses, preview notifications, and close the validated MD baseline. This is the technical, per-product/workstream validation - for function-level sign-off (Sales, Legal, Pricing...) see Stakeholders.</p>
                 </div>
                 <span class="meta-chip">Simulated workflow</span>
               </div>
@@ -598,17 +598,19 @@
                   </div>
                   <div id="validationRequestList" class="request-list" data-route-view="validation"></div>
 
-                  <div class="subsection-heading notification-section-heading" data-route-view="validation">
-                    <div>
-                      <div class="title-with-help compact-title">
-                        <h4>Owner notification and activity</h4>
-                        <button type="button" class="help-tooltip" data-help-key="notificationPreview" data-help-label="Notification preview"><span aria-hidden="true">i</span></button>
+                  <details class="notification-section-details" data-route-view="validation">
+                    <summary class="subsection-heading notification-section-heading">
+                      <div>
+                        <div class="title-with-help compact-title">
+                          <h4>Owner notification and activity</h4>
+                          <button type="button" class="help-tooltip" data-help-key="notificationPreview" data-help-label="Notification preview"><span aria-hidden="true">i</span></button>
+                        </div>
+                        <p class="subsection-help">Preview Email or Teams for the selected validation package and record local trigger activity. Nothing is sent externally.</p>
                       </div>
-                      <p class="subsection-help">Preview Email or Teams for the selected validation package and record local trigger activity. Nothing is sent externally.</p>
-                    </div>
-                    <span class="meta-chip">Preview only</span>
-                  </div>
-                  <div id="notificationPreview" data-route-view="validation"></div>
+                      <span class="meta-chip">Preview only</span>
+                    </summary>
+                    <div id="notificationPreview"></div>
+                  </details>
 
                   <details class="reference-registry" data-route-view="validation">
                     <summary>Resource owner registry</summary>
@@ -669,8 +671,8 @@
               <div class="section-heading">
                 <div>
                   <p class="eyebrow">Stakeholders</p>
-                  <h3>Validation matrix</h3>
-                  <p class="section-help">Track required stakeholder validation for product, delivery, pricing, support, legal, and governance readiness.</p>
+                  <h3>Function sign-off matrix</h3>
+                  <p class="section-help">Track internal sign-off by function - Sales, Solution Consulting, Product, Delivery, Pricing, Support, Legal. This is separate from the per-product sizing validation in Resource Validation.</p>
                 </div>
                 <span class="meta-chip">Click a status to cycle</span>
               </div>
