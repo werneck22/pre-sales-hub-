@@ -156,7 +156,7 @@ function runSizingForSelected() {
     scrollToSection("#scope");
     return;
   }
-  generateSizingForOpportunity(selectedId, { preserveExisting: false });
+  generateSizingForOpportunity(selectedId);
   if (selectedId === DEMO_OPPORTUNITY_ID && demoMode) applyDemoValidationOverrides();
   setEstimateProductFilter("all");
   setEstimateStatusFilter("all");
@@ -164,7 +164,7 @@ function runSizingForSelected() {
   const estimateCount = sizingEstimatesFor(selectedId).length;
   const requestCount = validationRequestsFor(selectedId).length;
   renderAll();
-  showToast(`Sizing generated: ${estimateCount} estimates and ${requestCount} validation requests created.`);
+  showToast(`Sizing refreshed: ${estimateCount} estimates and ${requestCount} validation requests. Existing owner validations were kept.`);
 }
 
 function executeJourneyAction(action, target, stepIndex) {
