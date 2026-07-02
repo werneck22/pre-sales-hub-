@@ -7,9 +7,7 @@ import {
   PRODUCT_NAMES,
   RISK_LEVELS,
   SCOPE_STATUSES,
-  SIZING_STATUSES,
   VALIDATION_REQUEST_STATUSES,
-  VALIDATION_STATUSES,
   WORKSTREAMS,
   benchmarkSignal,
   benchmarksForCategory,
@@ -981,6 +979,23 @@ function renderScopeDriverControls(scope, airportCategory, selected) {
   `;
 }
 
+function productSizingRollup(opportunityId, productName) {
+  const estimates = sizingEstimatesFor(opportunityId).filter((estimate) => estimate.product_name === productName);
+  if (!estimates.length) {
+    return { sizing: "Not sized yet", validation: "Run Automated Sizing first", tone: "" };
+  }
+  const approved = estimates.filter((estimate) => ["Approved", "Approved with Conditions"].includes(estimate.status)).length;
+  const rejected = estimates.filter((estimate) => estimate.status === "Rejected").length;
+  const overdue = estimates.filter((estimate) => estimate.status === "Overdue").length;
+  const tone = rejected || overdue ? "attention" : approved === estimates.length ? "ready" : "";
+  const flags = [rejected ? `${rejected} rejected` : "", overdue ? `${overdue} overdue` : ""].filter(Boolean).join(", ");
+  return {
+    sizing: `${pluralize(estimates.length, "estimate")} generated`,
+    validation: `${approved}/${estimates.length} approved${flags ? ` - ${flags}` : ""}`,
+    tone,
+  };
+}
+
 function renderProductScope(opportunity) {
   const scopes = productScopesFor(opportunity.id);
   const profile = airportProfileFor(opportunity.id);
@@ -1013,6 +1028,7 @@ function renderProductScope(opportunity) {
       comments: "",
       sizing_inputs: defaultSizingInputs(productName, airportCategory),
     };
+    const rollup = selected ? productSizingRollup(opportunity.id, productName) : null;
     const productCard = document.createElement("div");
     productCard.className = `product-card ${selected ? "included" : ""}`;
     productCard.innerHTML = `
@@ -1032,24 +1048,14 @@ function renderProductScope(opportunity) {
         </label>
         <label>
           Sizing
-          <select data-scope-product="${escapeHtml(productName)}" data-field="sizing_status" ${selected ? "" : "disabled"}>
-            ${statusOptions(SIZING_STATUSES, displayScope.sizing_status)}
-          </select>
+          <span class="scope-readout ${rollup ? rollup.tone : ""}">${rollup ? escapeHtml(rollup.sizing) : "-"}</span>
         </label>
         <label>
           Validation
-          <select data-scope-product="${escapeHtml(productName)}" data-field="validation_status" ${selected ? "" : "disabled"}>
-            ${statusOptions(VALIDATION_STATUSES, displayScope.validation_status)}
-          </select>
+          <span class="scope-readout ${rollup ? rollup.tone : ""}">${rollup ? escapeHtml(rollup.validation) : "-"}</span>
         </label>
         <label>
-          Owner
-          <input type="text" data-scope-product="${escapeHtml(productName)}" data-field="owner" value="${escapeHtml(displayScope.owner)}" ${
-      selected ? "" : "disabled"
-    } />
-        </label>
-        <label>
-          Owner email
+          Owner email override
           <input type="email" data-scope-product="${escapeHtml(productName)}" data-field="owner_email" value="${escapeHtml(displayScope.owner_email)}" ${
       selected ? "" : "disabled"
     } />
@@ -1059,12 +1065,6 @@ function renderProductScope(opportunity) {
           <select data-scope-product="${escapeHtml(productName)}" data-field="risk_level" ${selected ? "" : "disabled"}>
             ${statusOptions(RISK_LEVELS, displayScope.risk_level)}
           </select>
-        </label>
-        <label class="scope-comment">
-          Comments
-          <input type="text" data-scope-product="${escapeHtml(productName)}" data-field="comments" value="${escapeHtml(displayScope.comments)}" ${
-      selected ? "" : "disabled"
-    } />
         </label>
       </div>
       ${renderScopeDriverControls(displayScope, airportCategory, selected)}
@@ -1583,12 +1583,13 @@ function renderValidationRequests(opportunity) {
       </div>
     </section>
 
-    <div class="validation-queue-heading">
-      <div><span class="log-type">Line-level queue</span><strong>Validation decisions</strong></div>
-      <small>Select a line to review assumptions, notify the owner, and record the response.</small>
-    </div>
-
-    <div class="validation-workflow-board">
+    <details class="validation-queue-details">
+      <summary>
+        <span class="log-type">Line-level queue</span>
+        <strong>Validation decisions</strong>
+        <small>Alternate view of the same requests, grouped by state instead of by owner. Select a line to review assumptions, notify the owner, and record the response.</small>
+      </summary>
+      <div class="validation-workflow-board">
       ${lanes
         .map((lane) => {
           const laneContexts = contexts
@@ -1631,7 +1632,8 @@ function renderValidationRequests(opportunity) {
       `;
         })
         .join("")}
-    </div>
+      </div>
+    </details>
 
     <aside class="request-detail-card">
       <div>
