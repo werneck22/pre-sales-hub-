@@ -7,6 +7,12 @@ const PRODUCT_NAMES = [
   "DDS/FIDS",
   "Integrations / APIs",
   "Support / Field Services",
+  "Seamless GT 11 One Door Non Biometric Hardware",
+  "Seamless GT 11 + Seamless Journey Platform Lite",
+  "Seamless GT 11 + Seamless Journey Platform",
+  "Seamless GT 11 + Biopod",
+  "Amadeus Passenger Verification",
+  "Baggage Reconciliation System",
 ];
 
 const GOVERNANCE_FORUMS = ["BCM", "SRM", "BAB"];
@@ -112,6 +118,12 @@ const productRuleCodes = {
   "DDS/FIDS": "DDS",
   "Integrations / APIs": "API",
   "Support / Field Services": "SUP",
+  "Seamless GT 11 One Door Non Biometric Hardware": "GT11-NB",
+  "Seamless GT 11 + Seamless Journey Platform Lite": "GT11-SJPL",
+  "Seamless GT 11 + Seamless Journey Platform": "GT11-SJP",
+  "Seamless GT 11 + Biopod": "GT11-BIOPOD",
+  "Amadeus Passenger Verification": "APV",
+  "Baggage Reconciliation System": "BRS",
 };
 
 const workstreamRuleCodes = {
@@ -224,6 +236,65 @@ const productWorkstreamBase = {
     "Field Services": 16,
     Training: 4,
   },
+  "Seamless GT 11 One Door Non Biometric Hardware": {
+    Implementation: 14,
+    "R&D": 6,
+    "Project Management": 6,
+    "Airline Onboarding": 6,
+    "Testing & Cutover": 6,
+    Training: 3,
+    "Support Readiness": 4,
+  },
+  "Seamless GT 11 + Seamless Journey Platform Lite": {
+    Implementation: 18,
+    "R&D": 10,
+    "Project Management": 8,
+    "Airline Onboarding": 8,
+    Integrations: 8,
+    "Testing & Cutover": 8,
+    Training: 4,
+    "Support Readiness": 5,
+  },
+  "Seamless GT 11 + Seamless Journey Platform": {
+    Implementation: 24,
+    "R&D": 14,
+    "Project Management": 10,
+    "Airline Onboarding": 9,
+    Integrations: 12,
+    "Testing & Cutover": 9,
+    Training: 5,
+    "Support Readiness": 6,
+  },
+  "Seamless GT 11 + Biopod": {
+    Implementation: 20,
+    "R&D": 18,
+    "Project Management": 9,
+    "Airline Onboarding": 8,
+    Integrations: 14,
+    "Testing & Cutover": 9,
+    Training: 4,
+    "Support Readiness": 6,
+  },
+  "Amadeus Passenger Verification": {
+    Implementation: 12,
+    "R&D": 14,
+    "Project Management": 7,
+    "Airline Onboarding": 5,
+    Integrations: 16,
+    "Testing & Cutover": 8,
+    Training: 3,
+    "Support Readiness": 5,
+  },
+  "Baggage Reconciliation System": {
+    Implementation: 16,
+    "R&D": 10,
+    "Project Management": 10,
+    Integrations: 16,
+    "Testing & Cutover": 8,
+    Training: 5,
+    "Support Readiness": 6,
+    "Field Services": 6,
+  },
 };
 
 const productSizingDrivers = {
@@ -257,6 +328,13 @@ const productSizingDrivers = {
       unit: "kiosks",
       defaults: { Small: 8, Medium: 38, Large: 86, "Extra Large": 140 },
       weight: 0.35,
+    },
+    {
+      key: "cuss_baggage_drops",
+      label: "Amadeus Baggage Drops",
+      unit: "bag drops",
+      defaults: { Small: 4, Medium: 14, Large: 36, "Extra Large": 64 },
+      weight: 0.25,
     },
   ],
   SBD: [
@@ -332,6 +410,60 @@ const productSizingDrivers = {
       unit: "days",
       defaults: { Small: 5, Medium: 10, Large: 18, "Extra Large": 28 },
       weight: 0.25,
+    },
+  ],
+  "Seamless GT 11 One Door Non Biometric Hardware": [
+    {
+      key: "gt11_nb_doors",
+      label: "GT11 door units",
+      unit: "doors",
+      defaults: { Small: 6, Medium: 24, Large: 60, "Extra Large": 100 },
+      weight: 0.35,
+    },
+  ],
+  "Seamless GT 11 + Seamless Journey Platform Lite": [
+    {
+      key: "gt11_sjpl_doors",
+      label: "GT11 door units",
+      unit: "doors",
+      defaults: { Small: 6, Medium: 22, Large: 55, "Extra Large": 95 },
+      weight: 0.3,
+    },
+  ],
+  "Seamless GT 11 + Seamless Journey Platform": [
+    {
+      key: "gt11_sjp_doors",
+      label: "GT11 door units",
+      unit: "doors",
+      defaults: { Small: 6, Medium: 20, Large: 50, "Extra Large": 90 },
+      weight: 0.3,
+    },
+  ],
+  "Seamless GT 11 + Biopod": [
+    {
+      key: "gt11_biopod_units",
+      label: "Biopod units",
+      unit: "pods",
+      defaults: { Small: 4, Medium: 16, Large: 40, "Extra Large": 70 },
+      weight: 0.4,
+    },
+  ],
+  "Amadeus Passenger Verification": [
+    {
+      key: "apv_integrations",
+      label: "Verification integrations",
+      unit: "integrations",
+      defaults: { Small: 2, Medium: 4, Large: 8, "Extra Large": 14 },
+      weight: 0.35,
+    },
+  ],
+  "Baggage Reconciliation System": [
+    {
+      key: "brs_endpoints",
+      label: "BRS endpoints",
+      unit: "endpoints",
+      defaults: { Small: 3, Medium: 8, Large: 18, "Extra Large": 30 },
+      weight: 0.3,
     },
   ],
 };
