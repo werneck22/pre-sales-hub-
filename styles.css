@@ -5520,7 +5520,10 @@ tbody th {
   gap: 2px;
 }
 
-.owner-package-main strong,
+.owner-package-main strong {
+  overflow-wrap: break-word;
+}
+
 .owner-package-main small {
   overflow: hidden;
   text-overflow: ellipsis;
