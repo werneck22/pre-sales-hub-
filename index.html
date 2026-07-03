@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260703-1" />
+    <link rel="stylesheet" href="./styles.css?v=20260703-2" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -482,10 +482,10 @@
                 <div>
                   <p class="eyebrow">Resource owner workflow</p>
                   <div class="title-with-help">
-                    <h3>Validation command center</h3>
+                    <h3>Resource validation</h3>
                     <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Route sizing packages to the correct owners, capture responses, preview notifications, and close the validated MD baseline. This is the technical, per-product/workstream validation - for function-level sign-off (Sales, Legal, Pricing...) see Stakeholders.</p>
+                  <p class="section-help">Each product/workstream sizing line is routed to a resource owner for sign-off. Review the queue, select a line, and record the owner decision. For function-level sign-off (Sales, Legal, Pricing...) see Stakeholders.</p>
                 </div>
                 <span class="meta-chip">Simulated workflow</span>
               </div>
@@ -567,16 +567,6 @@
                   </div>
                   <div id="sizingEstimateTable" class="matrix-wrap" data-route-view="sizing"></div>
 
-                  <div class="subsection-heading" data-route-view="validation">
-                    <div>
-                      <div class="title-with-help compact-title">
-                        <h4>Owner queues and responses</h4>
-                        <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
-                      </div>
-                      <p class="subsection-help">Prepare the validation plan, route work to resource owners, resolve exceptions, and confirm the final sizing baseline.</p>
-                    </div>
-                    <span class="meta-chip">Simulated workflow</span>
-                  </div>
                   <div id="validationRequestList" class="request-list" data-route-view="validation"></div>
 
                   <details class="notification-section-details" data-route-view="validation">

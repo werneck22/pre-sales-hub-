@@ -57,6 +57,7 @@ import {
   setSelectedValidationRequestId,
   sizingEstimatesFor,
   updateRouteChrome,
+  validationQueueFilter,
   validationRequestsFor,
   validationsFor,
 } from "./state.js";
@@ -1376,12 +1377,6 @@ function renderValidationRequests(opportunity) {
   const validationComplete = pendingCount === 0 && exceptionCount === 0;
   const closeComplete = finalCount === requests.length && validationComplete;
   const currentStage = !contexts.length ? "Prepare" : !routesComplete ? "Route" : !validationComplete ? "Validate" : "Close";
-  const validationStages = [
-    { name: "Prepare", detail: `${contexts.length} sizing lines`, complete: contexts.length > 0 },
-    { name: "Route", detail: routesComplete ? "All owners assigned" : "Owner assignment required", complete: routesComplete },
-    { name: "Validate", detail: validationComplete ? "All responses resolved" : `${pendingCount + exceptionCount} owner actions`, complete: validationComplete },
-    { name: "Close", detail: `${finalCount}/${requests.length} final MD`, complete: closeComplete },
-  ];
   const stageGuidance = {
     Prepare: "Generate the sizing baseline before creating owner requests.",
     Route: "Resolve missing owners or email addresses before triggering validation.",
@@ -1417,134 +1412,114 @@ function renderValidationRequests(opportunity) {
     }))
     .sort((a, b) => b.overdue - a.overdue || b.exceptions - a.exceptions || b.pending - a.pending || b.md - a.md);
 
+  const filterDefs = [
+    { key: "all", label: "All lines", match: () => true },
+    { key: "attention", label: "Needs action", match: (context) => lanes[0].statuses.includes(context.effectiveStatus) },
+    { key: "conditional", label: "Conditional", match: (context) => context.effectiveStatus === "Approved with Conditions" },
+    { key: "approved", label: "Approved", match: (context) => context.effectiveStatus === "Approved" },
+  ];
+  const activeFilter = filterDefs.find((item) => item.key === validationQueueFilter) || filterDefs[0];
+  const productGroups = new Map();
+  contexts.forEach((context) => {
+    const key = context.estimate.product_name;
+    const group = productGroups.get(key) || { product: key, contexts: [], md: 0, pending: 0, conditional: 0 };
+    group.contexts.push(context);
+    group.md += Number(context.estimate.initial_md || 0);
+    if (lanes[0].statuses.includes(context.effectiveStatus)) group.pending += 1;
+    if (context.effectiveStatus === "Approved with Conditions") group.conditional += 1;
+    productGroups.set(key, group);
+  });
+  const groupRows = Array.from(productGroups.values()).sort(
+    (a, b) => b.pending - a.pending || b.conditional - a.conditional || a.product.localeCompare(b.product),
+  );
+  const visibleLineCount = contexts.filter(activeFilter.match).length;
+
   elements.validationRequestList.innerHTML = `
-    <section class="validation-stage-strip" aria-label="Validation workflow stages">
-      ${validationStages
-        .map(
-          (stage, index) => `
-        <div class="validation-stage ${stage.complete ? "complete" : stage.name === currentStage ? "current" : "pending"}">
-          <span>${index + 1}</span>
-          <div><strong>${stage.name}</strong><small>${escapeHtml(stage.detail)}</small></div>
-          <em>${stage.complete ? "Complete" : stage.name === currentStage ? "Current" : "Next"}</em>
-        </div>`,
-        )
-        .join("")}
-    </section>
-
-    <section class="validation-stage-callout ${closeComplete ? "complete" : "attention"}">
-      <div>
-        <span class="log-type">Current workflow step</span>
-        <strong>${escapeHtml(currentStage)}</strong>
-        <p>${escapeHtml(stageGuidance[currentStage])}</p>
+    <section class="validation-summary-bar ${closeComplete ? "complete" : "attention"}" aria-label="Validation progress summary">
+      <div class="validation-summary-copy">
+        <span class="log-type">Current step: ${escapeHtml(currentStage)}</span>
+        <strong>${closeComplete ? "Validation baseline complete" : escapeHtml(stageGuidance[currentStage])}</strong>
       </div>
-      <div class="validation-close-metric">
-        <strong>${unresolvedCount}</strong>
-        <span>responses remaining</span>
-      </div>
-      <div class="validation-close-metric">
-        <strong>${formatNumber(mdWaiting)}</strong>
-        <span>MD awaiting owner</span>
+      <div class="validation-summary-metrics">
+        <span><strong>${requests.length}</strong> sizing lines</span>
+        <span class="${pendingCount + exceptionCount ? "attention" : ""}"><strong>${pendingCount + exceptionCount}</strong> need action</span>
+        <span class="${overdueCount ? "attention" : ""}"><strong>${overdueCount}</strong> overdue</span>
+        <span><strong>${approvedCount}</strong> approved</span>
+        <span class="${mdWaiting ? "attention" : ""}"><strong>${formatNumber(mdWaiting)}</strong> MD awaiting owner</span>
       </div>
     </section>
 
-    <div class="validation-command-bar">
-      <div>
-        <span>${requests.length}</span>
-        <label>Total requests</label>
+    <section class="validation-queue-board" aria-label="Validation queue">
+      <div class="validation-queue-heading">
+        <div>
+          <span class="log-type">Validation queue</span>
+          <strong>What is being validated</strong>
+          <small>Every sizing line for this opportunity, grouped by product, with the resource owner who signs it off. Select a line to review and record the decision below.</small>
+        </div>
+        <span class="section-count">${pluralize(visibleLineCount, "line")}</span>
       </div>
-      <div class="${pendingCount ? "attention" : ""}">
-        <span>${pendingCount}</span>
-        <label>Owner action</label>
-      </div>
-      <div class="${exceptionCount ? "attention" : ""}">
-        <span>${exceptionCount}</span>
-        <label>Exceptions</label>
-      </div>
-      <div class="${overdueCount ? "attention" : ""}">
-        <span>${overdueCount}</span>
-        <label>Overdue</label>
-      </div>
-      <div class="${mdWaiting ? "attention" : ""}">
-        <span>${formatNumber(mdWaiting)}</span>
-        <label>MD awaiting owner</label>
-      </div>
-      <div>
-        <span>${approvedCount}</span>
-        <label>Approved / conditional</label>
-      </div>
-    </div>
-
-    <section class="owner-package-board">
-      <div class="owner-package-heading">
-        <div><span class="log-type">Validation plan</span><strong>Owner packages</strong><small>One consolidated owner view with line-level decisions preserved.</small></div>
-        <span class="section-count">${packageRows.length} owners</span>
-      </div>
-      <div class="owner-package-grid">
-        ${packageRows
+      <div class="validation-queue-filters" role="group" aria-label="Filter validation lines by status">
+        ${filterDefs
           .map((item) => {
-            const status = item.overdue ? "Escalate" : item.exceptions ? "Exception" : item.pending ? "Requires action" : item.conditional ? "Conditional" : "Completed";
-            const tone = item.overdue || item.exceptions ? "critical" : item.pending || item.conditional ? "attention" : "ready";
-            return `
-          <button type="button" class="owner-package ${tone}" data-request-id="${escapeHtml(item.primary.request.id)}">
-            <span class="owner-package-main"><strong>${escapeHtml(item.owner?.name || "Owner not assigned")}</strong><small>${pluralize(item.contexts.length, "sizing line")} - ${formatNumber(item.md)} MD - ${item.dueIn < 0 ? `${Math.abs(item.dueIn)}d overdue` : `due in ${item.dueIn}d`}</small></span>
-            <span class="status-pill ${statusClass(tone)}">${escapeHtml(status)}</span>
-          </button>`;
+            const count = contexts.filter(item.match).length;
+            return `<button type="button" data-validation-filter="${item.key}" class="${item.key === activeFilter.key ? "active" : ""}">${escapeHtml(item.label)} (${count})</button>`;
           })
           .join("")}
       </div>
-    </section>
-
-    <details class="validation-queue-details">
-      <summary>
-        <span class="log-type">Line-level queue</span>
-        <strong>Validation decisions</strong>
-        <small>Alternate view of the same requests, grouped by state instead of by owner. Select a line to review assumptions, notify the owner, and record the response.</small>
-      </summary>
-      <div class="validation-workflow-board">
-      ${lanes
-        .map((lane) => {
-          const laneContexts = contexts
-            .filter((context) => lane.statuses.includes(context.effectiveStatus))
-            .sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn);
-          return `
-        <section class="validation-lane ${lane.tone}">
-          <div class="lane-heading">
-            <div><strong>${escapeHtml(lane.title)}</strong><small>${escapeHtml(lane.subtitle)}</small></div>
-            <span>${laneContexts.length}</span>
-          </div>
-          <div class="lane-items">
-            ${
-              laneContexts.length
-                ? laneContexts
-                    .slice(0, 8)
-                    .map((context) => {
-                      const priority = requestPriorityLabel(requestPriorityScore(context));
-                      return `
-              <button type="button" class="request-mini priority-${statusClass(priority)} ${
-                        context.request.id === selectedValidationRequestId ? "selected" : ""
-                      }" data-request-id="${escapeHtml(
-                        context.request.id,
-                      )}">
-                <span class="request-product">${escapeHtml(priority)} - ${escapeHtml(context.estimate.product_name)}</span>
-                <strong>${escapeHtml(context.estimate.workstream)}</strong>
-                <small>${escapeHtml(context.owner?.name || "Owner")} - ${escapeHtml(requestGovernanceImpact(context))}</small>
-                <small>${escapeHtml(formatShortDate(context.request.due_date))} - ${context.dueIn < 0 ? `${Math.abs(context.dueIn)}d overdue` : `due in ${context.dueIn}d`} - ${formatNumber(
-                        context.estimate.initial_md,
-                      )} MD</small>
-              </button>
-            `;
-                    })
-                    .join("")
-                : '<div class="lane-empty">No items</div>'
-            }
-            ${laneContexts.length > 8 ? `<span class="lane-more">+${laneContexts.length - 8} more</span>` : ""}
-          </div>
-        </section>
-      `;
-        })
-        .join("")}
+      <div class="validation-queue-scroll matrix-wrap">
+        <table class="validation-queue-table">
+          <thead>
+            <tr>
+              <th>Product / workstream</th>
+              <th>Resource owner</th>
+              <th>MD</th>
+              <th>Due</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${groupRows
+              .map((group) => {
+                const groupLines = group.contexts.filter(activeFilter.match);
+                if (!groupLines.length) return "";
+                const groupSummary = [
+                  group.pending ? `${group.pending} need action` : "",
+                  group.conditional ? `${group.conditional} conditional` : "",
+                  !group.pending && !group.conditional ? "all approved" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" - ");
+                return `
+              <tr class="queue-product-row ${group.pending ? "attention" : ""}">
+                <th colspan="5" scope="colgroup">${escapeHtml(group.product)} <span>${pluralize(group.contexts.length, "line")} - ${formatNumber(group.md)} MD - ${escapeHtml(groupSummary)}</span></th>
+              </tr>
+              ${groupLines
+                .map((context) => {
+                  const needsAction = lanes[0].statuses.includes(context.effectiveStatus);
+                  const tone = requestIsOverdue(context)
+                    ? "critical"
+                    : needsAction
+                      ? "attention"
+                      : context.effectiveStatus === "Approved with Conditions"
+                        ? "warning"
+                        : "ready";
+                  return `
+                <tr class="queue-line-row ${tone} ${context.request.id === selectedValidationRequestId ? "selected" : ""}" data-request-id="${escapeHtml(context.request.id)}" tabindex="0">
+                  <td><strong>${escapeHtml(context.estimate.workstream)}</strong></td>
+                  <td>${escapeHtml(context.owner?.name || "Owner not assigned")}</td>
+                  <td>${formatNumber(dashboardMdForEstimate(context.estimate))}</td>
+                  <td class="${context.dueIn < 0 ? "overdue-cell" : ""}">${escapeHtml(formatShortDate(context.request.due_date))} (${context.dueIn < 0 ? `${Math.abs(context.dueIn)}d overdue` : `${context.dueIn}d`})</td>
+                  <td><span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span></td>
+                </tr>`;
+                })
+                .join("")}`;
+              })
+              .join("")}
+          </tbody>
+        </table>
+        ${visibleLineCount ? "" : `<div class="empty-state"><strong>No lines match this filter.</strong><p>Switch back to "All lines" to see the full queue.</p></div>`}
       </div>
-    </details>
+    </section>
 
     <aside class="request-detail-card">
       <div>
@@ -1669,6 +1644,26 @@ function renderValidationRequests(opportunity) {
         ${selectedRequest?.comments ? `<div><span>Latest owner comment</span><p>${escapeHtml(selectedRequest.comments)}</p></div>` : ""}
       </div>
     </aside>
+
+    <details class="owner-workload-details">
+      <summary>
+        <strong>Owner workload view</strong>
+        <small>The same queue grouped by resource owner - ${pluralize(packageRows.length, "owner")}. Selecting an owner opens their most urgent line.</small>
+      </summary>
+      <div class="owner-package-grid">
+        ${packageRows
+          .map((item) => {
+            const status = item.overdue ? "Escalate" : item.exceptions ? "Exception" : item.pending ? "Requires action" : item.conditional ? "Conditional" : "Completed";
+            const tone = item.overdue || item.exceptions ? "critical" : item.pending || item.conditional ? "attention" : "ready";
+            return `
+          <button type="button" class="owner-package ${tone}" data-request-id="${escapeHtml(item.primary.request.id)}">
+            <span class="owner-package-main"><strong>${escapeHtml(item.owner?.name || "Owner not assigned")}</strong><small>${pluralize(item.contexts.length, "sizing line")} - ${formatNumber(item.md)} MD - ${item.dueIn < 0 ? `${Math.abs(item.dueIn)}d overdue` : `due in ${item.dueIn}d`}</small></span>
+            <span class="status-pill ${statusClass(tone)}">${escapeHtml(status)}</span>
+          </button>`;
+          })
+          .join("")}
+      </div>
+    </details>
 
     <section class="validation-closeout ${closeComplete ? "complete" : "attention"}">
       <div><span class="log-type">Final sizing closeout</span><strong>${closeComplete ? "Validation baseline complete" : `${unresolvedCount} response${unresolvedCount === 1 ? "" : "s"} still required`}</strong><p>${closeComplete ? "All sizing lines have final MD and can support governance preparation." : "Resolve the remaining owner actions before treating the MD baseline as final."}</p></div>
