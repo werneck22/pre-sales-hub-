@@ -192,6 +192,12 @@ let mockDb = {
     productScope("opp-dfw-04", "CUSS", "Draft", "Jordan Lee", "In review", "Medium", "58 kiosks, airline branding assumptions open."),
     productScope("opp-dfw-04", "AODB", "Draft", "AODB SME", "In review", "Medium", "Operational data feed needed for concourse visibility."),
     productScope("opp-dfw-04", "Integrations / APIs", "Draft", "Integration SME", "Pending", "High", "12 candidate interfaces; airline ownership unclear."),
+    productScope("opp-est-00", "Amadeus Passenger Verification", "Sized", "Biometrics Product Owner", "Validated", "Medium", "Passenger verification baseline aligned with medium airport defaults."),
+    productScope("opp-est-00", "Seamless GT 11 + Seamless Journey Platform Lite", "Sized", "Biometrics Product Owner", "Validated", "Medium", "Lite journey rollout scoped for the demo baseline terminal."),
+    productScope("opp-ams-01", "Seamless GT 11 + Seamless Journey Platform", "Draft", "Product owner", "In review", "High", "Full self-service journey pending airline participation model."),
+    productScope("opp-sin-02", "Baggage Reconciliation System", "Draft", "SBD product owner", "In review", "High", "BRS scope tied to bag drop interface dependencies."),
+    productScope("opp-gru-03", "Seamless GT 11 One Door Non Biometric Hardware", "Not started", "Camila Almeida", "Pending", "Medium", "One door hardware count pending incumbent discovery."),
+    productScope("opp-dfw-04", "Seamless GT 11 + Biopod", "Draft", "Jordan Lee", "In review", "High", "Biopod placement pending gate concourse survey."),
   ],
   stakeholderValidations: [
     makeValidation("opp-est-00", 0, { status: "Validated", due_date: "2026-06-24", comments: "Commercial context captured." }),

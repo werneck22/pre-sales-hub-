@@ -672,6 +672,12 @@ function buildResourceOwners() {
     resourceOwner("owner-cupps-implementation-emea", "CUPPS Implementation Owner", "Implementation", "cupps.implementation@example.com", "CUPPS", "EMEA", "Implementation", "Implementation Owner"),
     resourceOwner("owner-cuss-onboarding-emea", "CUSS Airline Onboarding Owner", "Airline Onboarding", "cuss.onboarding@example.com", "CUSS", "EMEA", "Airline Onboarding", "Airline Onboarding Owner"),
     resourceOwner("owner-integration-emea", "EMEA Integration Owner", "Integrations", "emea.integration@example.com", "Integrations / APIs", "EMEA", "Integrations", "Integration Owner"),
+    resourceOwner("owner-gt11-nb-rd-global", "GT11 Hardware R&D Owner", "R&D", "gt11.hardware.rd@example.com", "Seamless GT 11 One Door Non Biometric Hardware", "Global", "R&D", "R&D Owner"),
+    resourceOwner("owner-gt11-sjpl-integration-global", "Seamless Journey Lite Integration Owner", "Integrations", "sjp.lite.integration@example.com", "Seamless GT 11 + Seamless Journey Platform Lite", "Global", "Integrations", "Integration Owner"),
+    resourceOwner("owner-gt11-sjp-implementation-global", "Seamless Journey Platform Owner", "Implementation", "sjp.implementation@example.com", "Seamless GT 11 + Seamless Journey Platform", "Global", "Implementation", "Implementation Owner"),
+    resourceOwner("owner-gt11-biopod-rd-global", "Biopod R&D Owner", "R&D", "biopod.rd@example.com", "Seamless GT 11 + Biopod", "Global", "R&D", "R&D Owner"),
+    resourceOwner("owner-apv-integration-global", "Passenger Verification Integration Owner", "Integrations", "apv.integration@example.com", "Amadeus Passenger Verification", "Global", "Integrations", "Integration Owner"),
+    resourceOwner("owner-brs-field-global", "Baggage Reconciliation Field Owner", "Field Services", "brs.field@example.com", "Baggage Reconciliation System", "Global", "Field Services", "Field Services Owner"),
   );
 
   return owners;
