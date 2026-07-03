@@ -506,6 +506,20 @@
                   <input name="airport_name" type="text" />
                 </label>
                 <label>
+                  Airport code (IATA/ICAO)
+                  <input name="airport_code" type="text" maxlength="4" placeholder="GRU or SBGR" autocomplete="off" />
+                </label>
+                <div class="airport-lookup-bar span-2">
+                  <div class="airport-lookup-copy">
+                    <div class="context-help-title">
+                      <strong>Automated traffic lookup</strong>
+                      <button type="button" class="help-tooltip" data-help-key="airportLookup" data-help-label="Airport traffic lookup"><span aria-hidden="true">i</span></button>
+                    </div>
+                    <span id="airportLookupStatus">Traffic figures: manual entry.</span>
+                  </div>
+                  <button id="airportLookupBtn" class="secondary-button" type="button">Lookup airport data</button>
+                </div>
+                <label>
                   Annual passengers
                   <input name="annual_passengers" type="number" min="0" step="1000" />
                 </label>
@@ -757,6 +771,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260703-3"></script>
+    <script type="module" src="./modules/main.js?v=20260703-4"></script>
   </body>
 </html>

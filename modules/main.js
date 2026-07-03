@@ -64,6 +64,9 @@ import {
   renderValidationRequests,
 } from "./render.js";
 import {
+  lookupAirportData,
+} from "./airport-lookup.js";
+import {
   addProductScope,
   applyOwnerValidationAction,
   createOpportunity,
@@ -191,6 +194,7 @@ if (elements.airportProfileForm) {
 if (elements.runSizingBtn) {
   elements.runSizingBtn.addEventListener("click", runSizingForSelected);
 }
+elements.airportLookupBtn?.addEventListener("click", lookupAirportData);
 if (elements.estimateProductFilter) {
   elements.estimateProductFilter.addEventListener("change", () => {
     setEstimateProductFilter(elements.estimateProductFilter.value);

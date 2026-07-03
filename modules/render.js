@@ -96,6 +96,9 @@ import {
   readinessRuleResults,
   sizingReadinessImpact,
 } from "./readiness-rules.js";
+import {
+  trafficProvenanceText,
+} from "./airport-lookup.js";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -991,12 +994,14 @@ function renderAirportProfile(opportunity) {
   classifyAirport(profile);
   const form = elements.airportProfileForm;
   form.airport_name.value = profile.airport_name;
+  if (form.airport_code) form.airport_code.value = profile.airport_code || "";
   form.annual_passengers.value = profile.annual_passengers;
   form.annual_movements.value = profile.annual_movements;
   form.region.value = profile.region;
   form.categorization_override.value = profile.categorization_override;
   form.override_reason.value = profile.override_reason;
   elements.categoryBadge.textContent = `${profile.airport_category} - ${profile.categorization_method}`;
+  if (elements.airportLookupStatus) elements.airportLookupStatus.textContent = trafficProvenanceText(profile);
 }
 
 function renderClassificationRules() {

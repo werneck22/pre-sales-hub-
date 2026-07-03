@@ -335,6 +335,14 @@ function migrateMockDb(db) {
   ].forEach((collection) => {
     if (!Array.isArray(db[collection])) db[collection] = [];
   });
+  db.airportProfiles.forEach((profile) => {
+    profile.airport_code ||= "";
+    profile.traffic_source ||= "";
+    profile.traffic_source_label ||= "";
+    profile.traffic_source_year ||= "";
+    profile.traffic_retrieved_at ||= "";
+    profile.traffic_fetched_passengers ||= 0;
+  });
   return db;
 }
 
@@ -405,6 +413,8 @@ const elements = {
   intakeNarrativeSummary: document.querySelector("#intakeNarrativeSummary"),
   productScope: document.querySelector("#productScope"),
   airportProfileForm: document.querySelector("#airportProfileForm"),
+  airportLookupBtn: document.querySelector("#airportLookupBtn"),
+  airportLookupStatus: document.querySelector("#airportLookupStatus"),
   categoryBadge: document.querySelector("#categoryBadge"),
   classificationRules: document.querySelector("#classificationRules"),
   runSizingBtn: document.querySelector("#runSizingBtn"),

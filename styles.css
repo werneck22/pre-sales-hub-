@@ -6642,3 +6642,32 @@ textarea:focus-visible {
     overflow: visible;
   }
 }
+
+/* --- Airport traffic lookup ---------------------------------- */
+.airport-lookup-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border: 1px dashed rgba(15, 64, 173, 0.35);
+  border-radius: 8px;
+  background: rgba(15, 64, 173, 0.04);
+}
+
+.airport-lookup-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.airport-lookup-copy strong {
+  font-size: 0.82rem;
+}
+
+#airportLookupStatus {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}

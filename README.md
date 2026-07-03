@@ -12,6 +12,8 @@ Opportunity, sizing, validation, risk, and decision data is saved to the browser
 
 Deadline and overdue calculations use the real current date; the guided demo temporarily freezes the clock at the date its scenario was authored against. The sizing baseline can be exported as CSV from Automated Sizing, and the Business Case Pack can be exported as PDF via the browser print dialog.
 
+The airport profile supports an automated traffic lookup: enter an IATA (3-letter) or ICAO (4-letter) code and the app queries Wikidata's public SPARQL endpoint from the browser for the latest annual passenger figure. The result is recorded as an unverified suggestion with source, reference year, and retrieval date; aircraft movements still require manual entry, and figures should be confirmed against official statistics (ACI, Eurostat, ANAC, FAA/BTS) before governance use.
+
 ## What The Prototype Demonstrates
 
 - Opportunity intake and readiness evidence.

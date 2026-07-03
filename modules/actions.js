@@ -225,6 +225,7 @@ function syncAirportProfileFromForm() {
   const profile = airportProfileFor(selectedId);
   const data = new FormData(elements.airportProfileForm);
   profile.airport_name = data.get("airport_name").toString().trim() || selectedOpportunity().customer;
+  profile.airport_code = (data.get("airport_code") || "").toString().trim().toUpperCase();
   profile.annual_passengers = Number(data.get("annual_passengers")) || 0;
   profile.annual_movements = Number(data.get("annual_movements")) || 0;
   profile.region = data.get("region").toString();

@@ -90,6 +90,8 @@ const HELP_TEXT = {
     "The decision log preserves forum outcomes, owners, conditions, and next steps as governance evidence.",
   manualOverrides:
     "Manual overrides require justification to preserve traceability. The original rule calculation remains visible for comparison.",
+  airportLookup:
+    "Looks up annual passenger traffic on Wikidata by IATA (3-letter) or ICAO (4-letter) airport code. The result is an unverified suggestion with its source and reference year recorded; movements still require manual entry and figures should be confirmed against official statistics before governance use.",
   businessCasePack:
     "The business case pack consolidates the validated sizing baseline, scope, assumptions, open risks, approval conditions, and decisions into one read-only summary, with a historical benchmark comparison for similar airports.",
 };
@@ -565,6 +567,12 @@ function airportProfile(opportunityId, airportName, annualPassengers, annualMove
     categorization_method: "Default rules",
     categorization_override: "",
     override_reason: "",
+    airport_code: "",
+    traffic_source: "",
+    traffic_source_label: "",
+    traffic_source_year: "",
+    traffic_retrieved_at: "",
+    traffic_fetched_passengers: 0,
   };
 }
 
