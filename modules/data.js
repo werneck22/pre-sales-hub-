@@ -45,7 +45,23 @@ const WORKSTREAMS = [
   "Field Services",
 ];
 
-const DASHBOARD_TODAY = "2026-06-17";
+// The guided demo narrative was authored against this frozen date; outside
+// demo mode all deadline/overdue math uses the real current date.
+const DEMO_FROZEN_TODAY = "2026-06-17";
+
+function localIsoDate(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+let referenceTodayValue = localIsoDate();
+
+function referenceToday() {
+  return referenceTodayValue;
+}
+
+function setReferenceToday(value) {
+  referenceTodayValue = value || localIsoDate();
+}
 const DEMO_OPPORTUNITY_ID = "opp-est-00";
 const DEMO_SCENARIO_NAME = "Estephan Airport Modernization - From Intake to BAB Readiness";
 
@@ -843,7 +859,7 @@ function dateDaysBefore(dateValue, days) {
   return date.toISOString().slice(0, 10);
 }
 
-function daysUntil(dateValue, baseDate = DASHBOARD_TODAY) {
+function daysUntil(dateValue, baseDate = referenceToday()) {
   const target = new Date(`${dateValue || baseDate}T00:00:00`);
   const base = new Date(`${baseDate}T00:00:00`);
   return Math.round((target - base) / 86400000);
@@ -962,7 +978,9 @@ export {
   COMPLEXITY_LEVELS,
   VALIDATION_REQUEST_STATUSES,
   WORKSTREAMS,
-  DASHBOARD_TODAY,
+  DEMO_FROZEN_TODAY,
+  referenceToday,
+  setReferenceToday,
   DEMO_OPPORTUNITY_ID,
   DEMO_SCENARIO_NAME,
   HELP_TEXT,

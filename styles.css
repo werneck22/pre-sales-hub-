@@ -227,6 +227,26 @@ button {
   font-size: 0.82rem;
 }
 
+.sidebar-reset {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(238, 242, 251, 0.72);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sidebar-reset:hover,
+.sidebar-reset:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
 .main-content {
   min-width: 0;
   width: 100%;
@@ -6573,4 +6593,52 @@ textarea:focus-visible {
 
 .owner-workload-details .owner-package-grid {
   padding: 0 14px 14px;
+}
+
+/* --- Print (Export PDF) ------------------------------------- */
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .sidebar,
+  .topbar,
+  .toast-region,
+  .route-context-bar,
+  .journey-panel,
+  .engine-actions,
+  .help-tooltip {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block;
+    padding: 0;
+  }
+
+  .main-content {
+    padding: 0;
+  }
+
+  .workspace-grid {
+    display: block;
+  }
+
+  .workspace-main,
+  .panel {
+    background: #ffffff;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .record-header {
+    border: none;
+    padding: 0 0 12px;
+  }
+
+  .matrix-wrap,
+  .validation-queue-scroll {
+    overflow: visible;
+  }
 }

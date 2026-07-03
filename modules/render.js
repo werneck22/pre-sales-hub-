@@ -1,5 +1,4 @@
 import {
-  DASHBOARD_TODAY,
   DEMO_OPPORTUNITY_ID,
   DEMO_SCENARIO_NAME,
   GOVERNANCE_FORUMS,
@@ -24,6 +23,7 @@ import {
   formatShortDate,
   isDocumented,
   pluralize,
+  referenceToday,
   sizingRuleCode,
   statusClass,
   statusOptions,
@@ -2163,7 +2163,7 @@ function buildBusinessCaseText(opportunity) {
   const lines = [];
   lines.push(`BUSINESS CASE PACK - ${opportunity.name}`);
   lines.push(`Customer: ${opportunity.customer} | Region: ${opportunity.region} | Stage: ${opportunity.current_governance_stage}`);
-  lines.push(`Generated (mock): ${DASHBOARD_TODAY} | Submission deadline: ${opportunity.submission_deadline || "TBC"}`);
+  lines.push(`Generated (mock): ${referenceToday()} | Submission deadline: ${opportunity.submission_deadline || "TBC"}`);
   lines.push(`Airport: ${profile.airport_name || opportunity.customer} (${category}) - ${formatNumber(profile.annual_passengers)} pax / ${formatNumber(profile.annual_movements)} movements`);
   lines.push(`Overall readiness: ${breakdown.score}% (${breakdown.status})`);
   lines.push("");
@@ -2269,7 +2269,7 @@ function renderBusinessCasePack(opportunity) {
       <div>
         <p class="eyebrow">${escapeHtml(opportunity.customer)} · ${escapeHtml(opportunity.region)}</p>
         <h4>${escapeHtml(opportunity.name)}</h4>
-        <p class="pack-muted">Mock pack generated ${escapeHtml(formatShortDate(DASHBOARD_TODAY))} · Submission ${escapeHtml(formatShortDate(opportunity.submission_deadline))} · Stage ${escapeHtml(opportunity.current_governance_stage)}</p>
+        <p class="pack-muted">Mock pack generated ${escapeHtml(formatShortDate(referenceToday()))} · Submission ${escapeHtml(formatShortDate(opportunity.submission_deadline))} · Stage ${escapeHtml(opportunity.current_governance_stage)}</p>
       </div>
       <div class="pack-banner-metrics">
         <div><span>${breakdown.score}%</span><label>Overall readiness</label></div>

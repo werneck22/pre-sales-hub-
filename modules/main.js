@@ -5,11 +5,13 @@ import {
   decision,
   productScope,
   risk,
+  slug,
 } from "./data.js";
 import {
   activeRoute,
   airportProfileFor,
   applyRoute,
+  clearPersistedState,
   demoMode,
   demoPresenterStep,
   elements,
@@ -17,6 +19,7 @@ import {
   estimateStatusFilter,
   expandedEstimateProducts,
   loadPersistedState,
+  migrateMockDb,
   mockDb,
   navigateToRoute,
   routeFromHash,
@@ -36,9 +39,11 @@ import {
   setSortByReadiness,
   setValidationQueueFilter,
   showToast,
+  sizingEstimatesFor,
   sortByReadiness,
 } from "./state.js";
 import {
+  buildSizingCsv,
   defaultValidationRequestId,
   estimateId,
   generateSizingForOpportunity,
@@ -558,11 +563,42 @@ elements.copyBusinessCaseBtn?.addEventListener("click", async () => {
   }
 });
 
+elements.printBusinessCaseBtn?.addEventListener("click", () => {
+  window.print();
+});
+
+elements.exportSizingCsvBtn?.addEventListener("click", () => {
+  const opportunity = selectedOpportunity();
+  if (!sizingEstimatesFor(opportunity.id).length) {
+    showToast("Run sizing first - there are no estimates to export.", "attention");
+    return;
+  }
+  const blob = new Blob([buildSizingCsv(opportunity)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${slug(opportunity.name)}-sizing-baseline.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast("Sizing baseline exported as CSV.");
+});
+
+elements.resetDataBtn?.addEventListener("click", () => {
+  const confirmed = window.confirm(
+    "Reset all locally saved data and reload the seeded demo dataset? Your local edits will be lost.",
+  );
+  if (!confirmed) return;
+  clearPersistedState();
+  window.location.reload();
+});
+
 window.addEventListener("hashchange", () => applyRoute(routeFromHash()));
 
 const persisted = loadPersistedState();
 if (persisted) {
-  setMockDb(persisted.mockDb);
+  setMockDb(migrateMockDb(persisted.mockDb));
   setSelectedId(
     mockDb.opportunities.some((opportunity) => opportunity.id === persisted.selectedId)
       ? persisted.selectedId

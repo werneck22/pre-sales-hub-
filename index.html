@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260703-2" />
+    <link rel="stylesheet" href="./styles.css?v=20260703-3" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -49,6 +49,8 @@
             <span>Salesforce remains system of record</span>
           </div>
         </div>
+
+        <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
         <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better.</p>
       </aside>
@@ -474,6 +476,7 @@
                 </div>
                 <div class="engine-actions">
                   <span id="categoryBadge" class="meta-chip">Category pending</span>
+                  <button id="exportSizingCsvBtn" class="secondary-button" type="button">Export CSV</button>
                   <button id="runSizingBtn" class="primary-button" type="button">Run sizing</button>
                 </div>
               </div>
@@ -660,7 +663,10 @@
                   </div>
                   <p class="section-help">A consolidated, read-only summary of the validated sizing baseline, scope, assumptions, open risks, approval conditions, decisions, and historical benchmark comparison for SRM and BAB.</p>
                 </div>
-                <button id="copyBusinessCaseBtn" class="secondary-button" type="button">Copy pack summary</button>
+                <div class="engine-actions">
+                  <button id="copyBusinessCaseBtn" class="secondary-button" type="button">Copy pack summary</button>
+                  <button id="printBusinessCaseBtn" class="primary-button" type="button">Export PDF</button>
+                </div>
               </div>
               <div id="businessCasePack" class="business-case-pack"></div>
             </section>
@@ -751,6 +757,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260702-1"></script>
+    <script type="module" src="./modules/main.js?v=20260703-3"></script>
   </body>
 </html>
