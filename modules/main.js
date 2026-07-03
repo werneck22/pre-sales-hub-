@@ -34,6 +34,7 @@ import {
   setSelectedNotificationChannel,
   setSelectedValidationRequestId,
   setSortByReadiness,
+  setValidationQueueFilter,
   showToast,
   sortByReadiness,
 } from "./state.js";
@@ -358,8 +359,26 @@ if (elements.validationRequestList) {
       return;
     }
 
+    const filterButton = event.target.closest("[data-validation-filter]");
+    if (filterButton) {
+      setValidationQueueFilter(filterButton.dataset.validationFilter);
+      renderValidationRequests(selectedOpportunity());
+      return;
+    }
+
     const row = event.target.closest("[data-request-id]");
     if (!row) return;
+    setSelectedValidationRequestId(row.dataset.requestId);
+    renderValidationRequests(selectedOpportunity());
+    renderNotificationPreview();
+    elements.validationRequestList.querySelector(".request-detail-card")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+
+  elements.validationRequestList.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const row = event.target.closest("tr[data-request-id]");
+    if (!row) return;
+    event.preventDefault();
     setSelectedValidationRequestId(row.dataset.requestId);
     renderValidationRequests(selectedOpportunity());
     renderNotificationPreview();

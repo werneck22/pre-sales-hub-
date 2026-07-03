@@ -323,6 +323,7 @@ let estimateStatusFilter = "all";
 let estimateExpansionOpportunityId = "";
 const expandedEstimateProducts = new Set();
 let selectedNotificationChannel = "Email";
+let validationQueueFilter = "all";
 let demoMode = true;
 let demoPresenterStep = 0;
 let activeRoute = "dashboard";
@@ -664,6 +665,7 @@ export {
   estimateExpansionOpportunityId,
   expandedEstimateProducts,
   selectedNotificationChannel,
+  validationQueueFilter,
   demoMode,
   demoPresenterStep,
   activeRoute,
@@ -699,6 +701,7 @@ export {
   setEstimateStatusFilter,
   setEstimateExpansionOpportunityId,
   setSelectedNotificationChannel,
+  setValidationQueueFilter,
   setDemoMode,
   setDemoPresenterStep,
   setActiveRoute,
@@ -730,6 +733,9 @@ function setEstimateExpansionOpportunityId(value) {
 }
 function setSelectedNotificationChannel(value) {
   selectedNotificationChannel = value;
+}
+function setValidationQueueFilter(value) {
+  validationQueueFilter = value;
 }
 function setDemoMode(value) {
   demoMode = value;
