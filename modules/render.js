@@ -24,6 +24,8 @@ import {
   isDocumented,
   pluralize,
   PRODUCT_FAMILY_ORDER,
+  PRODUCT_LINKS,
+  PRODUCTS_AWAITING_SIZING,
   productFamily,
   referenceToday,
   sizingRuleCode,
@@ -551,7 +553,7 @@ function recommendedNextAction(opportunity) {
   if (!scopes.length) {
     return {
       title: "Select products in scope",
-      body: "Choose CUSS, CUPPS, SBD, Biometrics, AODB, DDS/FIDS, Integrations, or Support to start sizing.",
+      body: "Choose CUSS, CUPPS, ABD, Standalone Biopod, AODB, DDS, Integrations, Seamless, or Support to start sizing.",
       cta: "Open product scope",
       target: "#scope",
       action: "scroll",
@@ -648,7 +650,7 @@ function demoScenarioSteps(opportunity) {
   const requests = validationRequestsFor(opportunity.id);
   const notifications = requests.map((request) => notificationForRequest(request.id)).filter(Boolean);
   const notificationEvents = notifications.flatMap((notification) => notification.activity || []);
-  const expectedProducts = ["CUPPS", "CUSS", "Biometrics", "AODB", "Integrations / APIs"];
+  const expectedProducts = ["CUPPS", "CUSS", "Standalone Biopod", "AODB", "Integrations / APIs"];
   const productsAligned = scopes.length === expectedProducts.length && expectedProducts.every((product) => scopes.some((scope) => scope.product_name === product));
   const ownersIdentified = estimates.length > 0 && estimates.every((estimate) => estimate.owner_id && isDocumented(estimate.owner_email));
   const adjustedEstimate = estimates.find((estimate) => Number(estimate.adjusted_md || 0) > Number(estimate.initial_md || 0));
@@ -877,8 +879,20 @@ function renderScopeDriverControls(scope, airportCategory, selected) {
       </div>
       <div class="scope-driver-grid">
         ${drivers
-          .map(
-            (driver) => `
+          .map((driver) =>
+            driver.computed
+              ? `
+          <label class="scope-driver-computed">
+            ${escapeHtml(driver.label)}
+            <input type="number" value="${escapeHtml(driver.value)}" readonly disabled />
+            <small>${escapeHtml(driver.unit)}; auto = sum of ${escapeHtml(
+                  driver.computed.sources
+                    .map((key) => driversForProduct(scope.product_name).find((item) => item.key === key)?.label || key)
+                    .join(" + "),
+                )}</small>
+          </label>
+        `
+              : `
           <label>
             ${escapeHtml(driver.label)}
             <input
@@ -920,13 +934,15 @@ function selectedProductCardHtml(opportunity, scope, airportCategory) {
   ensureScopeSizingInputs(scope, airportCategory);
   const productName = scope.product_name;
   const rollup = productSizingRollup(opportunity.id, productName);
+  const linkNote = PRODUCT_LINKS[productName] ? ` · linked to ${PRODUCT_LINKS[productName]}` : "";
+  const awaitingNote = PRODUCTS_AWAITING_SIZING.has(productName) ? " · sizing rules pending" : "";
   return `
     <div class="product-card included">
       <label class="product-toggle">
         <input type="checkbox" data-product="${escapeHtml(productName)}" checked />
         <span>
           <strong>${escapeHtml(productName)}</strong>
-          <small>${escapeHtml(scope.scope_status)}</small>
+          <small>${escapeHtml(scope.scope_status)}${escapeHtml(linkNote)}${escapeHtml(awaitingNote)}</small>
         </span>
       </label>
       <div class="scope-fields" aria-label="${escapeHtml(productName)} product scope">
