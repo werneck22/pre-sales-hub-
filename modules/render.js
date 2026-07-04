@@ -508,6 +508,9 @@ function renderRecordHeader(opportunity) {
   elements.stageBadge.className = `status-pill ${statusClass(currentForumStatus(opportunity))}`;
   elements.readinessBadge.textContent = `${score}% readiness`;
   elements.readinessBadge.className = `status-pill ${statusClass(breakdown.status)}`;
+  elements.readinessBadge.title = breakdown.caps.length
+    ? `Base score ${breakdown.baseScore}% is capped at ${breakdown.cap}% by a critical control: ${breakdown.caps[0].reason}`
+    : `${breakdown.status} - no critical score cap applied`;
   const readinessLabel = forumReadinessLabel(opportunity);
   elements.forumBadge.textContent = readinessLabel;
   elements.forumBadge.className = `status-pill ${statusClass(readinessLabel)}`;
@@ -1840,12 +1843,53 @@ function renderSizingEngine(opportunity) {
   renderResourceOwnerRegistry(opportunity);
 }
 
+function renderSrmCockpitBanner(opportunity, breakdown) {
+  const srm = breakdown.forumDetails.SRM;
+  const sizingImpact = sizingReadinessImpact(opportunity, "SRM");
+  const blockers = [...new Set([...srm.blockers, ...srm.missing])].slice(0, 4);
+  const ready = ["Ready", "Ready with Conditions"].includes(srm.status);
+  return `
+    <section class="srm-cockpit ${statusClass(srm.status)}" aria-label="SRM readiness cockpit">
+      <div class="srm-cockpit-head">
+        <div>
+          <p class="eyebrow">Solution Review Meeting</p>
+          <h4>SRM readiness</h4>
+          <p class="section-help">The portal's north star: get this opportunity to a validated, review-ready SRM package.</p>
+        </div>
+        <div class="srm-cockpit-score">
+          <span>${srm.score}%</span>
+          <span class="status-pill ${statusClass(srm.status)}">${escapeHtml(srm.status)}</span>
+        </div>
+      </div>
+      <div class="srm-cockpit-body">
+        <div class="srm-cockpit-facts">
+          <div><span>${srm.complete}/${srm.total}</span><label>SRM checklist complete</label></div>
+          <div><span>${srm.blockers.length}</span><label>Hard blockers</label></div>
+          <div><span>${escapeHtml(sizingImpact)}</span><label>Validated sizing</label></div>
+        </div>
+        <div class="srm-cockpit-blockers">
+          <strong>${ready ? "Ready for SRM" : "What is blocking SRM"}</strong>
+          ${
+            blockers.length
+              ? `<ul>${blockers.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+              : "<p>All SRM evidence is in place. Generate the pack for the review.</p>"
+          }
+        </div>
+      </div>
+      <div class="srm-cockpit-actions">
+        <button type="button" class="primary-button" data-action="scroll" data-target="#businessCase">Generate SRM pack</button>
+        <button type="button" class="secondary-button" data-action="scroll" data-target="#resource-validation">Open validation queue</button>
+      </div>
+    </section>`;
+}
+
 function renderReadinessBreakdown(opportunity) {
   if (!elements.readinessBreakdown) return;
   const breakdown = readinessBreakdown(opportunity);
   const topGaps = readinessGapsForOpportunity(opportunity).slice(0, 6);
 
   elements.readinessBreakdown.innerHTML = `
+    ${renderSrmCockpitBanner(opportunity, breakdown)}
     <section class="overall-readiness-card ${statusClass(breakdown.status)}">
       <div>
         <span>${breakdown.score}%</span>
@@ -2041,7 +2085,7 @@ function renderValidationMatrix(opportunity) {
             </label>
           </td>
           <td>
-            <button type="button" class="status-token ${statusClass(validation.status)}" data-validation-id="${escapeHtml(validation.id)}" data-cycle-status="true">
+            <button type="button" class="status-token ${statusClass(validation.status)}" data-validation-id="${escapeHtml(validation.id)}" data-cycle-status="true" title="Click to advance status - keep clicking to cycle back around">
               ${escapeHtml(validation.status)}
             </button>
           </td>

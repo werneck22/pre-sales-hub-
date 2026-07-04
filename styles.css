@@ -6942,3 +6942,117 @@ textarea:focus-visible {
   opacity: 0.9;
   cursor: default;
 }
+
+/* --- SRM cockpit banner (north-star readiness) --------------- */
+.srm-cockpit {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-left: 4px solid #2955d8;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(41, 85, 216, 0.05), rgba(41, 85, 216, 0.01));
+}
+
+.srm-cockpit.not-ready { border-left-color: #c9443b; }
+.srm-cockpit.partially-ready { border-left-color: #c98a1e; }
+.srm-cockpit.ready,
+.srm-cockpit.ready-with-conditions { border-left-color: #2fa37a; }
+
+.srm-cockpit-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.srm-cockpit-head h4 {
+  margin: 2px 0 0;
+  font-size: 1.05rem;
+}
+
+.srm-cockpit-score {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.srm-cockpit-score > span:first-child {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #1b3fa0;
+}
+
+.srm-cockpit-body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 14px;
+}
+
+.srm-cockpit-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-content: start;
+}
+
+.srm-cockpit-facts > div {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.srm-cockpit-facts span {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.srm-cockpit-facts label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.srm-cockpit-blockers {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.srm-cockpit-blockers strong { font-size: 0.86rem; }
+
+.srm-cockpit-blockers ul {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 3px;
+}
+
+.srm-cockpit-blockers li,
+.srm-cockpit-blockers p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.srm-cockpit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 720px) {
+  .srm-cockpit-body { grid-template-columns: 1fr; }
+}
