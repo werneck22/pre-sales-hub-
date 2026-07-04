@@ -337,6 +337,9 @@ function migrateMockDb(db) {
   });
   db.airportProfiles.forEach((profile) => {
     profile.airport_code ||= "";
+    profile.airport_city ||= "";
+    profile.airport_state ||= "";
+    profile.airport_country ||= "";
     profile.traffic_source ||= "";
     profile.traffic_source_label ||= "";
     profile.traffic_source_year ||= "";
@@ -391,6 +394,7 @@ const elements = {
   routePreviousBtn: document.querySelector("#routePreviousBtn"),
   routeNextBtn: document.querySelector("#routeNextBtn"),
   searchInput: document.querySelector("#searchInput"),
+  searchResults: document.querySelector("#searchResults"),
   stageFilter: document.querySelector("#stageFilter"),
   sortReadinessBtn: document.querySelector("#sortReadinessBtn"),
   newOpportunityBtn: document.querySelector("#newOpportunityBtn"),

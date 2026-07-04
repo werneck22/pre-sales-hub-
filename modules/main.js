@@ -67,6 +67,11 @@ import {
   lookupAirportData,
 } from "./airport-lookup.js";
 import {
+  handleSearchResultClick,
+  hideSearchResults,
+  renderSearchResults,
+} from "./airport-search.js";
+import {
   addProductScope,
   applyOwnerValidationAction,
   createOpportunity,
@@ -151,7 +156,26 @@ if (elements.executiveNextActions) {
   });
 }
 
-elements.searchInput.addEventListener("input", renderAll);
+elements.searchInput.addEventListener("input", () => {
+  renderSearchResults(elements.searchInput.value);
+  renderAll();
+});
+elements.searchInput.addEventListener("focus", () => {
+  if (elements.searchInput.value.trim().length >= 2) renderSearchResults(elements.searchInput.value);
+});
+elements.searchInput.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") hideSearchResults();
+});
+if (elements.searchResults) {
+  elements.searchResults.addEventListener("mousedown", (event) => {
+    // mousedown fires before the input blur, so the result survives the click.
+    event.preventDefault();
+    handleSearchResultClick(event);
+  });
+}
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".search-wrap")) hideSearchResults();
+});
 elements.stageFilter.addEventListener("change", renderAll);
 elements.sortReadinessBtn.addEventListener("click", () => {
   setSortByReadiness(!sortByReadiness);

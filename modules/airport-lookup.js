@@ -67,8 +67,20 @@ async function fetchWikidataAirport(code) {
 }
 
 function trafficProvenanceText(profile) {
+  const location = [profile.airport_city, profile.airport_state, profile.airport_country].filter(Boolean).join(", ");
+  const locationPrefix = location ? `${location} · ` : "";
+  if (profile.traffic_source === "Reference directory") {
+    const year = profile.traffic_source_year ? ` (${profile.traffic_source_year})` : "";
+    const edited = Number(profile.annual_passengers) !== Number(profile.traffic_fetched_passengers || 0);
+    if (edited) {
+      return `${locationPrefix}passengers manually edited after the reference directory${year} suggested ${Number(
+        profile.traffic_fetched_passengers || 0,
+      ).toLocaleString("en-US")}.`;
+    }
+    return `${locationPrefix}traffic from the reference directory${year} · approximate figures - confirm against official statistics before governance use.`;
+  }
   if (profile.traffic_source !== "Wikidata") {
-    return "Traffic figures: manual entry. Enter an IATA/ICAO code to look up passenger traffic.";
+    return `${locationPrefix}Traffic figures: manual entry. Enter an IATA/ICAO code to look up passenger traffic, or search an airport in the header to create a targeted opportunity.`;
   }
   const year = profile.traffic_source_year ? ` (${profile.traffic_source_year})` : "";
   const retrieved = profile.traffic_retrieved_at ? ` · retrieved ${profile.traffic_retrieved_at}` : "";
