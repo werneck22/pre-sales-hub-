@@ -50,10 +50,10 @@ const AIRPORT_DIRECTORY = [
   { iata: "MEL", icao: "YMML", name: "Melbourne Airport", city: "Melbourne", state: "Victoria", country: "Australia", region: "APAC", annual_passengers: 35000000, annual_movements: 240000, traffic_year: 2023 },
 
   // LATAM
-  { iata: "GRU", icao: "SBGR", name: "Sao Paulo/Guarulhos International", city: "Guarulhos", state: "Sao Paulo", country: "Brazil", region: "LATAM", annual_passengers: 43000000, annual_movements: 280000, traffic_year: 2023 },
-  { iata: "GIG", icao: "SBGL", name: "Rio de Janeiro/Galeao International", city: "Rio de Janeiro", state: "Rio de Janeiro", country: "Brazil", region: "LATAM", annual_passengers: 13000000, annual_movements: 120000, traffic_year: 2023 },
+  { iata: "GRU", icao: "SBGR", name: "Guarulhos International Airport", city: "Guarulhos", state: "Sao Paulo", country: "Brazil", region: "LATAM", annual_passengers: 43000000, annual_movements: 280000, traffic_year: 2023 },
+  { iata: "GIG", icao: "SBGL", name: "Galeao International Airport", city: "Rio de Janeiro", state: "Rio de Janeiro", country: "Brazil", region: "LATAM", annual_passengers: 13000000, annual_movements: 120000, traffic_year: 2023 },
   { iata: "BSB", icao: "SBBR", name: "Brasilia International", city: "Brasilia", state: "Federal District", country: "Brazil", region: "LATAM", annual_passengers: 16000000, annual_movements: 140000, traffic_year: 2023 },
-  { iata: "CGH", icao: "SBSP", name: "Sao Paulo/Congonhas", city: "Sao Paulo", state: "Sao Paulo", country: "Brazil", region: "LATAM", annual_passengers: 21000000, annual_movements: 200000, traffic_year: 2023 },
+  { iata: "CGH", icao: "SBSP", name: "Congonhas Airport", city: "Sao Paulo", state: "Sao Paulo", country: "Brazil", region: "LATAM", annual_passengers: 21000000, annual_movements: 200000, traffic_year: 2023 },
   { iata: "MEX", icao: "MMMX", name: "Mexico City International (Benito Juarez)", city: "Mexico City", state: "Mexico City", country: "Mexico", region: "LATAM", annual_passengers: 48400000, annual_movements: 450000, traffic_year: 2023 },
   { iata: "CUN", icao: "MMUN", name: "Cancun International", city: "Cancun", state: "Quintana Roo", country: "Mexico", region: "LATAM", annual_passengers: 30000000, annual_movements: 210000, traffic_year: 2023 },
   { iata: "BOG", icao: "SKBO", name: "El Dorado International", city: "Bogota", state: "Cundinamarca", country: "Colombia", region: "LATAM", annual_passengers: 35000000, annual_movements: 330000, traffic_year: 2023 },

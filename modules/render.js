@@ -504,7 +504,7 @@ function renderIntakeNarrativeSummary(opportunity) {
 function renderRecordHeader(opportunity) {
   const breakdown = readinessBreakdown(opportunity);
   const score = breakdown.score;
-  elements.recordCustomer.textContent = `${opportunity.customer} - ${opportunity.sales_owner} / ${opportunity.presales_owner}`;
+  elements.recordCustomer.textContent = `${opportunity.customer} · ${opportunity.region}`;
   elements.recordName.textContent = opportunity.name;
   elements.stageBadge.textContent = `${opportunity.current_governance_stage}: ${currentForumStatus(opportunity)}`;
   elements.stageBadge.className = `status-pill ${statusClass(currentForumStatus(opportunity))}`;
@@ -697,7 +697,7 @@ function demoScenarioSteps(opportunity) {
       target: "#resource-validation",
       complete: ownersIdentified,
       evidence: `${estimates.filter((estimate) => estimate.owner_id && estimate.owner_email).length}/${estimates.length} sizing lines have an owner and email.`,
-      note: "Explain that routing uses product, workstream, and region, with editable owner emails for the prototype.",
+      note: "Explain that routing uses product, workstream, and region, with editable owner emails.",
     },
     {
       label: "Requests created",
@@ -1622,7 +1622,7 @@ function renderValidationRequests(opportunity) {
         <div class="notification-trigger-copy">
           <span class="log-type">Simulation only</span>
           <strong>Notify resource owner</strong>
-          <small>Generate the validation request through Email or Teams and record the action locally. No external message is sent.</small>
+          <small>Send the request via Email or Teams. Nothing is sent externally.</small>
         </div>
         <div class="notification-trigger-actions">
           <button type="button" class="primary-button" data-notification-trigger="Email" data-request-id="${escapeHtml(selectedRequest?.id || "")}" ${selectedRequest ? "" : "disabled"}>
@@ -1644,7 +1644,7 @@ function renderValidationRequests(opportunity) {
       <div class="owner-action-panel" data-request-action-panel="${escapeHtml(selectedRequest?.id || "")}">
         <div>
           <strong class="fact-label-with-help">Resource owner action ${helpTooltip("resourceValidation", "Resource owner validation")}</strong>
-          <small>Review the assumptions and MD baseline, then approve, condition, adjust, reject, or request more information.</small>
+          <small>Approve, adjust, condition, reject, or request more information.</small>
         </div>
         <label>
           Adjusted MD
@@ -1734,7 +1734,7 @@ function renderNotificationPreview() {
     elements.notificationPreview.innerHTML = `
       <div class="empty-state guided-empty">
         <strong>No notification selected.</strong>
-        <p>Select a validation request to preview the simulated Email or Teams message. The MVP never sends external notifications.</p>
+        <p>Select a validation request to preview the Email or Teams message. Nothing is sent externally.</p>
         <button type="button" class="secondary-button" data-action="scroll" data-target="#resource-validation">Review validation requests</button>
       </div>
     `;
@@ -1770,7 +1770,7 @@ function renderNotificationPreview() {
         <pre>${escapeHtml(body)}</pre>
       </div>
       <div class="notification-preview-action">
-        <p>This action only updates the local prototype and creates an audit entry.</p>
+        <p>Records a local activity entry. Nothing is sent externally.</p>
         <button type="button" class="primary-button" data-notification-trigger="${escapeHtml(channel)}" data-request-id="${escapeHtml(request.id)}">
           Generate ${escapeHtml(channel)} simulation
         </button>
@@ -1863,7 +1863,7 @@ function renderSrmCockpitBanner(opportunity, breakdown) {
         <div>
           <p class="eyebrow">Solution Review Meeting</p>
           <h4>SRM readiness</h4>
-          <p class="section-help">The portal's north star: get this opportunity to a validated, review-ready SRM package.</p>
+          <p class="section-help">Validated technical and delivery inputs for the Solution Review Meeting.</p>
         </div>
         <div class="srm-cockpit-score">
           <span>${srm.score}%</span>

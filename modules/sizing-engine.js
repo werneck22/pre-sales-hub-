@@ -234,7 +234,7 @@ Sizing drivers: ${estimate.sizing_driver_summary || "No product-specific drivers
 
 Please validate whether this sizing is acceptable, requires adjustment, or should be escalated.
 
-Link to opportunity: [MVP link]
+Link to opportunity: [link]
 
 Regards,
 Pre-Sales Readiness Hub`;
@@ -255,7 +255,7 @@ Validation due: ${dueDate}
 
 Review the assumptions, approve the estimate, adjust the MD, or request more information.
 
-Open opportunity: [MVP link]`;
+Open opportunity: [link]`;
 }
 
 function notificationChannelState(notification, channel) {
