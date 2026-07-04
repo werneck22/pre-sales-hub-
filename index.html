@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260704-10" />
+    <link rel="stylesheet" href="./styles.css?v=20260704-11" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -114,9 +114,7 @@
           <article class="summary-panel executive-panel">
             <div class="section-heading dashboard-heading">
               <div>
-                <p class="eyebrow">Executive dashboard</p>
                 <h3>Portfolio readiness cockpit</h3>
-                <p class="section-help">One-page view of active deals, SRM/BAB readiness, sizing deltas, validation bottlenecks, and executive attention items.</p>
               </div>
               <select id="stageFilter" aria-label="Filter by governance stage">
                 <option value="all">All stages</option>
@@ -176,7 +174,7 @@
                   <div>
                     <p class="eyebrow">Leadership focus</p>
                     <h4 id="topReadinessGapsHeading">What Needs Attention</h4>
-                    <p class="section-help">The most urgent gap per opportunity, with the next action to close it.</p>
+                    <p class="section-help">Most urgent gap per opportunity.</p>
                   </div>
                   <span id="metricBlockers" class="section-count">0 blockers</span>
                 </div>
@@ -226,7 +224,6 @@
               <section class="dashboard-section dashboard-section-wide" aria-labelledby="forumReadinessHeading">
                 <div class="dashboard-section-title">
                   <div>
-                    <p class="eyebrow">Governance readiness</p>
                     <h4 id="forumReadinessHeading">Readiness by Governance Forum</h4>
                   </div>
                   <span id="metricGovernance" class="section-count">0 ready</span>
@@ -277,9 +274,7 @@
             <section id="intake" class="panel route-panel" data-route-screen="intake" hidden>
               <div class="section-heading">
                 <div>
-                  <p class="eyebrow">Intake</p>
                   <h3>Opportunity intake form</h3>
-                  <p class="section-help">Capture the commercial context and governance evidence needed before BCM, SRM, and BAB reviews.</p>
                 </div>
                 <span class="autosave-chip" title="Changes are saved automatically as you type">Saved automatically</span>
               </div>
@@ -464,9 +459,8 @@
             <section id="scope" class="panel route-panel" data-route-screen="scope" hidden>
               <div class="section-heading">
                 <div>
-                  <p class="eyebrow">Solution scope</p>
                   <div class="title-with-help">
-                    <h3>Product scope and sizing placeholders</h3>
+                    <h3>Product scope</h3>
                     <button type="button" class="help-tooltip" data-help-key="productScope" data-help-label="Product scope"><span aria-hidden="true">i</span></button>
                   </div>
                   <p class="section-help">Select the products in the proposal baseline.</p>
@@ -479,7 +473,6 @@
             <section id="sizing" class="panel route-panel" data-route-screen="sizing validation" hidden>
               <div class="section-heading" data-route-view="sizing">
                 <div>
-                  <p class="eyebrow">Automated sizing</p>
                   <div class="title-with-help">
                     <h3>Automated sizing engine</h3>
                     <button type="button" class="help-tooltip" data-help-key="automatedSizing" data-help-label="Automated sizing"><span aria-hidden="true">i</span></button>
@@ -495,7 +488,6 @@
 
               <div class="section-heading" data-route-view="validation" hidden>
                 <div>
-                  <p class="eyebrow">Resource owner workflow</p>
                   <div class="title-with-help">
                     <h3>Resource validation</h3>
                     <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
@@ -635,12 +627,11 @@
             <section id="governance" class="panel route-panel" data-route-screen="governance" hidden>
               <div class="section-heading">
                 <div>
-                  <p class="eyebrow">Governance readiness</p>
                   <div class="title-with-help">
                     <h3>BCM, SRM, and BAB checklist</h3>
                     <button type="button" class="help-tooltip" data-help-key="srmReadiness" data-help-label="Governance readiness"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Shows why the opportunity is or is not ready, including missing evidence, pending validation, risks, and blockers.</p>
+                  <p class="section-help">Why the opportunity is or is not ready.</p>
                 </div>
                 <span id="checklistScore" class="meta-chip">0 of 0 complete</span>
               </div>
@@ -667,9 +658,8 @@
             <section id="stakeholders" class="panel route-panel" data-route-screen="stakeholders" hidden>
               <div class="section-heading">
                 <div>
-                  <p class="eyebrow">Stakeholders</p>
                   <h3>Function sign-off matrix</h3>
-                  <p class="section-help">Track internal sign-off by function - Sales, Solution Consulting, Product, Delivery, Pricing, Support, Legal. This is separate from the per-product sizing validation in Resource Validation.</p>
+                  <p class="section-help">Internal sign-off by function. Separate from Resource Validation.</p>
                 </div>
                 <span class="meta-chip">Click a status to cycle</span>
               </div>
@@ -679,12 +669,11 @@
             <section id="businessCase" class="panel route-panel" data-route-screen="businessCase" hidden>
               <div class="section-heading">
                 <div>
-                  <p class="eyebrow">Business case</p>
                   <div class="title-with-help">
                     <h3>Business case pack</h3>
                     <button type="button" class="help-tooltip" data-help-key="businessCasePack" data-help-label="Business case pack"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">A consolidated, read-only summary of the validated sizing baseline, scope, assumptions, open risks, approval conditions, decisions, and historical benchmark comparison for SRM and BAB.</p>
+                  <p class="section-help">Read-only summary for SRM and BAB.</p>
                 </div>
                 <div class="engine-actions">
                   <button id="copyBusinessCaseBtn" class="secondary-button" type="button">Copy pack summary</button>
@@ -699,9 +688,8 @@
             <section id="risk-log" class="panel side-panel route-panel" data-route-screen="risks" hidden>
               <div class="section-heading compact">
                 <div>
-                  <p class="eyebrow">Risk register</p>
                   <h3>Risks and assumptions</h3>
-                  <p class="section-help">Capture assumptions, exclusions, and risks that should travel into SRM, BAB, and the business case pack.</p>
+                  <p class="section-help">Risks and assumptions carried into governance.</p>
                 </div>
               </div>
               <form id="riskForm" class="inline-form stacked">
@@ -753,12 +741,11 @@
             <section id="decisions" class="panel side-panel route-panel" data-route-screen="decisions" hidden>
               <div class="section-heading compact">
                 <div>
-                  <p class="eyebrow">Decisions</p>
                   <div class="title-with-help">
                     <h3>Decision log</h3>
                     <button type="button" class="help-tooltip" data-help-key="decisionLog" data-help-label="Decision log"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Preserve each forum outcome, decision owner, approval conditions, and next steps as traceable governance evidence.</p>
+                  <p class="section-help">Forum outcomes, owners, conditions, and next steps.</p>
                 </div>
               </div>
               <form id="decisionForm" class="inline-form stacked">
@@ -780,6 +767,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260704-10"></script>
+    <script type="module" src="./modules/main.js?v=20260704-11"></script>
   </body>
 </html>
