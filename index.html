@@ -3,6 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- GitHub Pages caches HTML at the CDN/browser; ask the browser to
+         revalidate index.html on each load so redeploys are picked up
+         without a manual hard refresh. Assets are already ?v= cache-busted. -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Airport IT Pre-Sales Readiness Hub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260704-8" />
+    <link rel="stylesheet" href="./styles.css?v=20260704-9" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -777,6 +783,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260704-8"></script>
+    <script type="module" src="./modules/main.js?v=20260704-9"></script>
   </body>
 </html>
