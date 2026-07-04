@@ -15,6 +15,34 @@ const PRODUCT_NAMES = [
   "Baggage Reconciliation System",
 ];
 
+// UI grouping for the Product Scope screen so related products (and the four
+// Seamless GT 11 variants) sit together instead of scattering down the page.
+const PRODUCT_FAMILY_ORDER = [
+  "Common Use",
+  "Self-Service & Baggage",
+  "Biometrics & Identity",
+  "Airport Operations",
+  "Integration & Support",
+  "Seamless GT 11",
+  "Other products",
+];
+const PRODUCT_FAMILY_MAP = {
+  CUSS: "Common Use",
+  CUPPS: "Common Use",
+  SBD: "Self-Service & Baggage",
+  "Baggage Reconciliation System": "Self-Service & Baggage",
+  Biometrics: "Biometrics & Identity",
+  "Amadeus Passenger Verification": "Biometrics & Identity",
+  AODB: "Airport Operations",
+  "DDS/FIDS": "Airport Operations",
+  "Integrations / APIs": "Integration & Support",
+  "Support / Field Services": "Integration & Support",
+};
+function productFamily(name) {
+  if (String(name).startsWith("Seamless GT 11")) return "Seamless GT 11";
+  return PRODUCT_FAMILY_MAP[name] || "Other products";
+}
+
 const GOVERNANCE_FORUMS = ["BCM", "SRM", "BAB"];
 const VALIDATION_STATUSES = ["Pending", "In review", "Validated", "Blocked"];
 const GOVERNANCE_STATUSES = ["Not started", "In progress", "Ready", "Conditionally approved", "Approved", "Blocked"];
@@ -989,6 +1017,8 @@ export {
   COMPLEXITY_LEVELS,
   VALIDATION_REQUEST_STATUSES,
   WORKSTREAMS,
+  PRODUCT_FAMILY_ORDER,
+  productFamily,
   DEMO_FROZEN_TODAY,
   referenceToday,
   setReferenceToday,

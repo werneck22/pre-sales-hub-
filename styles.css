@@ -6784,3 +6784,161 @@ textarea:focus-visible {
   color: var(--muted);
   font-size: 0.8rem;
 }
+
+/* --- Product Scope: family grouping + collapsed out-of-scope --- */
+.scope-family {
+  display: grid;
+  gap: 10px;
+}
+
+.scope-family + .scope-family {
+  margin-top: 6px;
+}
+
+.scope-family-title {
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scope-family-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.scope-add-panel {
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.scope-add-panel > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.scope-add-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 14px 14px;
+}
+
+.scope-add-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.scope-add-group-label {
+  flex: 0 0 100%;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.scope-add-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scope-add-toggle:hover {
+  border-color: #c2d3f2;
+  background: #f8fcfb;
+}
+
+/* --- Intake sections + autosave chip ------------------------- */
+.form-section-title {
+  margin: 6px 0 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.form-section-title small {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.form-section-title:not(:first-child) {
+  margin-top: 10px;
+}
+
+.autosave-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(41, 85, 216, 0.08);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.autosave-chip::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2fa37a;
+}
+
+/* --- Sizing table: validation status is read-only here ------- */
+.estimate-status-field {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.estimate-status-link {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--teal, #2955d8);
+  text-decoration: none;
+}
+
+.estimate-status-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Clickable affordance for dashboard rows/cards ----------- */
+.dashboard-row,
+.readiness-driver-row,
+.opportunity-card,
+.executive-action-card {
+  cursor: pointer;
+}
+
+/* --- Readiness: derived checklist reads as auto, not clickable - */
+.check-item input[type="checkbox"][disabled] {
+  opacity: 0.9;
+  cursor: default;
+}

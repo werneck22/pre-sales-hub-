@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260703-5" />
+    <link rel="stylesheet" href="./styles.css?v=20260704-6" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -275,9 +275,10 @@
                   <h3>Opportunity intake form</h3>
                   <p class="section-help">Capture the commercial context and governance evidence needed before BCM, SRM, and BAB reviews.</p>
                 </div>
-                <button id="saveIntakeBtn" class="primary-button" type="submit" form="intakeForm">Save mock intake</button>
+                <span class="autosave-chip" title="Changes are saved automatically as you type">Saved automatically</span>
               </div>
               <form id="intakeForm" class="form-grid">
+                <h4 class="form-section-title span-2">Commercial context</h4>
                 <label>
                   Opportunity name
                   <input name="name" type="text" required />
@@ -346,6 +347,7 @@
                     <option>Very High</option>
                   </select>
                 </label>
+                <h4 class="form-section-title span-2">Governance status <small>Feeds SRM/BAB readiness. Statuses you set here are the inputs; readiness is computed on the Readiness screen.</small></h4>
                 <label>
                   Current governance stage
                   <select name="current_governance_stage">
@@ -416,6 +418,7 @@
                     <option>Blocked</option>
                   </select>
                 </label>
+                <h4 class="form-section-title span-2">Governance narrative</h4>
                 <div id="intakeNarrativeSummary" class="narrative-summary span-2"></div>
                 <details class="intake-detail-panel span-2">
                   <summary>
@@ -774,6 +777,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260703-5"></script>
+    <script type="module" src="./modules/main.js?v=20260704-6"></script>
   </body>
 </html>
