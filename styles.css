@@ -227,6 +227,26 @@ button {
   font-size: 0.82rem;
 }
 
+.sidebar-reset {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(238, 242, 251, 0.72);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sidebar-reset:hover,
+.sidebar-reset:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
 .main-content {
   min-width: 0;
   width: 100%;
@@ -6573,4 +6593,194 @@ textarea:focus-visible {
 
 .owner-workload-details .owner-package-grid {
   padding: 0 14px 14px;
+}
+
+/* --- Print (Export PDF) ------------------------------------- */
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .sidebar,
+  .topbar,
+  .toast-region,
+  .route-context-bar,
+  .journey-panel,
+  .engine-actions,
+  .help-tooltip {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block;
+    padding: 0;
+  }
+
+  .main-content {
+    padding: 0;
+  }
+
+  .workspace-grid {
+    display: block;
+  }
+
+  .workspace-main,
+  .panel {
+    background: #ffffff;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .record-header {
+    border: none;
+    padding: 0 0 12px;
+  }
+
+  .matrix-wrap,
+  .validation-queue-scroll {
+    overflow: visible;
+  }
+}
+
+/* --- Airport traffic lookup ---------------------------------- */
+.airport-lookup-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border: 1px dashed rgba(15, 64, 173, 0.35);
+  border-radius: 8px;
+  background: rgba(15, 64, 173, 0.04);
+}
+
+.airport-lookup-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.airport-lookup-copy strong {
+  font-size: 0.82rem;
+}
+
+#airportLookupStatus {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+/* --- Header airport search dropdown -------------------------- */
+.search-wrap {
+  position: relative;
+}
+
+.search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 60;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: 0 18px 40px -20px rgba(15, 23, 42, 0.5);
+}
+
+.search-group + .search-group {
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+  padding-top: 4px;
+}
+
+.search-group-label {
+  padding: 6px 8px 4px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.search-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.search-result:hover,
+.search-result:focus-visible {
+  background: rgba(41, 85, 216, 0.08);
+  outline: none;
+}
+
+.search-result-code {
+  flex: 0 0 auto;
+  min-width: 42px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(41, 85, 216, 0.12);
+  color: var(--teal-dark, #1b3fa0);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.search-result-main {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.search-result-main strong {
+  font-size: 0.86rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-result-main small {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.search-result-traffic {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.search-result-cta {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--teal, #2955d8);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.opportunity-result .search-result-cta {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.search-empty {
+  padding: 12px 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
 }

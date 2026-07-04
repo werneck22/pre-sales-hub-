@@ -8,7 +8,15 @@ Live preview: https://werneck22.github.io/pre-sales-hub-/
 
 Or serve the folder locally with any static web server, e.g. `python3 -m http.server 4173`, then open http://127.0.0.1:4173/index.html.
 
-Opportunity, sizing, validation, risk, and decision data is saved to the browser's `localStorage` so work survives a page reload. It stays local to that browser only.
+Opportunity, sizing, validation, risk, and decision data is saved to the browser's `localStorage` so work survives a page reload. It stays local to that browser only. Use the **Reset demo data** button in the sidebar to discard local edits and reload the seeded dataset (reference data such as products, sizing rules, and owners is always refreshed from the current build on load).
+
+Deadline and overdue calculations use the real current date; the guided demo temporarily freezes the clock at the date its scenario was authored against. The sizing baseline can be exported as CSV from Automated Sizing, and the Business Case Pack can be exported as PDF via the browser print dialog.
+
+## Airport Search and Targeted Opportunities
+
+The header search doubles as an airport finder. Type an airport name, city, or IATA/ICAO code and the dropdown lists matches from a bundled reference directory (`modules/airport-directory.js`) showing name, city, state, country, annual passengers, and annual movements. Choosing an airport creates a new opportunity targeting it, pre-filling the airport profile (name, location, code, traffic) and classifying the airport (Small/Medium/Large/Extra Large) so sizing can start immediately. Existing opportunities matching the query are also offered so duplicates are avoided.
+
+Directory traffic figures are approximate recent-year public statistics for a set of major world airports and should be confirmed against official sources (ACI, Eurostat, ANAC, FAA/BTS) before governance use. The airport profile also keeps a per-code lookup button (Wikidata) for airports outside the bundle; both paths record the source, reference year, and retrieval date, and flag when a figure is later edited manually. Aircraft movements always require confirmation since no free source provides them reliably.
 
 ## What The Prototype Demonstrates
 

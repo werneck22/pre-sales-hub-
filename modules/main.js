@@ -5,11 +5,13 @@ import {
   decision,
   productScope,
   risk,
+  slug,
 } from "./data.js";
 import {
   activeRoute,
   airportProfileFor,
   applyRoute,
+  clearPersistedState,
   demoMode,
   demoPresenterStep,
   elements,
@@ -17,6 +19,7 @@ import {
   estimateStatusFilter,
   expandedEstimateProducts,
   loadPersistedState,
+  migrateMockDb,
   mockDb,
   navigateToRoute,
   routeFromHash,
@@ -36,9 +39,11 @@ import {
   setSortByReadiness,
   setValidationQueueFilter,
   showToast,
+  sizingEstimatesFor,
   sortByReadiness,
 } from "./state.js";
 import {
+  buildSizingCsv,
   defaultValidationRequestId,
   estimateId,
   generateSizingForOpportunity,
@@ -58,6 +63,14 @@ import {
   renderSizingEstimates,
   renderValidationRequests,
 } from "./render.js";
+import {
+  lookupAirportData,
+} from "./airport-lookup.js";
+import {
+  handleSearchResultClick,
+  hideSearchResults,
+  renderSearchResults,
+} from "./airport-search.js";
 import {
   addProductScope,
   applyOwnerValidationAction,
@@ -143,7 +156,26 @@ if (elements.executiveNextActions) {
   });
 }
 
-elements.searchInput.addEventListener("input", renderAll);
+elements.searchInput.addEventListener("input", () => {
+  renderSearchResults(elements.searchInput.value);
+  renderAll();
+});
+elements.searchInput.addEventListener("focus", () => {
+  if (elements.searchInput.value.trim().length >= 2) renderSearchResults(elements.searchInput.value);
+});
+elements.searchInput.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") hideSearchResults();
+});
+if (elements.searchResults) {
+  elements.searchResults.addEventListener("mousedown", (event) => {
+    // mousedown fires before the input blur, so the result survives the click.
+    event.preventDefault();
+    handleSearchResultClick(event);
+  });
+}
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".search-wrap")) hideSearchResults();
+});
 elements.stageFilter.addEventListener("change", renderAll);
 elements.sortReadinessBtn.addEventListener("click", () => {
   setSortByReadiness(!sortByReadiness);
@@ -186,6 +218,7 @@ if (elements.airportProfileForm) {
 if (elements.runSizingBtn) {
   elements.runSizingBtn.addEventListener("click", runSizingForSelected);
 }
+elements.airportLookupBtn?.addEventListener("click", lookupAirportData);
 if (elements.estimateProductFilter) {
   elements.estimateProductFilter.addEventListener("change", () => {
     setEstimateProductFilter(elements.estimateProductFilter.value);
@@ -558,11 +591,42 @@ elements.copyBusinessCaseBtn?.addEventListener("click", async () => {
   }
 });
 
+elements.printBusinessCaseBtn?.addEventListener("click", () => {
+  window.print();
+});
+
+elements.exportSizingCsvBtn?.addEventListener("click", () => {
+  const opportunity = selectedOpportunity();
+  if (!sizingEstimatesFor(opportunity.id).length) {
+    showToast("Run sizing first - there are no estimates to export.", "attention");
+    return;
+  }
+  const blob = new Blob([buildSizingCsv(opportunity)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${slug(opportunity.name)}-sizing-baseline.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast("Sizing baseline exported as CSV.");
+});
+
+elements.resetDataBtn?.addEventListener("click", () => {
+  const confirmed = window.confirm(
+    "Reset all locally saved data and reload the seeded demo dataset? Your local edits will be lost.",
+  );
+  if (!confirmed) return;
+  clearPersistedState();
+  window.location.reload();
+});
+
 window.addEventListener("hashchange", () => applyRoute(routeFromHash()));
 
 const persisted = loadPersistedState();
 if (persisted) {
-  setMockDb(persisted.mockDb);
+  setMockDb(migrateMockDb(persisted.mockDb));
   setSelectedId(
     mockDb.opportunities.some((opportunity) => opportunity.id === persisted.selectedId)
       ? persisted.selectedId

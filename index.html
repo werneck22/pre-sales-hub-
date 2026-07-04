@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260703-2" />
+    <link rel="stylesheet" href="./styles.css?v=20260703-5" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -50,6 +50,8 @@
           </div>
         </div>
 
+        <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
+
         <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better.</p>
       </aside>
 
@@ -60,10 +62,13 @@
             <h2 id="pageTitle">Executive Dashboard</h2>
           </div>
           <div class="topbar-actions">
-            <label class="search-box">
-              <span aria-hidden="true">Search</span>
-              <input id="searchInput" type="search" placeholder="Airport, customer, region, product" />
-            </label>
+            <div class="search-wrap">
+              <label class="search-box">
+                <span aria-hidden="true">Search</span>
+                <input id="searchInput" type="search" placeholder="Search an airport (name or IATA/ICAO) or opportunity" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="searchResults" aria-autocomplete="list" />
+              </label>
+              <div id="searchResults" class="search-results" role="listbox" hidden></div>
+            </div>
             <button id="demoModeBtn" class="secondary-button" type="button">Start guided demo</button>
             <button id="newOpportunityBtn" class="primary-button" type="button">New opportunity</button>
           </div>
@@ -474,6 +479,7 @@
                 </div>
                 <div class="engine-actions">
                   <span id="categoryBadge" class="meta-chip">Category pending</span>
+                  <button id="exportSizingCsvBtn" class="secondary-button" type="button">Export CSV</button>
                   <button id="runSizingBtn" class="primary-button" type="button">Run sizing</button>
                 </div>
               </div>
@@ -502,6 +508,20 @@
                   Airport name
                   <input name="airport_name" type="text" />
                 </label>
+                <label>
+                  Airport code (IATA/ICAO)
+                  <input name="airport_code" type="text" maxlength="4" placeholder="GRU or SBGR" autocomplete="off" />
+                </label>
+                <div class="airport-lookup-bar span-2">
+                  <div class="airport-lookup-copy">
+                    <div class="context-help-title">
+                      <strong>Automated traffic lookup</strong>
+                      <button type="button" class="help-tooltip" data-help-key="airportLookup" data-help-label="Airport traffic lookup"><span aria-hidden="true">i</span></button>
+                    </div>
+                    <span id="airportLookupStatus">Traffic figures: manual entry.</span>
+                  </div>
+                  <button id="airportLookupBtn" class="secondary-button" type="button">Lookup airport data</button>
+                </div>
                 <label>
                   Annual passengers
                   <input name="annual_passengers" type="number" min="0" step="1000" />
@@ -660,7 +680,10 @@
                   </div>
                   <p class="section-help">A consolidated, read-only summary of the validated sizing baseline, scope, assumptions, open risks, approval conditions, decisions, and historical benchmark comparison for SRM and BAB.</p>
                 </div>
-                <button id="copyBusinessCaseBtn" class="secondary-button" type="button">Copy pack summary</button>
+                <div class="engine-actions">
+                  <button id="copyBusinessCaseBtn" class="secondary-button" type="button">Copy pack summary</button>
+                  <button id="printBusinessCaseBtn" class="primary-button" type="button">Export PDF</button>
+                </div>
               </div>
               <div id="businessCasePack" class="business-case-pack"></div>
             </section>
@@ -751,6 +774,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260702-1"></script>
+    <script type="module" src="./modules/main.js?v=20260703-5"></script>
   </body>
 </html>

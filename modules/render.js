@@ -1,5 +1,4 @@
 import {
-  DASHBOARD_TODAY,
   DEMO_OPPORTUNITY_ID,
   DEMO_SCENARIO_NAME,
   GOVERNANCE_FORUMS,
@@ -24,6 +23,7 @@ import {
   formatShortDate,
   isDocumented,
   pluralize,
+  referenceToday,
   sizingRuleCode,
   statusClass,
   statusOptions,
@@ -96,6 +96,9 @@ import {
   readinessRuleResults,
   sizingReadinessImpact,
 } from "./readiness-rules.js";
+import {
+  trafficProvenanceText,
+} from "./airport-lookup.js";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -991,12 +994,14 @@ function renderAirportProfile(opportunity) {
   classifyAirport(profile);
   const form = elements.airportProfileForm;
   form.airport_name.value = profile.airport_name;
+  if (form.airport_code) form.airport_code.value = profile.airport_code || "";
   form.annual_passengers.value = profile.annual_passengers;
   form.annual_movements.value = profile.annual_movements;
   form.region.value = profile.region;
   form.categorization_override.value = profile.categorization_override;
   form.override_reason.value = profile.override_reason;
   elements.categoryBadge.textContent = `${profile.airport_category} - ${profile.categorization_method}`;
+  if (elements.airportLookupStatus) elements.airportLookupStatus.textContent = trafficProvenanceText(profile);
 }
 
 function renderClassificationRules() {
@@ -2163,7 +2168,7 @@ function buildBusinessCaseText(opportunity) {
   const lines = [];
   lines.push(`BUSINESS CASE PACK - ${opportunity.name}`);
   lines.push(`Customer: ${opportunity.customer} | Region: ${opportunity.region} | Stage: ${opportunity.current_governance_stage}`);
-  lines.push(`Generated (mock): ${DASHBOARD_TODAY} | Submission deadline: ${opportunity.submission_deadline || "TBC"}`);
+  lines.push(`Generated (mock): ${referenceToday()} | Submission deadline: ${opportunity.submission_deadline || "TBC"}`);
   lines.push(`Airport: ${profile.airport_name || opportunity.customer} (${category}) - ${formatNumber(profile.annual_passengers)} pax / ${formatNumber(profile.annual_movements)} movements`);
   lines.push(`Overall readiness: ${breakdown.score}% (${breakdown.status})`);
   lines.push("");
@@ -2269,7 +2274,7 @@ function renderBusinessCasePack(opportunity) {
       <div>
         <p class="eyebrow">${escapeHtml(opportunity.customer)} · ${escapeHtml(opportunity.region)}</p>
         <h4>${escapeHtml(opportunity.name)}</h4>
-        <p class="pack-muted">Mock pack generated ${escapeHtml(formatShortDate(DASHBOARD_TODAY))} · Submission ${escapeHtml(formatShortDate(opportunity.submission_deadline))} · Stage ${escapeHtml(opportunity.current_governance_stage)}</p>
+        <p class="pack-muted">Mock pack generated ${escapeHtml(formatShortDate(referenceToday()))} · Submission ${escapeHtml(formatShortDate(opportunity.submission_deadline))} · Stage ${escapeHtml(opportunity.current_governance_stage)}</p>
       </div>
       <div class="pack-banner-metrics">
         <div><span>${breakdown.score}%</span><label>Overall readiness</label></div>

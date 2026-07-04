@@ -89,9 +89,8 @@ function syncIntakeFromForm() {
   renderRecordHeader(opportunity);
 }
 
-function createOpportunity() {
-  const id = `opp-${Date.now()}`;
-  const opportunity = {
+function newOpportunityRecord(id, overrides = {}) {
+  return {
     id,
     name: "New Airport IT Opportunity",
     customer: "Customer name",
@@ -118,10 +117,16 @@ function createOpportunity() {
     executive_decision_required: "",
     exceptions_approval_conditions: "",
     overall_readiness_score: 0,
+    ...overrides,
   };
+}
 
+// Registers a new opportunity and its associated scaffold (airport profile,
+// stakeholder validations, governance items), then selects it and opens intake.
+function registerOpportunity(opportunity, profile, toastMessage) {
+  const id = opportunity.id;
   mockDb.opportunities = [opportunity, ...mockDb.opportunities];
-  mockDb.airportProfiles.push(airportProfile(id, opportunity.customer, 0, 0, opportunity.region));
+  mockDb.airportProfiles.push(profile);
   mockDb.stakeholderValidations.push(
     ...stakeholderTemplates.map((_, index) =>
       makeValidation(id, index, {
@@ -136,9 +141,48 @@ function createOpportunity() {
   setEstimateProductFilter("all");
   setEstimateStatusFilter("all");
   setSelectedValidationRequestId("");
+  readiness(opportunity);
   renderAll();
-  showToast("New mock opportunity created. Start by entering the airport profile.");
+  if (toastMessage) showToast(toastMessage);
   navigateToRoute("intake");
+}
+
+function createOpportunity() {
+  const id = `opp-${Date.now()}`;
+  const opportunity = newOpportunityRecord(id);
+  const profile = airportProfile(id, opportunity.customer, 0, 0, opportunity.region);
+  registerOpportunity(opportunity, profile, "New mock opportunity created. Start by entering the airport profile.");
+}
+
+// Creates an opportunity targeting a specific airport from the reference
+// directory, pre-filling the airport profile (name, location, traffic) and
+// classifying it so the sizing baseline can start immediately.
+function createOpportunityFromAirport(airport) {
+  if (!airport) return;
+  const id = `opp-${airport.iata.toLowerCase()}-${Date.now()}`;
+  const opportunity = newOpportunityRecord(id, {
+    name: `${airport.name} - Airport IT Opportunity`,
+    customer: airport.name,
+    region: airport.region,
+  });
+  const profile = airportProfile(id, airport.name, airport.annual_passengers, airport.annual_movements, airport.region);
+  profile.airport_code = airport.iata;
+  profile.airport_city = airport.city;
+  profile.airport_state = airport.state;
+  profile.airport_country = airport.country;
+  profile.traffic_source = "Reference directory";
+  profile.traffic_source_label = airport.name;
+  profile.traffic_source_year = String(airport.traffic_year || "");
+  profile.traffic_retrieved_at = new Date().toISOString().slice(0, 10);
+  profile.traffic_fetched_passengers = airport.annual_passengers;
+  classifyAirport(profile);
+  registerOpportunity(
+    opportunity,
+    profile,
+    `Opportunity created for ${airport.name} (${airport.iata}). Classified as ${profile.airport_category} from ${Number(
+      airport.annual_passengers,
+    ).toLocaleString("en-US")} passengers / ${Number(airport.annual_movements).toLocaleString("en-US")} movements.`,
+  );
 }
 
 function findProductScope(opportunityId, productName) {
@@ -225,6 +269,7 @@ function syncAirportProfileFromForm() {
   const profile = airportProfileFor(selectedId);
   const data = new FormData(elements.airportProfileForm);
   profile.airport_name = data.get("airport_name").toString().trim() || selectedOpportunity().customer;
+  profile.airport_code = (data.get("airport_code") || "").toString().trim().toUpperCase();
   profile.annual_passengers = Number(data.get("annual_passengers")) || 0;
   profile.annual_movements = Number(data.get("annual_movements")) || 0;
   profile.region = data.get("region").toString();
@@ -354,6 +399,7 @@ function applyOwnerValidationAction(requestId, action, fields) {
 export {
   syncIntakeFromForm,
   createOpportunity,
+  createOpportunityFromAirport,
   findProductScope,
   addProductScope,
   runSizingForSelected,

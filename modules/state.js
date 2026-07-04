@@ -1,5 +1,6 @@
 import {
   AIRPORT_CATEGORIES,
+  DEMO_FROZEN_TODAY,
   DEMO_OPPORTUNITY_ID,
   ROUTE_CONFIG,
   TARGET_ROUTE_MAP,
@@ -14,6 +15,7 @@ import {
   makeValidation,
   productScope,
   risk,
+  setReferenceToday,
 } from "./data.js";
 import {
   requestId,
@@ -293,25 +295,74 @@ let mockDb = {
   notifications: [],
 };
 
-const PERSISTED_STATE_KEY = "presalesHub.state.v1";
+const PERSISTED_STATE_KEY = "presalesHub.state.v2";
+const LEGACY_STATE_KEYS = ["presalesHub.state.v1"];
 
 function loadPersistedState() {
   try {
-    const raw = window.localStorage.getItem(PERSISTED_STATE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || !Array.isArray(parsed.mockDb?.opportunities) || !parsed.mockDb.opportunities.length) return null;
-    return parsed;
+    for (const key of [PERSISTED_STATE_KEY, ...LEGACY_STATE_KEYS]) {
+      const raw = window.localStorage.getItem(key);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.mockDb?.opportunities) && parsed.mockDb.opportunities.length) return parsed;
+    }
+    return null;
   } catch (error) {
     return null;
   }
 }
 
+// Reference data always comes fresh from the current build so new products,
+// sizing rules, and owners show up even when an older localStorage snapshot is
+// loaded (JSON.stringify also drops the Infinity bounds in classification
+// rules, so persisted copies of them are unusable anyway).
+function migrateMockDb(db) {
+  db.classificationRules = defaultClassificationRules();
+  db.sizingRules = buildDefaultSizingRules();
+  db.resourceOwners = buildResourceOwners();
+  [
+    "opportunities",
+    "productScopes",
+    "stakeholderValidations",
+    "risks",
+    "assumptions",
+    "decisions",
+    "governanceItems",
+    "airportProfiles",
+    "sizingEstimates",
+    "validationRequests",
+    "notifications",
+  ].forEach((collection) => {
+    if (!Array.isArray(db[collection])) db[collection] = [];
+  });
+  db.airportProfiles.forEach((profile) => {
+    profile.airport_code ||= "";
+    profile.airport_city ||= "";
+    profile.airport_state ||= "";
+    profile.airport_country ||= "";
+    profile.traffic_source ||= "";
+    profile.traffic_source_label ||= "";
+    profile.traffic_source_year ||= "";
+    profile.traffic_retrieved_at ||= "";
+    profile.traffic_fetched_passengers ||= 0;
+  });
+  return db;
+}
+
 function persistState() {
   try {
     window.localStorage.setItem(PERSISTED_STATE_KEY, JSON.stringify({ mockDb, selectedId }));
+    LEGACY_STATE_KEYS.forEach((key) => window.localStorage.removeItem(key));
   } catch (error) {
     // Storage unavailable (private browsing, quota) - the session keeps working in memory only.
+  }
+}
+
+function clearPersistedState() {
+  try {
+    [PERSISTED_STATE_KEY, ...LEGACY_STATE_KEYS].forEach((key) => window.localStorage.removeItem(key));
+  } catch (error) {
+    // Storage unavailable - nothing to clear.
   }
 }
 
@@ -324,7 +375,7 @@ let estimateExpansionOpportunityId = "";
 const expandedEstimateProducts = new Set();
 let selectedNotificationChannel = "Email";
 let validationQueueFilter = "all";
-let demoMode = true;
+let demoMode = false;
 let demoPresenterStep = 0;
 let activeRoute = "dashboard";
 const elements = {
@@ -343,10 +394,14 @@ const elements = {
   routePreviousBtn: document.querySelector("#routePreviousBtn"),
   routeNextBtn: document.querySelector("#routeNextBtn"),
   searchInput: document.querySelector("#searchInput"),
+  searchResults: document.querySelector("#searchResults"),
   stageFilter: document.querySelector("#stageFilter"),
   sortReadinessBtn: document.querySelector("#sortReadinessBtn"),
   newOpportunityBtn: document.querySelector("#newOpportunityBtn"),
   demoModeBtn: document.querySelector("#demoModeBtn"),
+  resetDataBtn: document.querySelector("#resetDataBtn"),
+  exportSizingCsvBtn: document.querySelector("#exportSizingCsvBtn"),
+  printBusinessCaseBtn: document.querySelector("#printBusinessCaseBtn"),
   toastRegion: document.querySelector("#toastRegion"),
   executiveNextActions: document.querySelector("#executiveNextActions"),
   executiveAttentionList: document.querySelector("#executiveAttentionList"),
@@ -362,6 +417,8 @@ const elements = {
   intakeNarrativeSummary: document.querySelector("#intakeNarrativeSummary"),
   productScope: document.querySelector("#productScope"),
   airportProfileForm: document.querySelector("#airportProfileForm"),
+  airportLookupBtn: document.querySelector("#airportLookupBtn"),
+  airportLookupStatus: document.querySelector("#airportLookupStatus"),
   categoryBadge: document.querySelector("#categoryBadge"),
   classificationRules: document.querySelector("#classificationRules"),
   runSizingBtn: document.querySelector("#runSizingBtn"),
@@ -656,7 +713,9 @@ export {
   mockDb,
   PERSISTED_STATE_KEY,
   loadPersistedState,
+  migrateMockDb,
   persistState,
+  clearPersistedState,
   selectedId,
   sortByReadiness,
   selectedValidationRequestId,
@@ -739,6 +798,9 @@ function setValidationQueueFilter(value) {
 }
 function setDemoMode(value) {
   demoMode = value;
+  // The guided demo narrates a scenario authored against a frozen date; the
+  // operational views always use the real current date.
+  setReferenceToday(value ? DEMO_FROZEN_TODAY : "");
 }
 function setDemoPresenterStep(value) {
   demoPresenterStep = value;

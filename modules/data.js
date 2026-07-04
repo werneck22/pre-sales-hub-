@@ -45,7 +45,23 @@ const WORKSTREAMS = [
   "Field Services",
 ];
 
-const DASHBOARD_TODAY = "2026-06-17";
+// The guided demo narrative was authored against this frozen date; outside
+// demo mode all deadline/overdue math uses the real current date.
+const DEMO_FROZEN_TODAY = "2026-06-17";
+
+function localIsoDate(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+let referenceTodayValue = localIsoDate();
+
+function referenceToday() {
+  return referenceTodayValue;
+}
+
+function setReferenceToday(value) {
+  referenceTodayValue = value || localIsoDate();
+}
 const DEMO_OPPORTUNITY_ID = "opp-est-00";
 const DEMO_SCENARIO_NAME = "Estephan Airport Modernization - From Intake to BAB Readiness";
 
@@ -74,6 +90,8 @@ const HELP_TEXT = {
     "The decision log preserves forum outcomes, owners, conditions, and next steps as governance evidence.",
   manualOverrides:
     "Manual overrides require justification to preserve traceability. The original rule calculation remains visible for comparison.",
+  airportLookup:
+    "Looks up annual passenger traffic on Wikidata by IATA (3-letter) or ICAO (4-letter) airport code. The result is an unverified suggestion with its source and reference year recorded; movements still require manual entry and figures should be confirmed against official statistics before governance use.",
   businessCasePack:
     "The business case pack consolidates the validated sizing baseline, scope, assumptions, open risks, approval conditions, and decisions into one read-only summary, with a historical benchmark comparison for similar airports.",
 };
@@ -549,6 +567,15 @@ function airportProfile(opportunityId, airportName, annualPassengers, annualMove
     categorization_method: "Default rules",
     categorization_override: "",
     override_reason: "",
+    airport_code: "",
+    airport_city: "",
+    airport_state: "",
+    airport_country: "",
+    traffic_source: "",
+    traffic_source_label: "",
+    traffic_source_year: "",
+    traffic_retrieved_at: "",
+    traffic_fetched_passengers: 0,
   };
 }
 
@@ -843,7 +870,7 @@ function dateDaysBefore(dateValue, days) {
   return date.toISOString().slice(0, 10);
 }
 
-function daysUntil(dateValue, baseDate = DASHBOARD_TODAY) {
+function daysUntil(dateValue, baseDate = referenceToday()) {
   const target = new Date(`${dateValue || baseDate}T00:00:00`);
   const base = new Date(`${baseDate}T00:00:00`);
   return Math.round((target - base) / 86400000);
@@ -962,7 +989,9 @@ export {
   COMPLEXITY_LEVELS,
   VALIDATION_REQUEST_STATUSES,
   WORKSTREAMS,
-  DASHBOARD_TODAY,
+  DEMO_FROZEN_TODAY,
+  referenceToday,
+  setReferenceToday,
   DEMO_OPPORTUNITY_ID,
   DEMO_SCENARIO_NAME,
   HELP_TEXT,

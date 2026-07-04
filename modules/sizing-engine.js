@@ -614,6 +614,50 @@ function totalsForOpportunity(opportunityId) {
   };
 }
 
+function csvField(value) {
+  const text = String(value ?? "");
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function buildSizingCsv(opportunity) {
+  const header = [
+    "Opportunity",
+    "Customer",
+    "Product",
+    "Workstream",
+    "Rule",
+    "Airport category",
+    "Complexity",
+    "Initial MD",
+    "Adjusted MD",
+    "Final MD",
+    "Validation status",
+    "Resource owner",
+    "Owner email",
+    "Validation due date",
+  ];
+  const rows = sizingEstimatesFor(opportunity.id).map((estimate) => {
+    const request = mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id);
+    return [
+      opportunity.name,
+      opportunity.customer,
+      estimate.product_name,
+      estimate.workstream,
+      estimate.applied_rule_code || "",
+      estimate.airport_category,
+      estimate.complexity,
+      estimate.initial_md,
+      estimate.adjusted_md || "",
+      finalMdForEstimate(estimate) || "",
+      estimate.status,
+      ownerName(estimate.owner_id),
+      estimate.owner_email || ownerEmail(estimate.owner_id),
+      request?.due_date || "",
+    ];
+  });
+  return [header, ...rows].map((row) => row.map(csvField).join(",")).join("\n");
+}
+
 function dashboardTotalsForOpportunity(opportunityId) {
   const estimates = sizingEstimatesFor(opportunityId);
   const initial = estimates.reduce((sum, estimate) => sum + Number(estimate.initial_md || 0), 0);
@@ -662,4 +706,5 @@ export {
   initializeSizingEngine,
   totalsForOpportunity,
   dashboardTotalsForOpportunity,
+  buildSizingCsv,
 };
