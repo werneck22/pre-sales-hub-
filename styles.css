@@ -7056,3 +7056,27 @@ textarea:focus-visible {
 @media (max-width: 720px) {
   .srm-cockpit-body { grid-template-columns: 1fr; }
 }
+
+/* --- Computed (auto) sizing driver ------------------------- */
+.driver-label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.driver-auto-tag {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(41, 85, 216, 0.1);
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.scope-driver-computed input[readonly] {
+  background: #f3f5f9;
+  color: var(--muted);
+  cursor: default;
+}

@@ -875,7 +875,6 @@ function renderScopeDriverControls(scope, airportCategory, selected) {
     <div class="scope-driver-panel">
       <div class="scope-driver-title">
         <strong>Sizing drivers</strong>
-        <span>${escapeHtml(scope.product_name)}</span>
       </div>
       <div class="scope-driver-grid">
         ${drivers
@@ -883,13 +882,8 @@ function renderScopeDriverControls(scope, airportCategory, selected) {
             driver.computed
               ? `
           <label class="scope-driver-computed">
-            ${escapeHtml(driver.label)}
+            <span class="driver-label-row">${escapeHtml(driver.label)}<span class="driver-auto-tag">Auto</span></span>
             <input type="number" value="${escapeHtml(driver.value)}" readonly disabled />
-            <small>${escapeHtml(driver.unit)}; auto = sum of ${escapeHtml(
-                  driver.computed.sources
-                    .map((key) => driversForProduct(scope.product_name).find((item) => item.key === key)?.label || key)
-                    .join(" + "),
-                )}</small>
           </label>
         `
               : `
@@ -903,7 +897,7 @@ function renderScopeDriverControls(scope, airportCategory, selected) {
               data-driver="${escapeHtml(driver.key)}"
               value="${escapeHtml(driver.value)}"
             />
-            <small>${escapeHtml(driver.unit)}; default ${formatNumber(driver.defaultValue)} for ${escapeHtml(airportCategory)}</small>
+            <small>Default ${formatNumber(driver.defaultValue)}</small>
           </label>
         `,
           )
@@ -1511,9 +1505,8 @@ function renderValidationRequests(opportunity) {
     <section class="validation-queue-board" aria-label="Validation queue">
       <div class="validation-queue-heading">
         <div>
-          <span class="log-type">Validation queue</span>
-          <strong>What is being validated</strong>
-          <small>Every sizing line for this opportunity, grouped by product, with the resource owner who signs it off. Select a line to review and record the decision below.</small>
+          <strong>Validation queue</strong>
+          <small>Grouped by product. Select a line to record the owner decision.</small>
         </div>
         <span class="section-count">${pluralize(visibleLineCount, "line")}</span>
       </div>
