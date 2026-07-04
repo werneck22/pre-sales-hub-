@@ -51,7 +51,7 @@ let mockDb = {
       bid_no_bid_recommendation: "Bid",
       preliminary_architecture: "Common use and biometric services integrated with AODB and API layer for partner systems.",
       delivery_dependency: "Resource owner validation required for implementation, integration, onboarding and testing effort.",
-      integration_assumptions: "Five initial integrations assumed for the MVP sizing scenario.",
+      integration_assumptions: "Five initial integrations assumed for the sizing scenario.",
       business_case_status: "In review",
       pricing_readiness_status: "Ready",
       executive_decision_required: "Confirm whether the validated sizing baseline can be used for the business case pack.",
@@ -248,7 +248,7 @@ let mockDb = {
   ],
   assumptions: [
     assumption("opp-est-00", "Annual passengers are 6.5M and annual movements are 72,000 for mock categorization.", "Technical", "Medium", "Pre-sales"),
-    assumption("opp-est-00", "Sizing uses configurable MVP default rules only, not confidential delivery formulas.", "Commercial", "High", "Pre-sales"),
+    assumption("opp-est-00", "Sizing uses configurable default rules only, not confidential delivery formulas.", "Commercial", "High", "Pre-sales"),
     assumption("opp-est-00", "Five initial integrations are assumed for the demo scenario.", "Integration", "High", "Integration Owner"),
     assumption("opp-ams-01", "Existing CUPPS workstation footprint can be reused.", "Technical", "Medium", "Solution Consulting"),
     assumption("opp-sin-02", "Customer will provide airport network readiness evidence before SRM closure.", "Delivery", "Medium", "Delivery"),

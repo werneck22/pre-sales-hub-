@@ -124,7 +124,7 @@ const HELP_TEXT = {
   resourceValidation:
     "Requests are routed by product, workstream, and region. Owner responses create the traceable evidence used by SRM and BAB readiness.",
   notificationPreview:
-    "Generate simulated Email or Teams validation requests for the selected resource owner. The MVP records the trigger locally and does not send external messages.",
+    "Generate an Email or Teams validation request for the resource owner. The trigger is recorded locally; nothing is sent externally.",
   srmReadiness:
     "SRM readiness indicates whether validated technical and delivery inputs are sufficient to proceed to solution review.",
   babReadiness:

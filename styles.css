@@ -1849,9 +1849,9 @@ select {
 
 .route-context-bar {
   display: grid;
-  gap: 12px;
-  margin: -8px 0 20px;
-  padding: 12px 16px;
+  gap: 10px;
+  margin: -8px 0 12px;
+  padding: 10px 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface);
@@ -4469,14 +4469,14 @@ tbody th {
 }
 
 .record-header {
-  padding: var(--space-4) var(--space-5);
+  padding: 12px 16px;
   border-left: 4px solid var(--teal);
   box-shadow: none;
 }
 
 .record-header h2 {
-  font-size: 1.35rem;
-  line-height: 1.25;
+  font-size: 1.15rem;
+  line-height: 1.2;
 }
 
 .journey-panel {
