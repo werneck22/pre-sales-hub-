@@ -174,32 +174,32 @@ let mockDb = {
   productScopes: [
     productScope("opp-est-00", "CUPPS", "Sized", "CUPPS Product Owner", "Validated", "Medium", "CUPPS positions based on medium airport mock defaults."),
     productScope("opp-est-00", "CUSS", "Sized", "CUSS Product Owner", "Validated", "Medium", "Kiosk effort based on medium airport mock defaults."),
-    productScope("opp-est-00", "Biometrics", "Sized", "Biometrics Product Owner", "Validated", "High", "Biometric touchpoints and API assumptions validated with conditions."),
+    productScope("opp-est-00", "Standalone Biopod", "Sized", "Standalone Biopod Owner", "Validated", "High", "Biopod touchpoints and API assumptions validated with conditions."),
     productScope("opp-est-00", "AODB", "Sized", "AODB Product Owner", "Validated", "Medium", "AODB baseline includes operational data and display feed assumptions."),
     productScope("opp-est-00", "Integrations / APIs", "Sized", "Integration Owner", "Validated", "High", "Five initial integrations assumed."),
     productScope("opp-ams-01", "CUSS", "Sized", "Elena Rossi", "Validated", "Medium", "86 kiosks, existing peripheral assumptions to confirm."),
     productScope("opp-ams-01", "CUPPS", "Draft", "Elena Rossi", "In review", "Medium", "142 workstations across terminal migration waves."),
-    productScope("opp-ams-01", "Biometrics", "Draft", "Product owner", "In review", "High", "Privacy and airline participation model pending."),
+    productScope("opp-ams-01", "Standalone Biopod", "Draft", "Product owner", "In review", "High", "Privacy and airline participation model pending."),
     productScope("opp-ams-01", "Integrations / APIs", "Draft", "Integration SME", "In review", "High", "9 candidate API touchpoints identified."),
     productScope("opp-ams-01", "Support / Field Services", "Sized", "Support lead", "Validated", "Medium", "Three support zones assumed."),
     productScope("opp-sin-02", "CUSS", "Sized", "Priya Menon", "Validated", "Medium", "120 kiosks across departure halls."),
-    productScope("opp-sin-02", "SBD", "Draft", "SBD product owner", "In review", "High", "44 bag drops; baggage interface dependencies open."),
-    productScope("opp-sin-02", "Biometrics", "Sized", "Product owner", "Validated", "Medium", "36 biometric touchpoints."),
-    productScope("opp-sin-02", "DDS/FIDS", "Validated", "Display SME", "Validated", "Low", "310 display endpoints."),
+    productScope("opp-sin-02", "ABD", "Draft", "ABD product owner", "In review", "High", "44 bag drops; baggage interface dependencies open."),
+    productScope("opp-sin-02", "Standalone Biopod", "Sized", "Product owner", "Validated", "Medium", "36 biopod touchpoints."),
+    productScope("opp-sin-02", "DDS", "Validated", "Display SME", "Validated", "Low", "310 display endpoints."),
     productScope("opp-sin-02", "Support / Field Services", "Draft", "Support lead", "Blocked", "High", "Field coverage model not yet agreed."),
     productScope("opp-gru-03", "AODB", "Draft", "Camila Almeida", "In review", "High", "Core AODB scope depends on incumbent discovery."),
-    productScope("opp-gru-03", "DDS/FIDS", "Not started", "Display SME", "Pending", "Medium", "420 displays estimated from airport inventory."),
+    productScope("opp-gru-03", "DDS", "Not started", "Display SME", "Pending", "Medium", "420 displays estimated from airport inventory."),
     productScope("opp-gru-03", "Integrations / APIs", "Not started", "Integration SME", "Pending", "High", "18 integrations assumed; catalogue pending."),
     productScope("opp-dfw-04", "CUPPS", "Sized", "Jordan Lee", "Validated", "Medium", "96 workstations across new gates."),
     productScope("opp-dfw-04", "CUSS", "Draft", "Jordan Lee", "In review", "Medium", "58 kiosks, airline branding assumptions open."),
     productScope("opp-dfw-04", "AODB", "Draft", "AODB SME", "In review", "Medium", "Operational data feed needed for concourse visibility."),
     productScope("opp-dfw-04", "Integrations / APIs", "Draft", "Integration SME", "Pending", "High", "12 candidate interfaces; airline ownership unclear."),
     productScope("opp-est-00", "Amadeus Passenger Verification", "Sized", "Biometrics Product Owner", "Validated", "Medium", "Passenger verification baseline aligned with medium airport defaults."),
-    productScope("opp-est-00", "Seamless GT 11 + Seamless Journey Platform Lite", "Sized", "Biometrics Product Owner", "Validated", "Medium", "Lite journey rollout scoped for the demo baseline terminal."),
-    productScope("opp-ams-01", "Seamless GT 11 + Seamless Journey Platform", "Draft", "Product owner", "In review", "High", "Full self-service journey pending airline participation model."),
+    productScope("opp-est-00", "Seamless Journey Platform Lite", "Sized", "Journey Platform Owner", "Validated", "Medium", "Lite journey rollout scoped for the demo baseline terminal."),
+    productScope("opp-ams-01", "Seamless Journey Full", "Draft", "Product owner", "In review", "High", "Full self-service journey pending airline participation model."),
     productScope("opp-sin-02", "Baggage Reconciliation System", "Draft", "SBD product owner", "In review", "High", "BRS scope tied to bag drop interface dependencies."),
-    productScope("opp-gru-03", "Seamless GT 11 One Door Non Biometric Hardware", "Not started", "Camila Almeida", "Pending", "Medium", "One door hardware count pending incumbent discovery."),
-    productScope("opp-dfw-04", "Seamless GT 11 + Biopod", "Draft", "Jordan Lee", "In review", "High", "Biopod placement pending gate concourse survey."),
+    productScope("opp-gru-03", "Seamless GT11 eGate - Non Biometric", "Not started", "Camila Almeida", "Pending", "Medium", "One door hardware count pending incumbent discovery."),
+    productScope("opp-dfw-04", "Seamless GT11 eGate - Biopod", "Draft", "Jordan Lee", "In review", "High", "Biopod placement pending gate concourse survey."),
   ],
   stakeholderValidations: [
     makeValidation("opp-est-00", 0, { status: "Validated", due_date: "2026-06-24", comments: "Commercial context captured." }),
@@ -334,6 +334,24 @@ function migrateMockDb(db) {
     "notifications",
   ].forEach((collection) => {
     if (!Array.isArray(db[collection])) db[collection] = [];
+  });
+  // Rename products in any persisted scopes/estimates so returning users pick
+  // up the restructured catalog without needing a reset.
+  const productRenames = {
+    SBD: "ABD",
+    Biometrics: "Standalone Biopod",
+    "DDS/FIDS": "DDS",
+    "Seamless GT 11 One Door Non Biometric Hardware": "Seamless GT11 eGate - Non Biometric",
+    "Seamless GT 11 + Seamless Journey Platform Lite": "Seamless Journey Platform Lite",
+    "Seamless GT 11 + Seamless Journey Platform": "Seamless Journey Full",
+    "Seamless GT 11 + Biopod": "Seamless GT11 eGate - Biopod",
+  };
+  [db.productScopes, db.sizingEstimates].forEach((collection) => {
+    collection.forEach((item) => {
+      if (item.product_name && productRenames[item.product_name]) {
+        item.product_name = productRenames[item.product_name];
+      }
+    });
   });
   db.airportProfiles.forEach((profile) => {
     profile.airport_code ||= "";

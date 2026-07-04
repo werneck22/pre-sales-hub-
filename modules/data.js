@@ -1,19 +1,27 @@
 const PRODUCT_NAMES = [
   "CUSS",
   "CUPPS",
-  "SBD",
-  "Biometrics",
-  "AODB",
-  "DDS/FIDS",
-  "Integrations / APIs",
-  "Support / Field Services",
-  "Seamless GT 11 One Door Non Biometric Hardware",
-  "Seamless GT 11 + Seamless Journey Platform Lite",
-  "Seamless GT 11 + Seamless Journey Platform",
-  "Seamless GT 11 + Biopod",
-  "Amadeus Passenger Verification",
+  "ABD",
   "Baggage Reconciliation System",
+  "Standalone Biopod",
+  "Amadeus Passenger Verification",
+  "AODB",
+  "FRMS",
+  "DDS",
+  "Integrations / APIs",
+  "Seamless GT11 eGate - Non Biometric",
+  "Seamless GT11 eGate - Biometric",
+  "Seamless GT11 eGate - Biopod",
+  "Seamless Journey Platform Lite",
+  "Seamless Journey Full",
+  "Support / Field Services",
 ];
+
+// Products for which no owner-validated sizing rule exists yet: the catalog
+// carries them, but effort must come from real rules/examples, so the engine
+// must not invent MD for them. FRMS: future AMS suite sizing is driven by the
+// airport's annual movements. The biometric eGate awaits its own rule set.
+const PRODUCTS_AWAITING_SIZING = new Set(["FRMS", "Seamless GT11 eGate - Biometric"]);
 
 // UI grouping for the Product Scope screen so related products (and the four
 // Seamless GT 11 variants) sit together instead of scattering down the page.
@@ -21,25 +29,32 @@ const PRODUCT_FAMILY_ORDER = [
   "Common Use",
   "Self-Service & Baggage",
   "Biometrics & Identity",
-  "Airport Operations",
-  "Integration & Support",
-  "Seamless GT 11",
+  "AMS - Amadeus Management Solutions",
+  "Seamless - Hardware",
+  "Seamless - Software",
+  "Support",
   "Other products",
 ];
 const PRODUCT_FAMILY_MAP = {
   CUSS: "Common Use",
   CUPPS: "Common Use",
-  SBD: "Self-Service & Baggage",
+  ABD: "Self-Service & Baggage",
   "Baggage Reconciliation System": "Self-Service & Baggage",
-  Biometrics: "Biometrics & Identity",
+  "Standalone Biopod": "Biometrics & Identity",
   "Amadeus Passenger Verification": "Biometrics & Identity",
-  AODB: "Airport Operations",
-  "DDS/FIDS": "Airport Operations",
-  "Integrations / APIs": "Integration & Support",
-  "Support / Field Services": "Integration & Support",
+  AODB: "AMS - Amadeus Management Solutions",
+  FRMS: "AMS - Amadeus Management Solutions",
+  DDS: "AMS - Amadeus Management Solutions",
+  "Integrations / APIs": "AMS - Amadeus Management Solutions",
+  "Support / Field Services": "Support",
 };
+// The AMS (Amadeus Management Solutions) suite. Integrations/APIs is scoped
+// against AODB (see PRODUCT_LINKS) rather than being a suite product itself.
+const AMS_SUITE_PRODUCTS = new Set(["AODB", "FRMS", "DDS"]);
+const PRODUCT_LINKS = { "Integrations / APIs": "AODB" };
 function productFamily(name) {
-  if (String(name).startsWith("Seamless GT 11")) return "Seamless GT 11";
+  if (String(name).startsWith("Seamless GT11 eGate")) return "Seamless - Hardware";
+  if (String(name).startsWith("Seamless Journey")) return "Seamless - Software";
   return PRODUCT_FAMILY_MAP[name] || "Other products";
 }
 
@@ -158,16 +173,18 @@ const TARGET_ROUTE_MAP = {
 const productRuleCodes = {
   CUSS: "CUSS",
   CUPPS: "CUPPS",
-  SBD: "SBD",
-  Biometrics: "BIO",
+  ABD: "ABD",
+  "Standalone Biopod": "BIOPOD",
   AODB: "AODB",
-  "DDS/FIDS": "DDS",
+  FRMS: "FRMS",
+  DDS: "DDS",
   "Integrations / APIs": "API",
   "Support / Field Services": "SUP",
-  "Seamless GT 11 One Door Non Biometric Hardware": "GT11-NB",
-  "Seamless GT 11 + Seamless Journey Platform Lite": "GT11-SJPL",
-  "Seamless GT 11 + Seamless Journey Platform": "GT11-SJP",
-  "Seamless GT 11 + Biopod": "GT11-BIOPOD",
+  "Seamless GT11 eGate - Non Biometric": "GT11-NB",
+  "Seamless GT11 eGate - Biometric": "GT11-BIO",
+  "Seamless GT11 eGate - Biopod": "GT11-BIOPOD",
+  "Seamless Journey Platform Lite": "SJP-LITE",
+  "Seamless Journey Full": "SJP-FULL",
   "Amadeus Passenger Verification": "APV",
   "Baggage Reconciliation System": "BRS",
 };
@@ -231,7 +248,7 @@ const productWorkstreamBase = {
     Training: 5,
     "Support Readiness": 5,
   },
-  SBD: {
+  ABD: {
     Implementation: 20,
     "R&D": 10,
     "Project Management": 8,
@@ -241,7 +258,7 @@ const productWorkstreamBase = {
     "Support Readiness": 6,
     "Field Services": 10,
   },
-  Biometrics: {
+  "Standalone Biopod": {
     Implementation: 16,
     "R&D": 20,
     "Project Management": 8,
@@ -259,7 +276,7 @@ const productWorkstreamBase = {
     Training: 6,
     "Support Readiness": 6,
   },
-  "DDS/FIDS": {
+  DDS: {
     Implementation: 14,
     "Project Management": 6,
     Integrations: 8,
@@ -268,6 +285,7 @@ const productWorkstreamBase = {
     "Support Readiness": 4,
     "Field Services": 8,
   },
+  FRMS: {},
   "Integrations / APIs": {
     Implementation: 8,
     "R&D": 12,
@@ -282,7 +300,7 @@ const productWorkstreamBase = {
     "Field Services": 16,
     Training: 4,
   },
-  "Seamless GT 11 One Door Non Biometric Hardware": {
+  "Seamless GT11 eGate - Non Biometric": {
     Implementation: 14,
     "R&D": 6,
     "Project Management": 6,
@@ -291,7 +309,17 @@ const productWorkstreamBase = {
     Training: 3,
     "Support Readiness": 4,
   },
-  "Seamless GT 11 + Seamless Journey Platform Lite": {
+  "Seamless GT11 eGate - Biopod": {
+    Implementation: 20,
+    "R&D": 18,
+    "Project Management": 9,
+    "Airline Onboarding": 8,
+    Integrations: 14,
+    "Testing & Cutover": 9,
+    Training: 4,
+    "Support Readiness": 6,
+  },
+  "Seamless Journey Platform Lite": {
     Implementation: 18,
     "R&D": 10,
     "Project Management": 8,
@@ -301,7 +329,7 @@ const productWorkstreamBase = {
     Training: 4,
     "Support Readiness": 5,
   },
-  "Seamless GT 11 + Seamless Journey Platform": {
+  "Seamless Journey Full": {
     Implementation: 24,
     "R&D": 14,
     "Project Management": 10,
@@ -309,16 +337,6 @@ const productWorkstreamBase = {
     Integrations: 12,
     "Testing & Cutover": 9,
     Training: 5,
-    "Support Readiness": 6,
-  },
-  "Seamless GT 11 + Biopod": {
-    Implementation: 20,
-    "R&D": 18,
-    "Project Management": 9,
-    "Airline Onboarding": 8,
-    Integrations: 14,
-    "Testing & Cutover": 9,
-    Training: 4,
     "Support Readiness": 6,
   },
   "Amadeus Passenger Verification": {
@@ -346,13 +364,6 @@ const productWorkstreamBase = {
 const productSizingDrivers = {
   CUPPS: [
     {
-      key: "cupps_positions",
-      label: "CUPPS positions",
-      unit: "positions",
-      defaults: { Small: 10, Medium: 24, Large: 64, "Extra Large": 120 },
-      weight: 0.3,
-    },
-    {
       key: "check_in_counters",
       label: "Check-in counters",
       unit: "counters",
@@ -365,6 +376,15 @@ const productSizingDrivers = {
       unit: "gates",
       defaults: { Small: 6, Medium: 18, Large: 52, "Extra Large": 85 },
       weight: 0.2,
+    },
+    {
+      // Auto-populated total; read-only. Weight 0 so it does not double-count
+      // the counters and gates it is the sum of.
+      key: "cupps_positions",
+      label: "CUPPS positions (total)",
+      unit: "positions",
+      computed: { op: "sum", sources: ["check_in_counters", "gates"] },
+      weight: 0,
     },
   ],
   CUSS: [
@@ -383,19 +403,33 @@ const productSizingDrivers = {
       weight: 0.25,
     },
   ],
-  SBD: [
+  ABD: [
     {
-      key: "sbd_units",
-      label: "SBD units",
-      unit: "bag drops",
-      defaults: { Small: 4, Medium: 14, Large: 36, "Extra Large": 64 },
-      weight: 0.45,
+      key: "abd_s1_mini_units",
+      label: "ABD S1 Mini units",
+      unit: "units",
+      defaults: { Small: 2, Medium: 6, Large: 14, "Extra Large": 24 },
+      weight: 0.2,
+    },
+    {
+      key: "abd_s1_t2_units",
+      label: "ABD S1 T2 units",
+      unit: "units",
+      defaults: { Small: 2, Medium: 5, Large: 12, "Extra Large": 20 },
+      weight: 0.2,
+    },
+    {
+      key: "abd_s7_units",
+      label: "ABD S7 units",
+      unit: "units",
+      defaults: { Small: 1, Medium: 3, Large: 8, "Extra Large": 14 },
+      weight: 0.2,
     },
   ],
-  Biometrics: [
+  "Standalone Biopod": [
     {
-      key: "biometric_positions",
-      label: "Biometric positions",
+      key: "biopod_positions",
+      label: "Standalone Biopod positions",
       unit: "positions",
       defaults: { Small: 6, Medium: 16, Large: 36, "Extra Large": 70 },
       weight: 0.4,
@@ -417,7 +451,7 @@ const productSizingDrivers = {
       weight: 0.2,
     },
   ],
-  "DDS/FIDS": [
+  DDS: [
     {
       key: "display_endpoints",
       label: "Display endpoints",
@@ -435,11 +469,32 @@ const productSizingDrivers = {
   ],
   "Integrations / APIs": [
     {
-      key: "integration_count",
-      label: "Integrations/APIs",
-      unit: "interfaces",
-      defaults: { Small: 3, Medium: 5, Large: 10, "Extra Large": 18 },
-      weight: 0.45,
+      key: "integration_l1_count",
+      label: "Integrations - L1 (Simple)",
+      unit: "integrations",
+      defaults: { Small: 2, Medium: 3, Large: 6, "Extra Large": 10 },
+      weight: 0.15,
+    },
+    {
+      key: "integration_l2_count",
+      label: "Integrations - L2 (Moderate)",
+      unit: "integrations",
+      defaults: { Small: 1, Medium: 2, Large: 4, "Extra Large": 7 },
+      weight: 0.2,
+    },
+    {
+      key: "integration_l3_count",
+      label: "Integrations - L3 (Complex)",
+      unit: "integrations",
+      defaults: { Small: 1, Medium: 1, Large: 3, "Extra Large": 5 },
+      weight: 0.25,
+    },
+    {
+      key: "integration_l4_count",
+      label: "Integrations - L4 (Very Complex)",
+      unit: "integrations",
+      defaults: { Small: 0, Medium: 1, Large: 2, "Extra Large": 3 },
+      weight: 0.3,
     },
   ],
   "Support / Field Services": [
@@ -458,40 +513,49 @@ const productSizingDrivers = {
       weight: 0.25,
     },
   ],
-  "Seamless GT 11 One Door Non Biometric Hardware": [
+  "Seamless GT11 eGate - Non Biometric": [
     {
       key: "gt11_nb_doors",
-      label: "GT11 door units",
+      label: "eGate door units",
       unit: "doors",
       defaults: { Small: 6, Medium: 24, Large: 60, "Extra Large": 100 },
       weight: 0.35,
     },
   ],
-  "Seamless GT 11 + Seamless Journey Platform Lite": [
+  "Seamless GT11 eGate - Biometric": [
     {
-      key: "gt11_sjpl_doors",
-      label: "GT11 door units",
-      unit: "doors",
-      defaults: { Small: 6, Medium: 22, Large: 55, "Extra Large": 95 },
-      weight: 0.3,
-    },
-  ],
-  "Seamless GT 11 + Seamless Journey Platform": [
-    {
-      key: "gt11_sjp_doors",
-      label: "GT11 door units",
+      key: "gt11_bio_doors",
+      label: "eGate door units",
       unit: "doors",
       defaults: { Small: 6, Medium: 20, Large: 50, "Extra Large": 90 },
-      weight: 0.3,
+      weight: 0.35,
     },
   ],
-  "Seamless GT 11 + Biopod": [
+  "Seamless GT11 eGate - Biopod": [
     {
       key: "gt11_biopod_units",
       label: "Biopod units",
       unit: "pods",
       defaults: { Small: 4, Medium: 16, Large: 40, "Extra Large": 70 },
       weight: 0.4,
+    },
+  ],
+  "Seamless Journey Platform Lite": [
+    {
+      key: "sjp_lite_doors",
+      label: "Journey doors served",
+      unit: "doors",
+      defaults: { Small: 6, Medium: 22, Large: 55, "Extra Large": 95 },
+      weight: 0.3,
+    },
+  ],
+  "Seamless Journey Full": [
+    {
+      key: "sjp_full_doors",
+      label: "Journey doors served",
+      unit: "doors",
+      defaults: { Small: 6, Medium: 20, Large: 50, "Extra Large": 90 },
+      weight: 0.3,
     },
   ],
   "Amadeus Passenger Verification": [
@@ -722,15 +786,16 @@ function buildResourceOwners() {
   );
 
   owners.push(
-    resourceOwner("owner-biometrics-rd-emea", "Biometrics R&D Owner", "R&D", "biometrics.rd@example.com", "Biometrics", "EMEA", "R&D", "R&D Owner"),
+    resourceOwner("owner-biopod-rd-emea", "Standalone Biopod R&D Owner", "R&D", "biopod.rd@example.com", "Standalone Biopod", "EMEA", "R&D", "R&D Owner"),
     resourceOwner("owner-aodb-pm-emea", "AODB PM Owner", "Project Management", "aodb.pm@example.com", "AODB", "EMEA", "Project Management", "PM Owner"),
+    resourceOwner("owner-dds-implementation-global", "DDS Implementation Owner", "Implementation", "dds.implementation@example.com", "DDS", "Global", "Implementation", "Implementation Owner"),
     resourceOwner("owner-cupps-implementation-emea", "CUPPS Implementation Owner", "Implementation", "cupps.implementation@example.com", "CUPPS", "EMEA", "Implementation", "Implementation Owner"),
     resourceOwner("owner-cuss-onboarding-emea", "CUSS Airline Onboarding Owner", "Airline Onboarding", "cuss.onboarding@example.com", "CUSS", "EMEA", "Airline Onboarding", "Airline Onboarding Owner"),
     resourceOwner("owner-integration-emea", "EMEA Integration Owner", "Integrations", "emea.integration@example.com", "Integrations / APIs", "EMEA", "Integrations", "Integration Owner"),
-    resourceOwner("owner-gt11-nb-rd-global", "GT11 Hardware R&D Owner", "R&D", "gt11.hardware.rd@example.com", "Seamless GT 11 One Door Non Biometric Hardware", "Global", "R&D", "R&D Owner"),
-    resourceOwner("owner-gt11-sjpl-integration-global", "Seamless Journey Lite Integration Owner", "Integrations", "sjp.lite.integration@example.com", "Seamless GT 11 + Seamless Journey Platform Lite", "Global", "Integrations", "Integration Owner"),
-    resourceOwner("owner-gt11-sjp-implementation-global", "Seamless Journey Platform Owner", "Implementation", "sjp.implementation@example.com", "Seamless GT 11 + Seamless Journey Platform", "Global", "Implementation", "Implementation Owner"),
-    resourceOwner("owner-gt11-biopod-rd-global", "Biopod R&D Owner", "R&D", "biopod.rd@example.com", "Seamless GT 11 + Biopod", "Global", "R&D", "R&D Owner"),
+    resourceOwner("owner-gt11-nb-rd-global", "eGate Hardware R&D Owner", "R&D", "gt11.hardware.rd@example.com", "Seamless GT11 eGate - Non Biometric", "Global", "R&D", "R&D Owner"),
+    resourceOwner("owner-sjp-lite-integration-global", "Seamless Journey Lite Integration Owner", "Integrations", "sjp.lite.integration@example.com", "Seamless Journey Platform Lite", "Global", "Integrations", "Integration Owner"),
+    resourceOwner("owner-sjp-full-implementation-global", "Seamless Journey Full Owner", "Implementation", "sjp.full.implementation@example.com", "Seamless Journey Full", "Global", "Implementation", "Implementation Owner"),
+    resourceOwner("owner-gt11-biopod-rd-global", "eGate Biopod R&D Owner", "R&D", "gt11.biopod.rd@example.com", "Seamless GT11 eGate - Biopod", "Global", "R&D", "R&D Owner"),
     resourceOwner("owner-apv-integration-global", "Passenger Verification Integration Owner", "Integrations", "apv.integration@example.com", "Amadeus Passenger Verification", "Global", "Integrations", "Integration Owner"),
     resourceOwner("owner-brs-field-global", "Baggage Reconciliation Field Owner", "Field Services", "brs.field@example.com", "Baggage Reconciliation System", "Global", "Field Services", "Field Services Owner"),
   );
@@ -822,8 +887,21 @@ function driverDefault(driver, airportCategory = "Medium") {
   return driver.defaults?.[airportCategory] ?? driver.defaults?.Medium ?? 0;
 }
 
+// Computed drivers (e.g. CUPPS positions = check-in counters + boarding gates)
+// derive their value from other driver inputs and are not stored or edited.
+function computeDriverValue(driver, inputs = {}) {
+  if (!driver.computed) return 0;
+  const values = driver.computed.sources.map((key) => Number(inputs?.[key] || 0));
+  if (driver.computed.op === "sum") return values.reduce((sum, value) => sum + value, 0);
+  return 0;
+}
+
 function defaultSizingInputs(productName, airportCategory = "Medium") {
-  return Object.fromEntries(driversForProduct(productName).map((driver) => [driver.key, driverDefault(driver, airportCategory)]));
+  return Object.fromEntries(
+    driversForProduct(productName)
+      .filter((driver) => !driver.computed)
+      .map((driver) => [driver.key, driverDefault(driver, airportCategory)]),
+  );
 }
 
 function ensureScopeSizingInputs(scope, airportCategory = "Medium") {
@@ -831,6 +909,7 @@ function ensureScopeSizingInputs(scope, airportCategory = "Medium") {
   if (!scope.owner_email) scope.owner_email = defaultOwnerEmail(scope.owner);
   if (!scope.sizing_inputs) scope.sizing_inputs = {};
   driversForProduct(scope.product_name).forEach((driver) => {
+    if (driver.computed) return;
     if (scope.sizing_inputs[driver.key] === undefined || scope.sizing_inputs[driver.key] === "") {
       scope.sizing_inputs[driver.key] = driverDefault(driver, airportCategory);
     }
@@ -840,8 +919,8 @@ function ensureScopeSizingInputs(scope, airportCategory = "Medium") {
 function driverDetailsForScope(scope, airportCategory = "Medium") {
   ensureScopeSizingInputs(scope, airportCategory);
   return driversForProduct(scope.product_name).map((driver) => {
-    const defaultValue = driverDefault(driver, airportCategory);
-    const value = Number(scope.sizing_inputs?.[driver.key] || 0);
+    const defaultValue = driver.computed ? computeDriverValue(driver, scope.sizing_inputs) : driverDefault(driver, airportCategory);
+    const value = driver.computed ? computeDriverValue(driver, scope.sizing_inputs) : Number(scope.sizing_inputs?.[driver.key] || 0);
     return {
       ...driver,
       defaultValue,
@@ -945,7 +1024,7 @@ const MOCK_BENCHMARKS = [
     name: "Gulf International - Biometrics & SBD Programme",
     category: "Large",
     year: 2025,
-    products: ["Biometrics", "SBD", "Integrations / APIs"],
+    products: ["Standalone Biopod", "ABD", "Integrations / APIs"],
     validated_md_total: 412,
     validated_md_range: [360, 470],
     confidence: "High",
@@ -956,7 +1035,7 @@ const MOCK_BENCHMARKS = [
     name: "Northstar Airports - AODB/DDS Modernization",
     category: "Large",
     year: 2024,
-    products: ["AODB", "DDS/FIDS", "Integrations / APIs"],
+    products: ["AODB", "DDS", "Integrations / APIs"],
     validated_md_total: 358,
     validated_md_range: [310, 405],
     confidence: "Medium",
@@ -967,7 +1046,7 @@ const MOCK_BENCHMARKS = [
     name: "Meridian Mega-Hub - Full Passenger Processing",
     category: "Extra Large",
     year: 2024,
-    products: ["CUPPS", "CUSS", "SBD", "Biometrics", "AODB"],
+    products: ["CUPPS", "CUSS", "ABD", "Standalone Biopod", "AODB"],
     validated_md_total: 684,
     validated_md_range: [600, 760],
     confidence: "Medium",
@@ -1019,6 +1098,10 @@ export {
   WORKSTREAMS,
   PRODUCT_FAMILY_ORDER,
   productFamily,
+  PRODUCTS_AWAITING_SIZING,
+  AMS_SUITE_PRODUCTS,
+  PRODUCT_LINKS,
+  computeDriverValue,
   DEMO_FROZEN_TODAY,
   referenceToday,
   setReferenceToday,
