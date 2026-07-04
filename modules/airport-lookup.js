@@ -80,7 +80,7 @@ function trafficProvenanceText(profile) {
     return `${locationPrefix}traffic from the reference directory${year} · approximate figures - confirm against official statistics before governance use.`;
   }
   if (profile.traffic_source !== "Wikidata") {
-    return `${locationPrefix}Traffic figures: manual entry. Enter an IATA/ICAO code to look up passenger traffic, or search an airport in the header to create a targeted opportunity.`;
+    return `${locationPrefix}Manual entry. Enter an IATA/ICAO code to look up traffic.`;
   }
   const year = profile.traffic_source_year ? ` (${profile.traffic_source_year})` : "";
   const retrieved = profile.traffic_retrieved_at ? ` · retrieved ${profile.traffic_retrieved_at}` : "";

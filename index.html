@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260704-9" />
+    <link rel="stylesheet" href="./styles.css?v=20260704-10" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -469,7 +469,7 @@
                     <h3>Product scope and sizing placeholders</h3>
                     <button type="button" class="help-tooltip" data-help-key="productScope" data-help-label="Product scope"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Select only the products included in the proposal baseline. Product choices determine sizing workstreams, owners, and validation requests.</p>
+                  <p class="section-help">Select the products in the proposal baseline.</p>
                 </div>
                 <span id="productCount" class="meta-chip">0 products</span>
               </div>
@@ -484,7 +484,7 @@
                     <h3>Automated sizing engine</h3>
                     <button type="button" class="help-tooltip" data-help-key="automatedSizing" data-help-label="Automated sizing"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Initial MDs come from configurable mock rules using airport category, product scope, complexity, risk, and product-specific drivers. Owner validation is required before governance use.</p>
+                  <p class="section-help">Generated from airport category, scope, and product drivers. Owner validation required before governance use.</p>
                 </div>
                 <div class="engine-actions">
                   <span id="categoryBadge" class="meta-chip">Category pending</span>
@@ -500,9 +500,8 @@
                     <h3>Resource validation</h3>
                     <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Each product/workstream sizing line is routed to a resource owner for sign-off. Review the queue, select a line, and record the owner decision. For function-level sign-off (Sales, Legal, Pricing...) see Stakeholders.</p>
+                  <p class="section-help">Each sizing line is routed to its resource owner for sign-off. Function-level sign-off lives in Stakeholders.</p>
                 </div>
-                <span class="meta-chip">Simulated workflow</span>
               </div>
 
               <form id="airportProfileForm" class="form-grid compact-form" data-route-view="sizing">
@@ -511,7 +510,7 @@
                     <strong>Airport categorization</strong>
                     <button type="button" class="help-tooltip" data-help-key="airportCategorization" data-help-label="Airport categorization"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p>The larger category produced by annual passengers or aircraft movements is used. An override requires a documented reason.</p>
+                  <p>The larger of the passenger or movement category applies.</p>
                 </div>
                 <label>
                   Airport name
@@ -575,9 +574,7 @@
                         <h4>Generated sizing estimates</h4>
                         <button type="button" class="help-tooltip" data-help-key="mdEstimates" data-help-label="MD estimates"><span aria-hidden="true">i</span></button>
                       </div>
-                      <p class="subsection-help">Compare product totals first, then expand a product to review workstreams, rule context, owners, and validation exceptions.</p>
                     </div>
-                    <span class="meta-chip">Mock default rules only</span>
                   </div>
                   <div class="estimate-toolbar" data-route-view="sizing" aria-label="Sizing estimate filters">
                     <label>
@@ -783,6 +780,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260704-9"></script>
+    <script type="module" src="./modules/main.js?v=20260704-10"></script>
   </body>
 </html>
