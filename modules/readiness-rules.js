@@ -557,11 +557,20 @@ function stakeholdersValidationRows(opportunity) {
   return validationsFor(opportunity.id);
 }
 
-function portfolioReadinessGaps(opportunities, limit = 8) {
-  return opportunities
-    .flatMap((opportunity) => readinessGapsForOpportunity(opportunity))
-    .sort((a, b) => severityWeight(b.severity) - severityWeight(a.severity) || b.priority - a.priority)
-    .slice(0, limit);
+function portfolioReadinessGaps(opportunities, limit = 8, { perOpportunity = false } = {}) {
+  const ranked = (gaps) =>
+    gaps.slice().sort((a, b) => severityWeight(b.severity) - severityWeight(a.severity) || b.priority - a.priority);
+
+  if (perOpportunity) {
+    // One row per opportunity: the single most urgent gap. Avoids a single
+    // struggling deal flooding the leadership "What Needs Attention" list.
+    const topPerOpportunity = opportunities
+      .map((opportunity) => ranked(readinessGapsForOpportunity(opportunity))[0])
+      .filter(Boolean);
+    return ranked(topPerOpportunity).slice(0, limit);
+  }
+
+  return ranked(opportunities.flatMap((opportunity) => readinessGapsForOpportunity(opportunity))).slice(0, limit);
 }
 
 function hasBlocker(opportunity) {

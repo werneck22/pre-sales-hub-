@@ -23,6 +23,8 @@ import {
   formatShortDate,
   isDocumented,
   pluralize,
+  PRODUCT_FAMILY_ORDER,
+  productFamily,
   referenceToday,
   sizingRuleCode,
   statusClass,
@@ -343,7 +345,7 @@ function renderExecutiveDashboard() {
   }
 
   if (elements.topReadinessGaps) {
-    const topGaps = portfolioReadinessGaps(visible, 7);
+    const topGaps = portfolioReadinessGaps(visible, 7, { perOpportunity: true });
     elements.topReadinessGaps.innerHTML = topGaps.length
       ? topGaps
           .map(
@@ -506,6 +508,9 @@ function renderRecordHeader(opportunity) {
   elements.stageBadge.className = `status-pill ${statusClass(currentForumStatus(opportunity))}`;
   elements.readinessBadge.textContent = `${score}% readiness`;
   elements.readinessBadge.className = `status-pill ${statusClass(breakdown.status)}`;
+  elements.readinessBadge.title = breakdown.caps.length
+    ? `Base score ${breakdown.baseScore}% is capped at ${breakdown.cap}% by a critical control: ${breakdown.caps[0].reason}`
+    : `${breakdown.status} - no critical score cap applied`;
   const readinessLabel = forumReadinessLabel(opportunity);
   elements.forumBadge.textContent = readinessLabel;
   elements.forumBadge.className = `status-pill ${statusClass(readinessLabel)}`;
@@ -911,81 +916,115 @@ function productSizingRollup(opportunityId, productName) {
   };
 }
 
-function renderProductScope(opportunity) {
-  const scopes = productScopesFor(opportunity.id);
-  const profile = airportProfileFor(opportunity.id);
-  const airportCategory = classifyAirport(profile);
-  elements.productScope.innerHTML = "";
-  elements.productCount.textContent = `${scopes.length} products`;
-
-  if (!scopes.length) {
-    elements.productScope.innerHTML = `
-      <div class="guided-empty product-onboarding-card span-2">
-        <strong>No products selected.</strong>
-        <p>The MVP will create product/workstream sizing lines, identify resource owners, and generate validation requests after products are selected.</p>
-        <button type="button" class="secondary-button" data-action="focus-first-product" data-target="#scope">Select the first product</button>
-      </div>
-    `;
-  }
-
-  PRODUCT_NAMES.forEach((productName) => {
-    const scope = scopes.find((item) => item.product_name === productName);
-    const selected = Boolean(scope);
-    if (scope) ensureScopeSizingInputs(scope, airportCategory);
-    const displayScope = scope || {
-      product_name: productName,
-      scope_status: "In scope",
-      sizing_status: "Not started",
-      owner: "",
-      owner_email: "",
-      validation_status: "Pending",
-      risk_level: "Low",
-      comments: "",
-      sizing_inputs: defaultSizingInputs(productName, airportCategory),
-    };
-    const rollup = selected ? productSizingRollup(opportunity.id, productName) : null;
-    const productCard = document.createElement("div");
-    productCard.className = `product-card ${selected ? "included" : ""}`;
-    productCard.innerHTML = `
+function selectedProductCardHtml(opportunity, scope, airportCategory) {
+  ensureScopeSizingInputs(scope, airportCategory);
+  const productName = scope.product_name;
+  const rollup = productSizingRollup(opportunity.id, productName);
+  return `
+    <div class="product-card included">
       <label class="product-toggle">
-        <input type="checkbox" data-product="${escapeHtml(productName)}" ${selected ? "checked" : ""} />
+        <input type="checkbox" data-product="${escapeHtml(productName)}" checked />
         <span>
           <strong>${escapeHtml(productName)}</strong>
-          <small>${selected ? escapeHtml(displayScope.scope_status) : "Out of scope"}</small>
+          <small>${escapeHtml(scope.scope_status)}</small>
         </span>
       </label>
       <div class="scope-fields" aria-label="${escapeHtml(productName)} product scope">
         <label>
           Scope
-          <select data-scope-product="${escapeHtml(productName)}" data-field="scope_status" ${selected ? "" : "disabled"}>
-            ${statusOptions(SCOPE_STATUSES, displayScope.scope_status)}
+          <select data-scope-product="${escapeHtml(productName)}" data-field="scope_status">
+            ${statusOptions(SCOPE_STATUSES, scope.scope_status)}
           </select>
         </label>
         <label>
           Sizing
-          <span class="scope-readout ${rollup ? rollup.tone : ""}">${rollup ? escapeHtml(rollup.sizing) : "-"}</span>
+          <span class="scope-readout ${rollup.tone}">${escapeHtml(rollup.sizing)}</span>
         </label>
         <label>
           Validation
-          <span class="scope-readout ${rollup ? rollup.tone : ""}">${rollup ? escapeHtml(rollup.validation) : "-"}</span>
+          <span class="scope-readout ${rollup.tone}">${escapeHtml(rollup.validation)}</span>
         </label>
         <label>
           Owner email override
-          <input type="email" data-scope-product="${escapeHtml(productName)}" data-field="owner_email" value="${escapeHtml(displayScope.owner_email)}" ${
-      selected ? "" : "disabled"
-    } />
+          <input type="email" data-scope-product="${escapeHtml(productName)}" data-field="owner_email" value="${escapeHtml(scope.owner_email)}" />
         </label>
         <label>
           Risk level
-          <select data-scope-product="${escapeHtml(productName)}" data-field="risk_level" ${selected ? "" : "disabled"}>
-            ${statusOptions(RISK_LEVELS, displayScope.risk_level)}
+          <select data-scope-product="${escapeHtml(productName)}" data-field="risk_level">
+            ${statusOptions(RISK_LEVELS, scope.risk_level)}
           </select>
         </label>
       </div>
-      ${renderScopeDriverControls(displayScope, airportCategory, selected)}
-    `;
-    elements.productScope.appendChild(productCard);
-  });
+      ${renderScopeDriverControls(scope, airportCategory, true)}
+    </div>
+  `;
+}
+
+function renderProductScope(opportunity) {
+  const scopes = productScopesFor(opportunity.id);
+  const profile = airportProfileFor(opportunity.id);
+  const airportCategory = classifyAirport(profile);
+  elements.productCount.textContent = `${scopes.length} products`;
+
+  const selectedNames = new Set(scopes.map((scope) => scope.product_name));
+  const outOfScope = PRODUCT_NAMES.filter((name) => !selectedNames.has(name));
+  const scopeByName = new Map(scopes.map((scope) => [scope.product_name, scope]));
+
+  const familiesWithSelected = PRODUCT_FAMILY_ORDER.filter((family) =>
+    scopes.some((scope) => productFamily(scope.product_name) === family),
+  );
+
+  const selectedSectionsHtml = scopes.length
+    ? familiesWithSelected
+        .map((family) => {
+          const cards = PRODUCT_NAMES.filter((name) => selectedNames.has(name) && productFamily(name) === family)
+            .map((name) => selectedProductCardHtml(opportunity, scopeByName.get(name), airportCategory))
+            .join("");
+          return `
+            <div class="scope-family span-2">
+              <h4 class="scope-family-title">${escapeHtml(family)}</h4>
+              <div class="scope-family-grid">${cards}</div>
+            </div>`;
+        })
+        .join("")
+    : `
+      <div class="guided-empty product-onboarding-card span-2">
+        <strong>No products selected.</strong>
+        <p>Selecting products creates sizing lines, identifies resource owners, and generates validation requests. Open "Add products" below to start.</p>
+      </div>`;
+
+  const addPanelHtml = outOfScope.length
+    ? `
+      <details class="scope-add-panel span-2" ${scopes.length ? "" : "open"}>
+        <summary>
+          <span>Add products to scope</span>
+          <span class="meta-chip">${outOfScope.length} available</span>
+        </summary>
+        <div class="scope-add-body">
+          ${PRODUCT_FAMILY_ORDER.filter((family) => outOfScope.some((name) => productFamily(name) === family))
+            .map((family) => {
+              const toggles = outOfScope
+                .filter((name) => productFamily(name) === family)
+                .map(
+                  (name) => `
+                  <label class="scope-add-toggle">
+                    <input type="checkbox" data-product="${escapeHtml(name)}" />
+                    <span>${escapeHtml(name)}</span>
+                  </label>`,
+                )
+                .join("");
+              return `
+                <div class="scope-add-group">
+                  <span class="scope-add-group-label">${escapeHtml(family)}</span>
+                  ${toggles}
+                </div>`;
+            })
+            .join("")}
+        </div>
+      </details>`
+    : "";
+
+  elements.productScope.innerHTML = selectedSectionsHtml + addPanelHtml;
 }
 
 function renderAirportProfile(opportunity) {
@@ -1258,12 +1297,11 @@ function renderSizingEstimates(opportunity) {
                 <strong>${escapeHtml(ownerName(estimate.owner_id))}</strong>
                 <small>${escapeHtml(estimate.owner_email || ownerEmail(estimate.owner_id))}</small>
               </div>
-              <label class="estimate-status-field">
+              <div class="estimate-status-field">
                 <span class="estimate-mobile-label">Validation status</span>
-                <select class="status-select compact-status" data-estimate-id="${escapeHtml(estimate.id)}" data-field="status">
-                  ${statusOptions(VALIDATION_REQUEST_STATUSES, estimate.status)}
-                </select>
-              </label>
+                <span class="status-pill ${statusClass(estimate.status)}">${escapeHtml(estimate.status)}</span>
+                <a class="estimate-status-link" href="#/validation" data-action="scroll" data-target="#resource-validation">Review in validation queue</a>
+              </div>
 
               <details class="estimate-row-detail">
                 <summary>Why this estimate?</summary>
@@ -1805,12 +1843,53 @@ function renderSizingEngine(opportunity) {
   renderResourceOwnerRegistry(opportunity);
 }
 
+function renderSrmCockpitBanner(opportunity, breakdown) {
+  const srm = breakdown.forumDetails.SRM;
+  const sizingImpact = sizingReadinessImpact(opportunity, "SRM");
+  const blockers = [...new Set([...srm.blockers, ...srm.missing])].slice(0, 4);
+  const ready = ["Ready", "Ready with Conditions"].includes(srm.status);
+  return `
+    <section class="srm-cockpit ${statusClass(srm.status)}" aria-label="SRM readiness cockpit">
+      <div class="srm-cockpit-head">
+        <div>
+          <p class="eyebrow">Solution Review Meeting</p>
+          <h4>SRM readiness</h4>
+          <p class="section-help">The portal's north star: get this opportunity to a validated, review-ready SRM package.</p>
+        </div>
+        <div class="srm-cockpit-score">
+          <span>${srm.score}%</span>
+          <span class="status-pill ${statusClass(srm.status)}">${escapeHtml(srm.status)}</span>
+        </div>
+      </div>
+      <div class="srm-cockpit-body">
+        <div class="srm-cockpit-facts">
+          <div><span>${srm.complete}/${srm.total}</span><label>SRM checklist complete</label></div>
+          <div><span>${srm.blockers.length}</span><label>Hard blockers</label></div>
+          <div><span>${escapeHtml(sizingImpact)}</span><label>Validated sizing</label></div>
+        </div>
+        <div class="srm-cockpit-blockers">
+          <strong>${ready ? "Ready for SRM" : "What is blocking SRM"}</strong>
+          ${
+            blockers.length
+              ? `<ul>${blockers.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+              : "<p>All SRM evidence is in place. Generate the pack for the review.</p>"
+          }
+        </div>
+      </div>
+      <div class="srm-cockpit-actions">
+        <button type="button" class="primary-button" data-action="scroll" data-target="#businessCase">Generate SRM pack</button>
+        <button type="button" class="secondary-button" data-action="scroll" data-target="#resource-validation">Open validation queue</button>
+      </div>
+    </section>`;
+}
+
 function renderReadinessBreakdown(opportunity) {
   if (!elements.readinessBreakdown) return;
   const breakdown = readinessBreakdown(opportunity);
   const topGaps = readinessGapsForOpportunity(opportunity).slice(0, 6);
 
   elements.readinessBreakdown.innerHTML = `
+    ${renderSrmCockpitBanner(opportunity, breakdown)}
     <section class="overall-readiness-card ${statusClass(breakdown.status)}">
       <div>
         <span>${breakdown.score}%</span>
@@ -2006,7 +2085,7 @@ function renderValidationMatrix(opportunity) {
             </label>
           </td>
           <td>
-            <button type="button" class="status-token ${statusClass(validation.status)}" data-validation-id="${escapeHtml(validation.id)}" data-cycle-status="true">
+            <button type="button" class="status-token ${statusClass(validation.status)}" data-validation-id="${escapeHtml(validation.id)}" data-cycle-status="true" title="Click to advance status - keep clicking to cycle back around">
               ${escapeHtml(validation.status)}
             </button>
           </td>
