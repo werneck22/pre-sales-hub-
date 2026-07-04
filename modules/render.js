@@ -206,20 +206,16 @@ function renderExecutiveDashboard() {
   };
 
   if (elements.pendingValidationList) {
-    elements.pendingValidationList.innerHTML = pendingRequests
-      .filter((context) => context.effectiveStatus !== "Overdue")
+    // Overdue and pending share one list (overdue ranks highest by priority),
+    // so the dashboard shows a single owner-validation queue instead of two.
+    const ownerValidations = [
+      ...overdueRequests,
+      ...pendingRequests.filter((context) => context.effectiveStatus !== "Overdue"),
+    ]
       .sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn)
-      .slice(0, 6)
-      .map(requestRow)
-      .join("") || emptyDashboard("No pending owner validations.");
-  }
-
-  if (elements.overdueValidationList) {
-    elements.overdueValidationList.innerHTML = overdueRequests
-      .sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn)
-      .slice(0, 6)
-      .map(requestRow)
-      .join("") || emptyDashboard("No overdue validations.");
+      .slice(0, 7);
+    elements.pendingValidationList.innerHTML =
+      ownerValidations.map(requestRow).join("") || emptyDashboard("No owner validations pending.");
   }
 
   if (elements.deadlineList) {
