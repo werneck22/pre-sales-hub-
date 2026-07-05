@@ -176,24 +176,24 @@ let mockDb = {
     productScope("opp-est-00", "CUSS", "Sized", "CUSS Product Owner", "Validated", "Medium", "Kiosk effort based on medium airport mock defaults."),
     productScope("opp-est-00", "Standalone Biopod", "Sized", "Standalone Biopod Owner", "Validated", "High", "Biopod touchpoints and API assumptions validated with conditions."),
     productScope("opp-est-00", "AODB", "Sized", "AODB Product Owner", "Validated", "Medium", "AODB baseline includes operational data and display feed assumptions."),
-    productScope("opp-est-00", "Integrations / APIs", "Sized", "Integration Owner", "Validated", "High", "Five initial integrations assumed."),
+    productScope("opp-est-00", "Integrations & APIs", "Sized", "Integration Owner", "Validated", "High", "Five initial integrations assumed."),
     productScope("opp-ams-01", "CUSS", "Sized", "Elena Rossi", "Validated", "Medium", "86 kiosks, existing peripheral assumptions to confirm."),
     productScope("opp-ams-01", "CUPPS", "Draft", "Elena Rossi", "In review", "Medium", "142 workstations across terminal migration waves."),
     productScope("opp-ams-01", "Standalone Biopod", "Draft", "Product owner", "In review", "High", "Privacy and airline participation model pending."),
-    productScope("opp-ams-01", "Integrations / APIs", "Draft", "Integration SME", "In review", "High", "9 candidate API touchpoints identified."),
-    productScope("opp-ams-01", "Support / Field Services", "Sized", "Support lead", "Validated", "Medium", "Three support zones assumed."),
+    productScope("opp-ams-01", "Integrations & APIs", "Draft", "Integration SME", "In review", "High", "9 candidate API touchpoints identified."),
+    productScope("opp-ams-01", "Support & Field Services", "Sized", "Support lead", "Validated", "Medium", "Three support zones assumed."),
     productScope("opp-sin-02", "CUSS", "Sized", "Priya Menon", "Validated", "Medium", "120 kiosks across departure halls."),
     productScope("opp-sin-02", "ABD", "Draft", "ABD product owner", "In review", "High", "44 bag drops; baggage interface dependencies open."),
     productScope("opp-sin-02", "Standalone Biopod", "Sized", "Product owner", "Validated", "Medium", "36 biopod touchpoints."),
     productScope("opp-sin-02", "DDS", "Validated", "Display SME", "Validated", "Low", "310 display endpoints."),
-    productScope("opp-sin-02", "Support / Field Services", "Draft", "Support lead", "Blocked", "High", "Field coverage model not yet agreed."),
+    productScope("opp-sin-02", "Support & Field Services", "Draft", "Support lead", "Blocked", "High", "Field coverage model not yet agreed."),
     productScope("opp-gru-03", "AODB", "Draft", "Camila Almeida", "In review", "High", "Core AODB scope depends on incumbent discovery."),
     productScope("opp-gru-03", "DDS", "Not started", "Display SME", "Pending", "Medium", "420 displays estimated from airport inventory."),
-    productScope("opp-gru-03", "Integrations / APIs", "Not started", "Integration SME", "Pending", "High", "18 integrations assumed; catalogue pending."),
+    productScope("opp-gru-03", "Integrations & APIs", "Not started", "Integration SME", "Pending", "High", "18 integrations assumed; catalogue pending."),
     productScope("opp-dfw-04", "CUPPS", "Sized", "Jordan Lee", "Validated", "Medium", "96 workstations across new gates."),
     productScope("opp-dfw-04", "CUSS", "Draft", "Jordan Lee", "In review", "Medium", "58 kiosks, airline branding assumptions open."),
     productScope("opp-dfw-04", "AODB", "Draft", "AODB SME", "In review", "Medium", "Operational data feed needed for concourse visibility."),
-    productScope("opp-dfw-04", "Integrations / APIs", "Draft", "Integration SME", "Pending", "High", "12 candidate interfaces; airline ownership unclear."),
+    productScope("opp-dfw-04", "Integrations & APIs", "Draft", "Integration SME", "Pending", "High", "12 candidate interfaces; airline ownership unclear."),
     productScope("opp-est-00", "Amadeus Passenger Verification", "Sized", "Biometrics Product Owner", "Validated", "Medium", "Passenger verification baseline aligned with medium airport defaults."),
     productScope("opp-est-00", "Seamless Journey Platform Lite", "Sized", "Journey Platform Owner", "Validated", "Medium", "Lite journey rollout scoped for the demo baseline terminal."),
     productScope("opp-ams-01", "Seamless Journey Full", "Draft", "Product owner", "In review", "High", "Full self-service journey pending airline participation model."),
@@ -345,6 +345,8 @@ function migrateMockDb(db) {
     "Seamless GT 11 + Seamless Journey Platform Lite": "Seamless Journey Platform Lite",
     "Seamless GT 11 + Seamless Journey Platform": "Seamless Journey Full",
     "Seamless GT 11 + Biopod": "Seamless GT11 eGate - Biopod",
+    "Integrations / APIs": "Integrations & APIs",
+    "Support / Field Services": "Support & Field Services",
   };
   [db.productScopes, db.sizingEstimates].forEach((collection) => {
     collection.forEach((item) => {
@@ -548,12 +550,14 @@ function updateRouteChrome(route) {
   if (elements.routePreviousBtn) {
     elements.routePreviousBtn.hidden = !config.previous;
     elements.routePreviousBtn.dataset.route = config.previous || "";
-    elements.routePreviousBtn.textContent = config.previous ? `Previous: ${ROUTE_CONFIG[config.previous].title}` : "Previous";
+    elements.routePreviousBtn.textContent = "Previous";
+    elements.routePreviousBtn.title = config.previous ? `Previous: ${ROUTE_CONFIG[config.previous].title}` : "Previous";
   }
   if (elements.routeNextBtn) {
     elements.routeNextBtn.hidden = !config.next;
     elements.routeNextBtn.dataset.route = config.next || "";
-    elements.routeNextBtn.textContent = config.next ? `Next: ${ROUTE_CONFIG[config.next].title}` : "Next";
+    elements.routeNextBtn.textContent = "Next";
+    elements.routeNextBtn.title = config.next ? `Next: ${ROUTE_CONFIG[config.next].title}` : "Next";
   }
 
   document.querySelectorAll("[data-route-link]").forEach((link) => {

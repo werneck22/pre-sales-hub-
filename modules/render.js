@@ -486,7 +486,7 @@ function renderIntakeNarrativeSummary(opportunity) {
         <article class="narrative-card ${isDocumented(item.value) ? "ready" : "missing"}">
           <div>
             <strong>${escapeHtml(item.label)}</strong>
-            <span>${isDocumented(item.value) ? "Captured" : "Missing"}</span>
+            <span>${isDocumented(item.value) ? "" : "Missing"}</span>
           </div>
           <p>${escapeHtml(shortText(item.value))}</p>
         </article>
@@ -646,7 +646,7 @@ function demoScenarioSteps(opportunity) {
   const requests = validationRequestsFor(opportunity.id);
   const notifications = requests.map((request) => notificationForRequest(request.id)).filter(Boolean);
   const notificationEvents = notifications.flatMap((notification) => notification.activity || []);
-  const expectedProducts = ["CUPPS", "CUSS", "Standalone Biopod", "AODB", "Integrations / APIs"];
+  const expectedProducts = ["CUPPS", "CUSS", "Standalone Biopod", "AODB", "Integrations & APIs"];
   const productsAligned = scopes.length === expectedProducts.length && expectedProducts.every((product) => scopes.some((scope) => scope.product_name === product));
   const ownersIdentified = estimates.length > 0 && estimates.every((estimate) => estimate.owner_id && isDocumented(estimate.owner_email));
   const adjustedEstimate = estimates.find((estimate) => Number(estimate.adjusted_md || 0) > Number(estimate.initial_md || 0));
@@ -889,11 +889,11 @@ function renderScopeDriverControls(scope, airportCategory, selected) {
               type="number"
               min="0"
               step="1"
+              title="Default ${formatNumber(driver.defaultValue)} for ${escapeHtml(airportCategory)}"
               data-scope-product="${escapeHtml(scope.product_name)}"
               data-driver="${escapeHtml(driver.key)}"
               value="${escapeHtml(driver.value)}"
             />
-            <small>Default ${formatNumber(driver.defaultValue)}</small>
           </label>
         `,
           )
@@ -924,15 +924,19 @@ function selectedProductCardHtml(opportunity, scope, airportCategory) {
   ensureScopeSizingInputs(scope, airportCategory);
   const productName = scope.product_name;
   const rollup = productSizingRollup(opportunity.id, productName);
-  const linkNote = PRODUCT_LINKS[productName] ? ` · linked to ${PRODUCT_LINKS[productName]}` : "";
-  const awaitingNote = PRODUCTS_AWAITING_SIZING.has(productName) ? " · sizing rules pending" : "";
+  const notes = [
+    PRODUCT_LINKS[productName] ? `Linked to ${PRODUCT_LINKS[productName]}` : "",
+    PRODUCTS_AWAITING_SIZING.has(productName) ? "Sizing rules pending" : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   return `
     <div class="product-card included">
       <label class="product-toggle">
         <input type="checkbox" data-product="${escapeHtml(productName)}" checked />
         <span>
           <strong>${escapeHtml(productName)}</strong>
-          <small>${escapeHtml(scope.scope_status)}${escapeHtml(linkNote)}${escapeHtml(awaitingNote)}</small>
+          ${notes ? `<small>${escapeHtml(notes)}</small>` : ""}
         </span>
       </label>
       <div class="scope-fields" aria-label="${escapeHtml(productName)} product scope">
@@ -1085,45 +1089,8 @@ function renderSizingSummary(opportunity) {
   const profile = airportProfileFor(opportunity.id);
   const requests = validationRequestsFor(opportunity.id);
   const estimates = sizingEstimatesFor(opportunity.id);
-  const scopes = productScopesFor(opportunity.id);
-  const approved = estimates.filter((estimate) => ["Approved", "Approved with Conditions"].includes(estimate.status)).length;
-  const flowSteps = [
-    { label: "Airport classified", value: profile.airport_category, state: profile.airport_category ? "ready" : "attention" },
-    { label: "Scope selected", value: `${scopes.length} products`, state: scopes.length ? "ready" : "attention" },
-    { label: "Sizing generated", value: `${estimates.length} estimates`, state: estimates.length ? "ready" : "attention" },
-    {
-      label: "Owners routed",
-      value: `${requests.length} requests`,
-      state: requests.length && requests.every((request) => isDocumented(ownerEmail(request.resource_owner_id))) ? "ready" : "attention",
-    },
-    {
-      label: "Validation",
-      value: `${approved}/${estimates.length || 0} approved`,
-      state: totals.pending ? "attention" : "ready",
-    },
-    {
-      label: "Governance",
-      value: `SRM ${sizingReadinessImpact(opportunity, "SRM")}`,
-      state: sizingReadinessImpact(opportunity, "SRM") === "Ready" ? "ready" : "attention",
-    },
-  ];
 
   elements.sizingSummary.innerHTML = `
-    <div class="process-flow span-all" aria-label="Automated validation process flow">
-      ${flowSteps
-        .map(
-          (step, index) => `
-        <div class="flow-step ${step.state}">
-          <span>${index + 1}</span>
-          <div>
-            <strong>${escapeHtml(step.label)}</strong>
-            <small>${escapeHtml(step.value)}</small>
-          </div>
-        </div>
-      `,
-        )
-        .join("")}
-    </div>
     <div class="metric compact-metric">
       <span>${totals.initial}</span>
       <label class="metric-label-with-help">Initial MD ${helpTooltip("mdEstimates", "MD estimates")}</label>
@@ -1280,7 +1247,7 @@ function renderSizingEstimates(opportunity) {
               <div class="estimate-row-primary">
                 <strong>${escapeHtml(estimate.workstream)}</strong>
                 <small>${escapeHtml(defaultRule)}</small>
-                <span>${escapeHtml(estimate.airport_category)} airport - ${escapeHtml(estimate.complexity)} complexity - ${escapeHtml(estimate.confidence_level)} confidence</span>
+                <span>${escapeHtml(estimate.confidence_level)} confidence</span>
               </div>
               <div class="estimate-md-readout">
                 <span class="estimate-mobile-label">Initial MD</span>
@@ -1616,7 +1583,7 @@ function renderValidationRequests(opportunity) {
       </div>
       <section class="notification-trigger-panel" aria-label="Resource owner notification trigger">
         <div class="notification-trigger-copy">
-          <span class="log-type">Simulation only</span>
+          <span class="log-type">Notify owner</span>
           <strong>Notify resource owner</strong>
           <small>Send the request via Email or Teams. Nothing is sent externally.</small>
         </div>
@@ -1712,13 +1679,6 @@ function renderValidationRequests(opportunity) {
           .join("")}
       </div>
     </details>
-
-    <section class="validation-closeout ${closeComplete ? "complete" : "attention"}">
-      <div><span class="log-type">Final sizing closeout</span><strong>${closeComplete ? "Validation baseline complete" : `${unresolvedCount} response${unresolvedCount === 1 ? "" : "s"} still required`}</strong><p>${closeComplete ? "All sizing lines have final MD and can support governance preparation." : "Resolve the remaining owner actions before treating the MD baseline as final."}</p></div>
-      <div><strong>${finalCount}/${requests.length}</strong><span>validated lines</span></div>
-      <div><strong>${formatNumber(finalMd)}</strong><span>final validated MD</span></div>
-      <span class="status-pill ${closeComplete ? "ready" : "attention"}">${closeComplete ? "Ready to close" : "BAB dependency"}</span>
-    </section>
   `;
 }
 
@@ -2086,7 +2046,7 @@ function renderValidationMatrix(opportunity) {
           <td>
             <label class="required-control">
               <input type="checkbox" data-validation-id="${escapeHtml(validation.id)}" data-field="required" ${validation.required ? "checked" : ""} />
-              <span>${validation.required ? "Required" : "Optional"}</span>
+              <span class="required-mark">${validation.required ? "Required" : "Optional"}</span>
             </label>
           </td>
           <td>
@@ -2358,7 +2318,7 @@ function renderBusinessCasePack(opportunity) {
       <div>
         <p class="eyebrow">${escapeHtml(opportunity.customer)} · ${escapeHtml(opportunity.region)}</p>
         <h4>${escapeHtml(opportunity.name)}</h4>
-        <p class="pack-muted">Mock pack generated ${escapeHtml(formatShortDate(referenceToday()))} · Submission ${escapeHtml(formatShortDate(opportunity.submission_deadline))} · Stage ${escapeHtml(opportunity.current_governance_stage)}</p>
+        <p class="pack-muted">Generated ${escapeHtml(formatShortDate(referenceToday()))} · Submission ${escapeHtml(formatShortDate(opportunity.submission_deadline))} · Stage ${escapeHtml(opportunity.current_governance_stage)}</p>
       </div>
       <div class="pack-banner-metrics">
         <div><span>${breakdown.score}%</span><label>Overall readiness</label></div>
@@ -2418,7 +2378,7 @@ function renderBusinessCasePack(opportunity) {
       </section>
     </div>
 
-    <p class="pack-footnote">Mock pack for internal pre-sales review only. Salesforce remains the commercial system of record; SRM and BAB remain the governance forums of record.</p>
+    <p class="pack-footnote">Salesforce remains the system of record; SRM and BAB are the governance forums.</p>
   `;
 }
 

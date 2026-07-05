@@ -7093,3 +7093,68 @@ textarea:focus-visible {
   font-weight: 800;
   letter-spacing: 0.03em;
 }
+
+/* --- Unified opportunity header (merged into context bar) ---- */
+.record-identity {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.record-customer {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.record-name {
+  font-size: 1.15rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.route-screen-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* --- Risk/decision delete control reads as a button --------- */
+.log-item > button {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.log-item > button:hover {
+  border-color: #d9534f;
+  color: #d9534f;
+  background: #fff5f5;
+}
+
+/* --- Guided demo step chips: readable, not truncated --------- */
+.journey-step strong,
+.journey-step div strong {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}

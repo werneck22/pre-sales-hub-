@@ -8,13 +8,13 @@ const PRODUCT_NAMES = [
   "AODB",
   "FRMS",
   "DDS",
-  "Integrations / APIs",
+  "Integrations & APIs",
   "Seamless GT11 eGate - Non Biometric",
   "Seamless GT11 eGate - Biometric",
   "Seamless GT11 eGate - Biopod",
   "Seamless Journey Platform Lite",
   "Seamless Journey Full",
-  "Support / Field Services",
+  "Support & Field Services",
 ];
 
 // Products for which no owner-validated sizing rule exists yet: the catalog
@@ -45,13 +45,13 @@ const PRODUCT_FAMILY_MAP = {
   AODB: "AMS - Amadeus Management Solutions",
   FRMS: "AMS - Amadeus Management Solutions",
   DDS: "AMS - Amadeus Management Solutions",
-  "Integrations / APIs": "AMS - Amadeus Management Solutions",
-  "Support / Field Services": "Support",
+  "Integrations & APIs": "AMS - Amadeus Management Solutions",
+  "Support & Field Services": "Support",
 };
 // The AMS (Amadeus Management Solutions) suite. Integrations/APIs is scoped
 // against AODB (see PRODUCT_LINKS) rather than being a suite product itself.
 const AMS_SUITE_PRODUCTS = new Set(["AODB", "FRMS", "DDS"]);
-const PRODUCT_LINKS = { "Integrations / APIs": "AODB" };
+const PRODUCT_LINKS = { "Integrations & APIs": "AODB" };
 function productFamily(name) {
   if (String(name).startsWith("Seamless GT11 eGate")) return "Seamless - Hardware";
   if (String(name).startsWith("Seamless Journey")) return "Seamless - Software";
@@ -178,8 +178,8 @@ const productRuleCodes = {
   AODB: "AODB",
   FRMS: "FRMS",
   DDS: "DDS",
-  "Integrations / APIs": "API",
-  "Support / Field Services": "SUP",
+  "Integrations & APIs": "API",
+  "Support & Field Services": "SUP",
   "Seamless GT11 eGate - Non Biometric": "GT11-NB",
   "Seamless GT11 eGate - Biometric": "GT11-BIO",
   "Seamless GT11 eGate - Biopod": "GT11-BIOPOD",
@@ -286,7 +286,7 @@ const productWorkstreamBase = {
     "Field Services": 8,
   },
   FRMS: {},
-  "Integrations / APIs": {
+  "Integrations & APIs": {
     Implementation: 8,
     "R&D": 12,
     "Project Management": 6,
@@ -294,7 +294,7 @@ const productWorkstreamBase = {
     "Testing & Cutover": 8,
     "Support Readiness": 4,
   },
-  "Support / Field Services": {
+  "Support & Field Services": {
     "Project Management": 5,
     "Support Readiness": 12,
     "Field Services": 16,
@@ -467,7 +467,7 @@ const productSizingDrivers = {
       weight: 0.18,
     },
   ],
-  "Integrations / APIs": [
+  "Integrations & APIs": [
     {
       key: "integration_l1_count",
       label: "Integrations - L1 (Simple)",
@@ -497,7 +497,7 @@ const productSizingDrivers = {
       weight: 0.3,
     },
   ],
-  "Support / Field Services": [
+  "Support & Field Services": [
     {
       key: "support_sites",
       label: "Support sites",
@@ -791,7 +791,7 @@ function buildResourceOwners() {
     resourceOwner("owner-dds-implementation-global", "DDS Implementation Owner", "Implementation", "dds.implementation@example.com", "DDS", "Global", "Implementation", "Implementation Owner"),
     resourceOwner("owner-cupps-implementation-emea", "CUPPS Implementation Owner", "Implementation", "cupps.implementation@example.com", "CUPPS", "EMEA", "Implementation", "Implementation Owner"),
     resourceOwner("owner-cuss-onboarding-emea", "CUSS Airline Onboarding Owner", "Airline Onboarding", "cuss.onboarding@example.com", "CUSS", "EMEA", "Airline Onboarding", "Airline Onboarding Owner"),
-    resourceOwner("owner-integration-emea", "EMEA Integration Owner", "Integrations", "emea.integration@example.com", "Integrations / APIs", "EMEA", "Integrations", "Integration Owner"),
+    resourceOwner("owner-integration-emea", "EMEA Integration Owner", "Integrations", "emea.integration@example.com", "Integrations & APIs", "EMEA", "Integrations", "Integration Owner"),
     resourceOwner("owner-gt11-nb-rd-global", "eGate Hardware R&D Owner", "R&D", "gt11.hardware.rd@example.com", "Seamless GT11 eGate - Non Biometric", "Global", "R&D", "R&D Owner"),
     resourceOwner("owner-sjp-lite-integration-global", "Seamless Journey Lite Integration Owner", "Integrations", "sjp.lite.integration@example.com", "Seamless Journey Platform Lite", "Global", "Integrations", "Integration Owner"),
     resourceOwner("owner-sjp-full-implementation-global", "Seamless Journey Full Owner", "Implementation", "sjp.full.implementation@example.com", "Seamless Journey Full", "Global", "Implementation", "Implementation Owner"),
@@ -1024,7 +1024,7 @@ const MOCK_BENCHMARKS = [
     name: "Gulf International - Biometrics & SBD Programme",
     category: "Large",
     year: 2025,
-    products: ["Standalone Biopod", "ABD", "Integrations / APIs"],
+    products: ["Standalone Biopod", "ABD", "Integrations & APIs"],
     validated_md_total: 412,
     validated_md_range: [360, 470],
     confidence: "High",
@@ -1035,7 +1035,7 @@ const MOCK_BENCHMARKS = [
     name: "Northstar Airports - AODB/DDS Modernization",
     category: "Large",
     year: 2024,
-    products: ["AODB", "DDS", "Integrations / APIs"],
+    products: ["AODB", "DDS", "Integrations & APIs"],
     validated_md_total: 358,
     validated_md_range: [310, 405],
     confidence: "Medium",
@@ -1057,7 +1057,7 @@ const MOCK_BENCHMARKS = [
     name: "Alpine Regional - CUSS Pilot",
     category: "Small",
     year: 2025,
-    products: ["CUSS", "Support / Field Services"],
+    products: ["CUSS", "Support & Field Services"],
     validated_md_total: 88,
     validated_md_range: [72, 110],
     confidence: "High",

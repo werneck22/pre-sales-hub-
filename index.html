@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260704-14" />
+    <link rel="stylesheet" href="./styles.css?v=20260705-15" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -58,13 +58,12 @@
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v14</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v15</span></p>
       </aside>
 
       <main class="main-content">
         <header class="topbar">
           <div>
-            <p id="pageEyebrow" class="eyebrow">Portfolio</p>
             <h2 id="pageTitle">Executive Dashboard</h2>
           </div>
           <div class="topbar-actions">
@@ -83,12 +82,14 @@
 
         <section id="routeContextBar" class="route-context-bar" aria-label="Current screen and workflow navigation">
           <div class="route-context-heading">
-            <div class="route-breadcrumb" aria-label="Breadcrumb">
-              <span id="routeArea">Portfolio</span>
-              <span aria-hidden="true">/</span>
-              <strong id="routeBreadcrumb">Executive Dashboard</strong>
+            <div class="record-identity" data-opportunity-context>
+              <p id="recordCustomer" class="record-customer">Selected opportunity</p>
+              <h2 id="recordName" class="record-name">Opportunity</h2>
             </div>
             <div class="route-screen-actions">
+              <span id="stageBadge" class="status-pill">BCM</span>
+              <span id="readinessBadge" class="status-pill calm">0% readiness</span>
+              <span id="forumBadge" class="status-pill">Forum pending</span>
               <button id="routePreviousBtn" class="secondary-button" type="button">Previous</button>
               <button id="routeNextBtn" class="primary-button" type="button">Next</button>
             </div>
@@ -230,17 +231,6 @@
 
         <section class="workspace-grid routed-workspace" hidden>
           <article class="workspace-main" aria-label="Opportunity workspace">
-            <div class="record-header" data-opportunity-context hidden>
-              <div>
-                <p id="recordCustomer" class="eyebrow">Selected opportunity</p>
-                <h2 id="recordName">Opportunity</h2>
-              </div>
-              <div class="record-badges">
-                <span id="stageBadge" class="status-pill">BCM</span>
-                <span id="readinessBadge" class="status-pill calm">0% readiness</span>
-                <span id="forumBadge" class="status-pill">Forum pending</span>
-              </div>
-            </div>
             <section id="journeyPanel" class="journey-panel" data-route-screen="demo" aria-label="End-to-end demo journey" hidden>
               <div class="journey-heading">
                 <div>
@@ -268,7 +258,7 @@
                   <input name="name" type="text" required />
                 </label>
                 <label>
-                  Customer / airport group
+                  Customer (airport group)
                   <input name="customer" type="text" required />
                 </label>
                 <label>
@@ -331,7 +321,7 @@
                     <option>Very High</option>
                   </select>
                 </label>
-                <h4 class="form-section-title span-2">Governance status <small>Feeds SRM/BAB readiness. Statuses you set here are the inputs; readiness is computed on the Readiness screen.</small></h4>
+                <h4 class="form-section-title span-2">Governance status <small>Inputs to readiness — scored on the Readiness screen.</small></h4>
                 <label>
                   Current governance stage
                   <select name="current_governance_stage">
@@ -374,7 +364,7 @@
                   </select>
                 </label>
                 <label>
-                  Bid/no-bid recommendation
+                  Bid recommendation
                   <select name="bid_no_bid_recommendation">
                     <option></option>
                     <option>Bid</option>
@@ -407,7 +397,7 @@
                 <details class="intake-detail-panel span-2">
                   <summary>
                     <span>Governance narrative</span>
-                    <small>Strategic rationale, architecture, dependencies, assumptions and approvals</small>
+                    <small>Edit the narrative fields</small>
                   </summary>
                   <div class="narrative-field-grid">
                     <label>
@@ -492,8 +482,8 @@
                   <input name="airport_name" type="text" />
                 </label>
                 <label>
-                  Airport code (IATA/ICAO)
-                  <input name="airport_code" type="text" maxlength="4" placeholder="GRU or SBGR" autocomplete="off" />
+                  Airport code
+                  <input name="airport_code" type="text" maxlength="4" placeholder="e.g. GRU" autocomplete="off" />
                 </label>
                 <div class="airport-lookup-bar span-2">
                   <div class="airport-lookup-copy">
@@ -598,7 +588,7 @@
                         <h4>Classification rules</h4>
                         <button type="button" class="help-tooltip" data-help-key="airportCategorization" data-help-label="Airport categorization"><span aria-hidden="true">i</span></button>
                       </div>
-                      <p class="subsection-help">Mock thresholds remain visible so the assigned category can be explained and reviewed.</p>
+                      <p class="subsection-help">Thresholds used to assign the airport category.</p>
                     </div>
                   </div>
                   <div id="classificationRules" class="matrix-wrap"></div>
@@ -618,22 +608,6 @@
                 </div>
                 <span id="checklistScore" class="meta-chip">0 of 0 complete</span>
               </div>
-              <div class="governance-help-grid">
-                <div>
-                  <div class="context-help-title">
-                    <strong>SRM readiness</strong>
-                    <button type="button" class="help-tooltip" data-help-key="srmReadiness" data-help-label="SRM readiness"><span aria-hidden="true">i</span></button>
-                  </div>
-                  <p>Confirms whether validated technical and delivery inputs are sufficient for solution review.</p>
-                </div>
-                <div>
-                  <div class="context-help-title">
-                    <strong>BAB readiness</strong>
-                    <button type="button" class="help-tooltip" data-help-key="babReadiness" data-help-label="BAB readiness"><span aria-hidden="true">i</span></button>
-                  </div>
-                  <p>Confirms whether validated effort, business case inputs, risks, and executive decisions are prepared for approval.</p>
-                </div>
-              </div>
               <div id="readinessBreakdown" class="readiness-breakdown"></div>
               <div id="governanceChecklist" class="checklist-board"></div>
             </section>
@@ -642,7 +616,7 @@
               <div class="section-heading">
                 <div>
                   <h3>Function sign-off matrix</h3>
-                  <p class="section-help">Internal sign-off by function. Separate from Resource Validation.</p>
+                  <p class="section-help">Internal sign-off by function.</p>
                 </div>
                 <span class="meta-chip">Click a status to cycle</span>
               </div>
@@ -672,8 +646,7 @@
               <div class="section-heading compact">
                 <div>
                   <h3>Risks and assumptions</h3>
-                  <p class="section-help">Risks and assumptions carried into governance.</p>
-                </div>
+                                  </div>
               </div>
               <form id="riskForm" class="inline-form stacked">
                 <select name="category" aria-label="Risk category">
@@ -728,8 +701,7 @@
                     <h3>Decision log</h3>
                     <button type="button" class="help-tooltip" data-help-key="decisionLog" data-help-label="Decision log"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Forum outcomes, owners, conditions, and next steps.</p>
-                </div>
+                                  </div>
               </div>
               <form id="decisionForm" class="inline-form stacked">
                 <select name="forum" aria-label="Forum">
@@ -750,6 +722,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260704-14"></script>
+    <script type="module" src="./modules/main.js?v=20260705-15"></script>
   </body>
 </html>
