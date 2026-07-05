@@ -52,9 +52,9 @@ package.
   `computed: { op, sources }` is **read-only and derived** (e.g. CUPPS
   "positions (total)" = check-in counters + boarding gates; weight 0 so it does
   not double-count).
-- `PRODUCT_LINKS` — soft links (Integrations / APIs → AODB).
+- `PRODUCT_LINKS` — soft links (Integrations & APIs → AODB).
 - ABD uses model subcategories (S1 Mini, S1 T2, S7) as separate unit drivers.
-  Integrations / APIs uses 4 complexity-level drivers (L1–L4).
+  Integrations & APIs uses 4 complexity-level drivers (L1–L4).
 - When you rename/add a product, update **all** of: `PRODUCT_NAMES`,
   `PRODUCT_FAMILY_MAP`/`productFamily`, `productRuleCodes`,
   `productWorkstreamBase`, `productSizingDrivers`, `buildResourceOwners`, the

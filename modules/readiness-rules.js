@@ -147,7 +147,7 @@ function readinessRuleResults(opportunity, forum) {
       ["Approved", "Approved with Conditions"].includes(estimateValidationStatus(opportunity, estimate)) && finalMdForEstimate(estimate) > 0,
   );
   const integrationExposure =
-    scopes.some((scope) => scope.product_name === "Integrations / APIs") || estimates.some((estimate) => estimate.workstream === "Integrations");
+    scopes.some((scope) => scope.product_name === "Integrations & APIs") || estimates.some((estimate) => estimate.workstream === "Integrations");
   const integrationRisks = risks.filter((riskItem) =>
     `${riskItem.category} ${riskItem.description}`.toLowerCase().match(/integration|interface|api/),
   );

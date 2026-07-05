@@ -568,7 +568,7 @@ function applyDemoValidationOverrides() {
     },
     {
       opportunity: "opp-dfw-04",
-      product: "Integrations / APIs",
+      product: "Integrations & APIs",
       workstream: "R&D",
       dueDate: "2026-06-13",
       reason: "Airline API ownership must be confirmed before SRM can close.",
