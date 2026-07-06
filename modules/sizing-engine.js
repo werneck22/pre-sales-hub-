@@ -229,6 +229,8 @@ Airport category: ${estimate.airport_category}
 Annual passengers: ${formatNumber(profile.annual_passengers)}
 Annual movements: ${formatNumber(profile.annual_movements)}
 Submission deadline: ${opportunity.submission_deadline}
+Implementation start: ${opportunity.implementation_start || "To be confirmed"}
+Target go-live: ${opportunity.go_live_date || "To be confirmed"}
 Assumptions: ${estimate.assumptions_used}
 Sizing drivers: ${estimate.sizing_driver_summary || "No product-specific drivers configured"}
 
@@ -252,6 +254,8 @@ Workstream: ${estimate.workstream}
 Initial estimate: ${estimate.initial_md} MD
 Complexity: ${estimate.complexity}
 Validation due: ${dueDate}
+Implementation start: ${opportunity.implementation_start || "To be confirmed"}
+Target go-live: ${opportunity.go_live_date || "To be confirmed"}
 
 Review the assumptions, approve the estimate, adjust the MD, or request more information.
 

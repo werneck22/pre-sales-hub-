@@ -8,6 +8,9 @@ import {
 import {
   renderAll,
 } from "./render.js";
+import {
+  applyAirportCodeToProfile,
+} from "./actions.js";
 
 // Public SPARQL endpoint, CORS-enabled, no key required. Wikidata stores
 // annual passenger traffic as "patronage" (P3872) statements with a
@@ -103,6 +106,15 @@ async function lookupAirportData() {
     return;
   }
 
+  // Bundled directory first: instant, offline, and fills name + location +
+  // traffic in one step. Wikidata remains the fallback for other codes.
+  const localAirport = applyAirportCodeToProfile(code);
+  if (localAirport) {
+    renderAll();
+    showToast(`${localAirport.name} loaded from the airport directory.`);
+    return;
+  }
+
   const defaultLabel = button.textContent;
   button.disabled = true;
   button.textContent = "Looking up...";
@@ -115,9 +127,7 @@ async function lookupAirportData() {
 
     const profile = airportProfileFor(selectedId);
     profile.airport_code = code;
-    if (result.label && !String(profile.airport_name || "").trim()) {
-      profile.airport_name = result.label;
-    }
+    if (result.label) profile.airport_name = result.label;
     if (result.passengers > 0) {
       profile.annual_passengers = result.passengers;
       profile.traffic_source = "Wikidata";

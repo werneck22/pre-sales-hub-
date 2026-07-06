@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260705-15" />
+    <link rel="stylesheet" href="./styles.css?v=20260706-16" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -58,7 +58,7 @@
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v15</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v16</span></p>
       </aside>
 
       <main class="main-content">
@@ -252,6 +252,12 @@
                 <span class="autosave-chip" title="Changes are saved automatically as you type">Saved automatically</span>
               </div>
               <form id="intakeForm" class="form-grid">
+                <h4 class="form-section-title span-2">Airport target</h4>
+                <label>
+                  Airport IATA code
+                  <input name="airport_iata" type="text" maxlength="4" autocomplete="off" placeholder="e.g. GRU" />
+                </label>
+                <div id="intakeAirportSummary" class="intake-airport-summary"></div>
                 <h4 class="form-section-title span-2">Commercial context</h4>
                 <label>
                   Opportunity name
@@ -299,6 +305,14 @@
                 <label>
                   Submission deadline
                   <input name="submission_deadline" type="date" />
+                </label>
+                <label>
+                  Implementation start
+                  <input name="implementation_start" type="date" />
+                </label>
+                <label>
+                  Target go-live
+                  <input name="go_live_date" type="date" />
                 </label>
                 <label>
                   Strategic importance
@@ -438,7 +452,10 @@
                   </div>
                   <p class="section-help">Select the products in the proposal baseline.</p>
                 </div>
-                <span id="productCount" class="meta-chip">0 products</span>
+                <div class="engine-actions">
+                  <span id="productCount" class="meta-chip">0 products</span>
+                  <button id="generateSizingBtn" class="primary-button" type="button">Generate sizing</button>
+                </div>
               </div>
               <div id="productScope" class="product-grid"></div>
             </section>
@@ -455,7 +472,7 @@
                 <div class="engine-actions">
                   <span id="categoryBadge" class="meta-chip">Category pending</span>
                   <button id="exportSizingCsvBtn" class="secondary-button" type="button">Export CSV</button>
-                  <button id="runSizingBtn" class="primary-button" type="button">Run sizing</button>
+                  <button id="runSizingBtn" class="secondary-button" type="button">Recalculate</button>
                 </div>
               </div>
 
@@ -722,6 +739,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260705-15"></script>
+    <script type="module" src="./modules/main.js?v=20260706-16"></script>
   </body>
 </html>
