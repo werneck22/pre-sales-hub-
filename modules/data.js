@@ -386,6 +386,23 @@ const productSizingDrivers = {
       computed: { op: "sum", sources: ["check_in_counters", "gates"] },
       weight: 0,
     },
+    // Similarity characteristics for the future example-based sizing engine.
+    // Weight 0: their effort impact must come from real historical rules, not
+    // an invented multiplier.
+    {
+      key: "cupps_agent_portal",
+      label: "Agent Portal",
+      unit: "included",
+      type: "boolean",
+      weight: 0,
+    },
+    {
+      key: "cupps_airport_insight",
+      label: "Airport Insight",
+      unit: "included",
+      type: "boolean",
+      weight: 0,
+    },
   ],
   CUSS: [
     {
@@ -884,6 +901,7 @@ function driversForProduct(productName) {
 }
 
 function driverDefault(driver, airportCategory = "Medium") {
+  if (driver.type === "boolean") return 0;
   return driver.defaults?.[airportCategory] ?? driver.defaults?.Medium ?? 0;
 }
 
@@ -940,7 +958,13 @@ function sizingDriverFactor(scope, airportCategory = "Medium") {
 function driverSummary(scope, airportCategory = "Medium") {
   const drivers = driverDetailsForScope(scope, airportCategory);
   if (!drivers.length) return "No product-specific drivers configured";
-  return drivers.map((driver) => `${driver.label}: ${formatNumber(driver.value)} ${driver.unit}`).join(" | ");
+  return drivers
+    .map((driver) =>
+      driver.type === "boolean"
+        ? `${driver.label}: ${Number(driver.value) ? "Yes" : "No"}`
+        : `${driver.label}: ${formatNumber(driver.value)} ${driver.unit}`,
+    )
+    .join(" | ");
 }
 
 function escapeHtml(value) {

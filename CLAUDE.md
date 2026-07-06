@@ -54,7 +54,15 @@ package.
   not double-count).
 - `PRODUCT_LINKS` — soft links (Integrations & APIs → AODB).
 - ABD uses model subcategories (S1 Mini, S1 T2, S7) as separate unit drivers.
-  Integrations & APIs uses 4 complexity-level drivers (L1–L4).
+  Integrations & APIs uses 4 complexity-level drivers (L1–L4). CUPPS also
+  records Agent Portal / Airport Insight as `type: "boolean"` drivers —
+  similarity characteristics with weight 0 (no effort impact until real rules).
+- Flow starts at Intake: the IATA field populates the airport profile (name,
+  location, region, traffic, category) from `airport-directory.js` via
+  `applyAirportCodeToProfile`. Sizing generates automatically on scope edits;
+  "Generate sizing" on Product Scope runs it and opens Automated Sizing.
+  Opportunity carries `implementation_start` / `go_live_date`, included in the
+  owner notification Email/Teams bodies.
 - When you rename/add a product, update **all** of: `PRODUCT_NAMES`,
   `PRODUCT_FAMILY_MAP`/`productFamily`, `productRuleCodes`,
   `productWorkstreamBase`, `productSizingDrivers`, `buildResourceOwners`, the

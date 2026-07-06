@@ -22,6 +22,7 @@ import {
   migrateMockDb,
   mockDb,
   navigateToRoute,
+  productScopesFor,
   routeFromHash,
   selectedId,
   selectedNotificationChannel,
@@ -73,6 +74,7 @@ import {
 } from "./airport-search.js";
 import {
   addProductScope,
+  applyAirportCodeToProfile,
   applyOwnerValidationAction,
   createOpportunity,
   executeJourneyAction,
@@ -206,8 +208,16 @@ if (elements.airportProfileForm) {
     syncAirportProfileFromForm();
     renderAll();
   });
-  elements.airportProfileForm.addEventListener("change", () => {
+  elements.airportProfileForm.addEventListener("change", (event) => {
     syncAirportProfileFromForm();
+    if (event.target.name === "airport_code") {
+      const airport = applyAirportCodeToProfile(event.target.value);
+      if (airport) {
+        renderAll();
+        showToast(`${airport.name} loaded from the airport directory.`);
+        return;
+      }
+    }
     renderAll();
     const profile = airportProfileFor(selectedId);
     if (airportProfileComplete(profile)) {
@@ -218,6 +228,10 @@ if (elements.airportProfileForm) {
 if (elements.runSizingBtn) {
   elements.runSizingBtn.addEventListener("click", runSizingForSelected);
 }
+elements.generateSizingBtn?.addEventListener("click", () => {
+  runSizingForSelected();
+  if (productScopesFor(selectedId).length) navigateToRoute("sizing");
+});
 elements.airportLookupBtn?.addEventListener("click", lookupAirportData);
 if (elements.estimateProductFilter) {
   elements.estimateProductFilter.addEventListener("change", () => {
@@ -231,8 +245,24 @@ if (elements.estimateStatusFilter) {
     renderSizingEstimates(selectedOpportunity());
   });
 }
-elements.intakeForm.addEventListener("input", syncIntakeFromForm);
-elements.intakeForm.addEventListener("change", syncIntakeFromForm);
+elements.intakeForm.addEventListener("input", (event) => {
+  if (event.target.name === "airport_iata") return;
+  syncIntakeFromForm();
+});
+elements.intakeForm.addEventListener("change", (event) => {
+  if (event.target.name === "airport_iata") {
+    const airport = applyAirportCodeToProfile(event.target.value);
+    renderAll();
+    showToast(
+      airport
+        ? `${airport.name} loaded: region, passengers, and movements populated.`
+        : "Airport code not in the reference directory. Enter traffic manually on Automated Sizing.",
+      airport ? "success" : "attention",
+    );
+    return;
+  }
+  syncIntakeFromForm();
+});
 elements.intakeForm.addEventListener("submit", (event) => {
   event.preventDefault();
   syncIntakeFromForm();

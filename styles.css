@@ -7158,3 +7158,21 @@ textarea:focus-visible {
   overflow: visible;
   text-overflow: clip;
 }
+
+/* --- Intake airport summary (populated from IATA) ------------ */
+.intake-airport-summary {
+  grid-column: 1 / -1;
+  padding: 9px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.intake-airport-summary.loaded {
+  border-style: solid;
+  border-color: #c2d3f2;
+  background: #f8fcfb;
+  color: var(--ink);
+  font-weight: 600;
+}

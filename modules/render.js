@@ -454,6 +454,18 @@ function fillIntakeForm(opportunity) {
       form.elements[key].value = value;
     }
   });
+
+  const profile = airportProfileFor(opportunity.id);
+  if (form.elements.airport_iata) form.elements.airport_iata.value = profile.airport_code || "";
+  if (elements.intakeAirportSummary) {
+    const loaded = isDocumented(profile.airport_name) && Number(profile.annual_passengers) > 0;
+    elements.intakeAirportSummary.classList.toggle("loaded", loaded);
+    elements.intakeAirportSummary.textContent = loaded
+      ? `${profile.airport_name} · ${[profile.airport_city, profile.airport_country].filter(Boolean).join(", ") || profile.region} · ${formatNumber(
+          profile.annual_passengers,
+        )} passengers · ${formatNumber(profile.annual_movements)} movements · ${profile.airport_category || "Unclassified"}`
+      : "Enter the airport IATA code to load name, location, region, and annual traffic.";
+  }
 }
 
 function shortText(value, fallback = "Not captured") {
@@ -882,7 +894,17 @@ function renderScopeDriverControls(scope, airportCategory, selected) {
             <input type="number" value="${escapeHtml(driver.value)}" readonly disabled />
           </label>
         `
-              : `
+              : driver.type === "boolean"
+                ? `
+          <label>
+            ${escapeHtml(driver.label)}
+            <select data-scope-product="${escapeHtml(scope.product_name)}" data-driver="${escapeHtml(driver.key)}">
+              <option value="0" ${Number(driver.value) ? "" : "selected"}>No</option>
+              <option value="1" ${Number(driver.value) ? "selected" : ""}>Yes</option>
+            </select>
+          </label>
+        `
+                : `
           <label>
             ${escapeHtml(driver.label)}
             <input

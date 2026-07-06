@@ -50,6 +50,9 @@ import {
   readiness,
 } from "./readiness-rules.js";
 import {
+  airportByCode,
+} from "./airport-directory.js";
+import {
   demoScenarioSteps,
   renderAll,
   renderIntakeNarrativeSummary,
@@ -69,6 +72,8 @@ function syncIntakeFromForm() {
   opportunity.estimated_value = Number(data.get("estimated_value")) || 0;
   opportunity.close_date = data.get("close_date").toString();
   opportunity.submission_deadline = data.get("submission_deadline").toString();
+  opportunity.implementation_start = (data.get("implementation_start") || "").toString();
+  opportunity.go_live_date = (data.get("go_live_date") || "").toString();
   opportunity.strategic_importance = data.get("strategic_importance").toString();
   opportunity.complexity = data.get("complexity").toString();
   opportunity.current_governance_stage = data.get("current_governance_stage").toString();
@@ -101,6 +106,8 @@ function newOpportunityRecord(id, overrides = {}) {
     estimated_value: 0,
     close_date: new Date().toISOString().slice(0, 10),
     submission_deadline: new Date().toISOString().slice(0, 10),
+    implementation_start: "",
+    go_live_date: "",
     strategic_importance: "Medium",
     complexity: "Medium",
     current_governance_stage: "BCM",
@@ -244,6 +251,33 @@ function executeJourneyAction(action, target, stepIndex) {
     return;
   }
   scrollToSection(target || ".workspace-grid");
+}
+
+// Populates the airport profile from the bundled directory when the IATA/ICAO
+// code matches, so entering a code fills name, location, region, and traffic.
+// Returns the directory entry, or null when the code is unknown.
+function applyAirportCodeToProfile(rawCode, opportunityId = selectedId) {
+  const profile = airportProfileFor(opportunityId);
+  const code = String(rawCode || "").trim().toUpperCase();
+  profile.airport_code = code;
+  const airport = airportByCode(code);
+  if (!airport) return null;
+  profile.airport_name = airport.name;
+  profile.airport_city = airport.city;
+  profile.airport_state = airport.state;
+  profile.airport_country = airport.country;
+  profile.region = airport.region;
+  profile.annual_passengers = airport.annual_passengers;
+  profile.annual_movements = airport.annual_movements;
+  profile.traffic_source = "Reference directory";
+  profile.traffic_source_label = airport.name;
+  profile.traffic_source_year = String(airport.traffic_year || "");
+  profile.traffic_retrieved_at = new Date().toISOString().slice(0, 10);
+  profile.traffic_fetched_passengers = airport.annual_passengers;
+  classifyAirport(profile);
+  const opportunity = mockDb.opportunities.find((item) => item.id === opportunityId);
+  if (opportunity) opportunity.region = airport.region;
+  return airport;
 }
 
 function updateScopeDriverValue(opportunityId, productName, driverKey, value) {
@@ -407,6 +441,7 @@ export {
   updateScopeDriverValue,
   syncScopeOwnerEmailToEstimates,
   syncAirportProfileFromForm,
+  applyAirportCodeToProfile,
   syncEstimateWorkflowAfterChange,
   updateEstimateManualOverride,
   updateEstimateValidation,

@@ -41,6 +41,8 @@ let mockDb = {
       estimated_value: 5400000,
       close_date: "2026-09-30",
       submission_deadline: "2026-07-15",
+      implementation_start: "2026-10-01",
+      go_live_date: "2027-06-30",
       strategic_importance: "Strategic",
       complexity: "Medium",
       current_governance_stage: "BAB",
@@ -69,6 +71,8 @@ let mockDb = {
       estimated_value: 4200000,
       close_date: "2026-09-30",
       submission_deadline: "2026-07-22",
+      implementation_start: "2026-11-02",
+      go_live_date: "2027-09-30",
       strategic_importance: "High",
       complexity: "High",
       current_governance_stage: "SRM",
@@ -97,6 +101,8 @@ let mockDb = {
       estimated_value: 6800000,
       close_date: "2026-10-18",
       submission_deadline: "2026-08-05",
+      implementation_start: "2027-01-11",
+      go_live_date: "2027-12-15",
       strategic_importance: "Strategic",
       complexity: "High",
       current_governance_stage: "BAB",
@@ -125,6 +131,8 @@ let mockDb = {
       estimated_value: 3100000,
       close_date: "2026-09-10",
       submission_deadline: "2026-07-12",
+      implementation_start: "",
+      go_live_date: "",
       strategic_importance: "High",
       complexity: "Medium",
       current_governance_stage: "BCM",
@@ -153,6 +161,8 @@ let mockDb = {
       estimated_value: 5000000,
       close_date: "2026-11-20",
       submission_deadline: "2026-09-15",
+      implementation_start: "2027-02-01",
+      go_live_date: "2027-11-30",
       strategic_importance: "Medium",
       complexity: "High",
       current_governance_stage: "SRM",
@@ -355,6 +365,10 @@ function migrateMockDb(db) {
       }
     });
   });
+  db.opportunities.forEach((opportunity) => {
+    opportunity.implementation_start ||= "";
+    opportunity.go_live_date ||= "";
+  });
   db.airportProfiles.forEach((profile) => {
     profile.airport_code ||= "";
     profile.airport_city ||= "";
@@ -435,6 +449,8 @@ const elements = {
   opportunityList: document.querySelector("#opportunityList"),
   intakeForm: document.querySelector("#intakeForm"),
   intakeNarrativeSummary: document.querySelector("#intakeNarrativeSummary"),
+  intakeAirportSummary: document.querySelector("#intakeAirportSummary"),
+  generateSizingBtn: document.querySelector("#generateSizingBtn"),
   productScope: document.querySelector("#productScope"),
   airportProfileForm: document.querySelector("#airportProfileForm"),
   airportLookupBtn: document.querySelector("#airportLookupBtn"),
