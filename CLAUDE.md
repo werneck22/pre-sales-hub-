@@ -53,10 +53,18 @@ package.
   "positions (total)" = check-in counters + boarding gates; weight 0 so it does
   not double-count).
 - `PRODUCT_LINKS` — soft links (Integrations & APIs → AODB).
+- Driver types: numeric (default), `computed`, `type: "boolean"` (Yes/No), and
+  `type: "select"` with an `options` list. Boolean/select are similarity
+  characteristics with weight 0 (no effort impact until real rules exist).
 - ABD uses model subcategories (S1 Mini, S1 T2, S7) as separate unit drivers.
-  Integrations & APIs uses 4 complexity-level drivers (L1–L4). CUPPS also
-  records Agent Portal / Airport Insight as `type: "boolean"` drivers —
-  similarity characteristics with weight 0 (no effort impact until real rules).
+  Integrations & APIs uses 4 complexity-level drivers (L1–L4). CUPPS records
+  Agent Portal (boolean) and Airport Insight as a tier select — None /
+  Standard / Cross Product / Predictive Insights / Data Feeds (product owner
+  definition).
+- Airport categorization passenger bands are the product owner's real
+  definition: 2–8M Small, 8–20M Medium, 20–40M Large, 40–70M Extra Large
+  (edges assumed: <2M → Small, >70M → Extra Large). Movement bands are still
+  mock placeholders.
 - Flow starts at Intake: the IATA field populates the airport profile (name,
   location, region, traffic, category) from `airport-directory.js` via
   `applyAirportCodeToProfile`. Sizing generates automatically on scope edits;

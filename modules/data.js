@@ -397,10 +397,13 @@ const productSizingDrivers = {
       weight: 0,
     },
     {
+      // Airport Insight tier (product owner definition). Effort impact must
+      // come from real historical rules, hence weight 0.
       key: "cupps_airport_insight",
       label: "Airport Insight",
-      unit: "included",
-      type: "boolean",
+      unit: "tier",
+      type: "select",
+      options: ["None", "Standard", "Cross Product", "Predictive Insights", "Data Feeds"],
       weight: 0,
     },
   ],
@@ -688,13 +691,17 @@ function airportProfile(opportunityId, airportName, annualPassengers, annualMove
   };
 }
 
+// Passenger bands are the product owner's definition: 2-8M Small, 8-20M
+// Medium, 20-40M Large, 40-70M Extra Large. Airports below 2M are treated as
+// Small and above 70M as Extra Large until dedicated bands are provided.
+// Movement bands remain mock placeholders pending real thresholds.
 function defaultClassificationRules() {
   return [
     {
       id: "class-small",
       category: "Small",
       passenger_min: 0,
-      passenger_max: 2000000,
+      passenger_max: 8000000,
       movement_min: 0,
       movement_max: 25000,
       active: true,
@@ -702,8 +709,8 @@ function defaultClassificationRules() {
     {
       id: "class-medium",
       category: "Medium",
-      passenger_min: 2000000,
-      passenger_max: 10000000,
+      passenger_min: 8000000,
+      passenger_max: 20000000,
       movement_min: 25000,
       movement_max: 100000,
       active: true,
@@ -711,8 +718,8 @@ function defaultClassificationRules() {
     {
       id: "class-large",
       category: "Large",
-      passenger_min: 10000000,
-      passenger_max: 30000000,
+      passenger_min: 20000000,
+      passenger_max: 40000000,
       movement_min: 100000,
       movement_max: 250000,
       active: true,
@@ -720,7 +727,7 @@ function defaultClassificationRules() {
     {
       id: "class-extra-large",
       category: "Extra Large",
-      passenger_min: 30000000,
+      passenger_min: 40000000,
       passenger_max: Infinity,
       movement_min: 250000,
       movement_max: Infinity,
@@ -902,6 +909,7 @@ function driversForProduct(productName) {
 
 function driverDefault(driver, airportCategory = "Medium") {
   if (driver.type === "boolean") return 0;
+  if (driver.type === "select") return driver.options?.[0] ?? "";
   return driver.defaults?.[airportCategory] ?? driver.defaults?.Medium ?? 0;
 }
 
@@ -938,12 +946,16 @@ function driverDetailsForScope(scope, airportCategory = "Medium") {
   ensureScopeSizingInputs(scope, airportCategory);
   return driversForProduct(scope.product_name).map((driver) => {
     const defaultValue = driver.computed ? computeDriverValue(driver, scope.sizing_inputs) : driverDefault(driver, airportCategory);
-    const value = driver.computed ? computeDriverValue(driver, scope.sizing_inputs) : Number(scope.sizing_inputs?.[driver.key] || 0);
+    let value;
+    if (driver.computed) value = computeDriverValue(driver, scope.sizing_inputs);
+    else if (driver.type === "select") value = String(scope.sizing_inputs?.[driver.key] ?? defaultValue);
+    else value = Number(scope.sizing_inputs?.[driver.key] || 0);
+    const ratio = driver.type === "select" || !defaultValue ? 1 : value / defaultValue;
     return {
       ...driver,
       defaultValue,
       value,
-      ratio: defaultValue ? value / defaultValue : 1,
+      ratio,
     };
   });
 }
@@ -959,11 +971,11 @@ function driverSummary(scope, airportCategory = "Medium") {
   const drivers = driverDetailsForScope(scope, airportCategory);
   if (!drivers.length) return "No product-specific drivers configured";
   return drivers
-    .map((driver) =>
-      driver.type === "boolean"
-        ? `${driver.label}: ${Number(driver.value) ? "Yes" : "No"}`
-        : `${driver.label}: ${formatNumber(driver.value)} ${driver.unit}`,
-    )
+    .map((driver) => {
+      if (driver.type === "boolean") return `${driver.label}: ${Number(driver.value) ? "Yes" : "No"}`;
+      if (driver.type === "select") return `${driver.label}: ${driver.value || "None"}`;
+      return `${driver.label}: ${formatNumber(driver.value)} ${driver.unit}`;
+    })
     .join(" | ");
 }
 

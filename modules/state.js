@@ -369,6 +369,13 @@ function migrateMockDb(db) {
     opportunity.implementation_start ||= "";
     opportunity.go_live_date ||= "";
   });
+  // Airport Insight moved from a Yes/No flag to a tier select; legacy "Yes"
+  // maps to the lowest tier (Standard) for the owner to review.
+  db.productScopes.forEach((scope) => {
+    const insight = scope.sizing_inputs?.cupps_airport_insight;
+    if (insight === 0 || insight === "0") scope.sizing_inputs.cupps_airport_insight = "None";
+    else if (insight === 1 || insight === "1") scope.sizing_inputs.cupps_airport_insight = "Standard";
+  });
   db.airportProfiles.forEach((profile) => {
     profile.airport_code ||= "";
     profile.airport_city ||= "";

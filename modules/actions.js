@@ -4,6 +4,7 @@ import {
   airportProfile,
   clamp,
   decision,
+  driversForProduct,
   isDocumented,
   makeGovernanceItems,
   makeValidation,
@@ -284,7 +285,8 @@ function updateScopeDriverValue(opportunityId, productName, driverKey, value) {
   const scope = findProductScope(opportunityId, productName);
   if (!scope) return;
   if (!scope.sizing_inputs) scope.sizing_inputs = {};
-  scope.sizing_inputs[driverKey] = Number(value) || 0;
+  const driver = driversForProduct(productName).find((item) => item.key === driverKey);
+  scope.sizing_inputs[driverKey] = driver?.type === "select" ? String(value) : Number(value) || 0;
 }
 
 function syncScopeOwnerEmailToEstimates(opportunityId, productName, email) {
