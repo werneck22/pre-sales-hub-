@@ -31,7 +31,7 @@ import {
 
 function sizingReadinessImpact(opportunity, forum) {
   const estimates = sizingEstimatesFor(opportunity.id);
-  const technicalWorkstreams = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services"];
+  const technicalWorkstreams = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services", "Implementation Engineer", "Airline Integration", "Insights Set up", "Agent Portal"];
   const contexts = validationRequestContexts([opportunity]);
   const criticalContexts = contexts.filter(
     (context) => technicalWorkstreams.includes(context.estimate.workstream) || context.estimate.risk_level === "High",
@@ -73,7 +73,9 @@ function estimateValidationStatus(opportunity, estimate) {
 }
 
 function workstreamValidationEvidence(opportunity, workstream) {
-  const estimates = sizingEstimatesFor(opportunity.id).filter((estimate) => estimate.workstream === workstream);
+  const workstreams = Array.isArray(workstream) ? workstream : [workstream];
+  const label = workstreams[0];
+  const estimates = sizingEstimatesFor(opportunity.id).filter((estimate) => workstreams.includes(estimate.workstream));
   const statuses = estimates.map((estimate) => estimateValidationStatus(opportunity, estimate));
   const approvedStatuses = ["Approved", "Approved with Conditions"];
   const complete = estimates.length === 0 || statuses.every((status) => approvedStatuses.includes(status));
@@ -90,8 +92,8 @@ function workstreamValidationEvidence(opportunity, workstream) {
     pending,
     total: estimates.length,
     evidence: estimates.length
-      ? `${statuses.filter((status) => approvedStatuses.includes(status)).length}/${estimates.length} ${workstream} sizing validations approved or conditional`
-      : `No ${workstream} effort is required for the selected product scope`,
+      ? `${statuses.filter((status) => approvedStatuses.includes(status)).length}/${estimates.length} ${label} sizing validations approved or conditional`
+      : `No ${label} effort is required for the selected product scope`,
   };
 }
 
@@ -105,6 +107,14 @@ function deliveryEffortEvidence(opportunity) {
     "Training",
     "Support Readiness",
     "Field Services",
+    "Project Manager",
+    "Implementation Engineer",
+    "ACS Training",
+    "ACS Support Establishment",
+    "Central Service Delivery",
+    "Airline Integration",
+    "Insights Set up",
+    "Agent Portal",
   ];
   const estimates = sizingEstimatesFor(opportunity.id).filter((estimate) => deliveryWorkstreams.includes(estimate.workstream));
   const statuses = estimates.map((estimate) => estimateValidationStatus(opportunity, estimate));
@@ -137,7 +147,7 @@ function readinessRuleResults(opportunity, forum) {
   const risks = risksFor(opportunity.id);
   const profile = airportProfileFor(opportunity.id);
   const estimates = sizingEstimatesFor(opportunity.id);
-  const implementationValidation = workstreamValidationEvidence(opportunity, "Implementation");
+  const implementationValidation = workstreamValidationEvidence(opportunity, ["Implementation", "Implementation Engineer"]);
   const rdValidation = workstreamValidationEvidence(opportunity, "R&D");
   const deliveryValidation = deliveryEffortEvidence(opportunity);
   const criticalBlockers = openBlockersFor(opportunity);
