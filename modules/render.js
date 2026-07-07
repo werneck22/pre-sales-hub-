@@ -904,7 +904,18 @@ function renderScopeDriverControls(scope, airportCategory, selected) {
             </select>
           </label>
         `
-                : `
+                : driver.type === "select"
+                  ? `
+          <label>
+            ${escapeHtml(driver.label)}
+            <select data-scope-product="${escapeHtml(scope.product_name)}" data-driver="${escapeHtml(driver.key)}">
+              ${(driver.options || [])
+                .map((option) => `<option value="${escapeHtml(option)}" ${option === String(driver.value) ? "selected" : ""}>${escapeHtml(option)}</option>`)
+                .join("")}
+            </select>
+          </label>
+        `
+                  : `
           <label>
             ${escapeHtml(driver.label)}
             <input
