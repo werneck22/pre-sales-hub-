@@ -141,7 +141,7 @@ function requestPriorityScore(context) {
   }[context.effectiveStatus] || 20;
   const dueScore = context.dueIn < 0 ? Math.min(30, Math.abs(context.dueIn) * 4) : context.dueIn <= 7 ? 12 : context.dueIn <= 14 ? 6 : 0;
   const riskScore = context.estimate.confidence_level === "Medium" ? 6 : 0;
-  const workstreamScore = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services"].includes(context.estimate.workstream)
+  const workstreamScore = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services", "Implementation Engineer", "Airline Integration", "Insights Set up", "Agent Portal"].includes(context.estimate.workstream)
     ? 8
     : 3;
   const mdScore = Math.min(12, Math.round(Number(context.estimate.initial_md || 0) / 10));
@@ -156,7 +156,7 @@ function requestPriorityLabel(score) {
 }
 
 function requestGovernanceImpact(context) {
-  const technicalWorkstreams = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services"];
+  const technicalWorkstreams = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services", "Implementation Engineer", "Airline Integration", "Insights Set up", "Agent Portal"];
   if (["Rejected", "Overdue"].includes(context.effectiveStatus) && technicalWorkstreams.includes(context.estimate.workstream)) return "Blocks SRM/BAB";
   if (requestNeedsOwnerAction(context) && technicalWorkstreams.includes(context.estimate.workstream)) return "SRM dependency";
   if (requestNeedsOwnerAction(context)) return "BAB dependency";
@@ -514,7 +514,7 @@ function applyDemoValidationOverrides() {
     let adjustedMd = "";
     let reason = "Approved against the generated mock sizing baseline.";
 
-    if (estimate.product_name === "CUPPS" && estimate.workstream === "Implementation") {
+    if (estimate.product_name === "CUPPS" && estimate.workstream === "Implementation Engineer") {
       status = "Approved with Conditions";
       reason = "Approved subject to phased terminal sequencing and confirmed installation windows.";
     }

@@ -53,6 +53,15 @@ package.
   "positions (total)" = check-in counters + boarding gates; weight 0 so it does
   not double-count).
 - `PRODUCT_LINKS` — soft links (Integrations & APIs → AODB).
+- Each product can have its own activity list in `productWorkstreamBase`
+  (per-product automated sizing). CUPPS uses the product owner's list:
+  Project Manager, Implementation Engineer, ACS Training, ACS Support
+  Establishment, Central Service Delivery, Airline Integration, Insights Set
+  up, Agent Portal (MDs still mock placeholders). Other products keep the
+  generic workstreams until their lists are provided. When adding an
+  activity, also update `WORKSTREAMS`, `workstreamRuleCodes`, the owner rows
+  in `buildResourceOwners`, and the technical/delivery classification lists
+  in `readiness-rules.js` and `sizing-engine.js`.
 - Driver types: numeric (default), `computed`, `type: "boolean"` (Yes/No), and
   `type: "select"` with an `options` list. Boolean/select are similarity
   characteristics with weight 0 (no effort impact until real rules exist).

@@ -77,6 +77,7 @@ const VALIDATION_REQUEST_STATUSES = [
   "Overdue",
 ];
 const WORKSTREAMS = [
+  // Generic workstreams (products without a dedicated activity list yet)
   "Implementation",
   "R&D",
   "Project Management",
@@ -86,6 +87,15 @@ const WORKSTREAMS = [
   "Training",
   "Support Readiness",
   "Field Services",
+  // CUPPS product-specific activities
+  "Project Manager",
+  "Implementation Engineer",
+  "ACS Training",
+  "ACS Support Establishment",
+  "Central Service Delivery",
+  "Airline Integration",
+  "Insights Set up",
+  "Agent Portal",
 ];
 
 // The guided demo narrative was authored against this frozen date; outside
@@ -199,6 +209,14 @@ const workstreamRuleCodes = {
   Training: "TRN",
   "Support Readiness": "SUP",
   "Field Services": "FLD",
+  "Project Manager": "PMGR",
+  "Implementation Engineer": "IMPE",
+  "ACS Training": "ACST",
+  "ACS Support Establishment": "ACSS",
+  "Central Service Delivery": "CSD",
+  "Airline Integration": "AINT",
+  "Insights Set up": "INS",
+  "Agent Portal": "AGP",
 };
 
 const categoryRuleCodes = {
@@ -238,15 +256,17 @@ const productWorkstreamBase = {
     Training: 4,
     "Support Readiness": 5,
   },
+  // CUPPS uses its product-specific activity list (product owner definition).
+  // MD values remain mock placeholders until real historical rules arrive.
   CUPPS: {
-    Implementation: 25,
-    "R&D": 10,
-    "Project Management": 9,
-    "Airline Onboarding": 10,
-    Integrations: 8,
-    "Testing & Cutover": 8,
-    Training: 5,
-    "Support Readiness": 5,
+    "Project Manager": 9,
+    "Implementation Engineer": 25,
+    "ACS Training": 5,
+    "ACS Support Establishment": 6,
+    "Central Service Delivery": 8,
+    "Airline Integration": 10,
+    "Insights Set up": 7,
+    "Agent Portal": 5,
   },
   ABD: {
     Implementation: 20,
@@ -803,6 +823,14 @@ function buildResourceOwners() {
     ["Training", "Training Owner", "training.owner@example.com"],
     ["Support Readiness", "Support Readiness Owner", "support.readiness@example.com"],
     ["Field Services", "Field Services Owner", "field.services@example.com"],
+    ["Project Manager", "Project Manager Owner", "project.manager@example.com"],
+    ["Implementation Engineer", "Implementation Engineer Owner", "implementation.engineer@example.com"],
+    ["ACS Training", "ACS Training Owner", "acs.training@example.com"],
+    ["ACS Support Establishment", "ACS Support Owner", "acs.support@example.com"],
+    ["Central Service Delivery", "Central Service Delivery Owner", "central.service.delivery@example.com"],
+    ["Airline Integration", "Airline Integration Owner", "airline.integration@example.com"],
+    ["Insights Set up", "Insights Owner", "insights.setup@example.com"],
+    ["Agent Portal", "Agent Portal Owner", "agent.portal@example.com"],
   ];
 
   const owners = rows.map(([workstream, name, email]) =>
@@ -813,7 +841,7 @@ function buildResourceOwners() {
     resourceOwner("owner-biopod-rd-emea", "Standalone Biopod R&D Owner", "R&D", "biopod.rd@example.com", "Standalone Biopod", "EMEA", "R&D", "R&D Owner"),
     resourceOwner("owner-aodb-pm-emea", "AODB PM Owner", "Project Management", "aodb.pm@example.com", "AODB", "EMEA", "Project Management", "PM Owner"),
     resourceOwner("owner-dds-implementation-global", "DDS Implementation Owner", "Implementation", "dds.implementation@example.com", "DDS", "Global", "Implementation", "Implementation Owner"),
-    resourceOwner("owner-cupps-implementation-emea", "CUPPS Implementation Owner", "Implementation", "cupps.implementation@example.com", "CUPPS", "EMEA", "Implementation", "Implementation Owner"),
+    resourceOwner("owner-cupps-implementation-emea", "CUPPS Implementation Owner", "Implementation Engineer", "cupps.implementation@example.com", "CUPPS", "EMEA", "Implementation Engineer", "Implementation Engineer Owner"),
     resourceOwner("owner-cuss-onboarding-emea", "CUSS Airline Onboarding Owner", "Airline Onboarding", "cuss.onboarding@example.com", "CUSS", "EMEA", "Airline Onboarding", "Airline Onboarding Owner"),
     resourceOwner("owner-integration-emea", "EMEA Integration Owner", "Integrations", "emea.integration@example.com", "Integrations & APIs", "EMEA", "Integrations", "Integration Owner"),
     resourceOwner("owner-gt11-nb-rd-global", "eGate Hardware R&D Owner", "R&D", "gt11.hardware.rd@example.com", "Seamless GT11 eGate - Non Biometric", "Global", "R&D", "R&D Owner"),
