@@ -1940,21 +1940,36 @@ select {
 }
 
 .route-recommendation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid var(--line);
 }
 
-.route-recommendation > div {
+.route-recommendation-copy {
   display: grid;
   min-width: 0;
   gap: 2px;
 }
 
-.route-recommendation span {
+.route-recommendation .log-type {
   color: var(--muted);
   font-size: 0.67rem;
   font-weight: 850;
   text-transform: uppercase;
+}
+
+.route-recommendation strong {
+  font-size: 0.88rem;
+  overflow-wrap: break-word;
+}
+
+.route-recommendation button {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .route-recommendation strong {
@@ -3822,10 +3837,38 @@ button:disabled {
 
 .score-calculation-card,
 .readiness-gap-card {
-  display: grid;
   align-content: start;
   gap: 10px;
   padding: 12px;
+  grid-column: 1 / -1;
+}
+
+.readiness-gap-card {
+  display: grid;
+}
+
+.score-calculation-card > .score-component-list {
+  margin-top: 10px;
+}
+
+.score-calculation-card > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.score-calculation-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+.score-calculation-card > summary::after {
+  content: "▸";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.score-calculation-card[open] > summary::after {
+  content: "▾";
 }
 
 .score-card-heading,
@@ -3968,6 +4011,28 @@ button:disabled {
   color: var(--muted);
   font-size: 0.8rem;
   line-height: 1.35;
+}
+
+.checklist-board-details {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.checklist-board-details > summary {
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.checklist-board-details[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.checklist-board-details > .checklist-board {
+  padding: 12px;
 }
 
 .checklist-board {
@@ -5177,24 +5242,34 @@ tbody th {
 }
 
 .owner-package {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  align-items: center;
   min-width: 0;
   padding: 10px;
   border: 1px solid var(--line);
   border-left: 3px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  color: var(--ink);
   background: var(--surface);
+}
+
+.owner-package-open {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
   text-align: left;
+  cursor: pointer;
 }
 
 .owner-package:hover {
   border-color: #a9cfc9;
   background: #f2f5fc;
-  transform: none;
 }
 
 .owner-package.critical {
@@ -5207,6 +5282,12 @@ tbody th {
 
 .owner-package.ready {
   border-left-color: var(--green);
+}
+
+.owner-package-approve {
+  align-self: flex-start;
+  padding: 4px 10px;
+  font-size: 0.68rem;
 }
 
 .owner-package-main {
@@ -6812,6 +6893,11 @@ textarea:focus-visible {
   gap: 12px;
 }
 
+/* A family with a single product fills the row instead of leaving an empty half. */
+.scope-family-grid > :only-child {
+  grid-column: 1 / -1;
+}
+
 .scope-add-panel {
   border: 1px dashed var(--line);
   border-radius: 8px;
@@ -7175,4 +7261,63 @@ textarea:focus-visible {
   background: #f8fcfb;
   color: var(--ink);
   font-weight: 600;
+}
+
+.sizing-airport-profile {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted, #f8fafc);
+}
+
+.sizing-airport-profile-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand, #2f5fd0);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+.sizing-airport-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.sizing-airport-profile-grid div {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.sizing-airport-profile-grid dt {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.sizing-airport-profile-grid dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 640;
+  overflow-wrap: break-word;
 }

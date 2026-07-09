@@ -134,7 +134,7 @@ const HELP_TEXT = {
   resourceValidation:
     "Requests are routed by product, workstream, and region. Owner responses create the traceable evidence used by SRM and BAB readiness.",
   notificationPreview:
-    "Generate an Email or Teams validation request for the resource owner. The trigger is recorded locally; nothing is sent externally.",
+    "Preview and send the Email or Teams validation request for the selected resource owner.",
   srmReadiness:
     "SRM readiness indicates whether validated technical and delivery inputs are sufficient to proceed to solution review.",
   babReadiness:
@@ -1041,6 +1041,12 @@ function dateDaysBefore(dateValue, days) {
   return date.toISOString().slice(0, 10);
 }
 
+function dateDaysAfter(dateValue, days) {
+  const date = new Date(`${dateValue || referenceToday()}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
 function daysUntil(dateValue, baseDate = referenceToday()) {
   const target = new Date(`${dateValue || baseDate}T00:00:00`);
   const base = new Date(`${baseDate}T00:00:00`);
@@ -1074,7 +1080,7 @@ function formatCurrency(value) {
 const MOCK_BENCHMARKS = [
   {
     id: "bench-medium-pax-2025",
-    name: "Iberia Regional Hub - CUSS/CUPPS Refresh",
+    name: "Iberia Regional Hub - CUSS and CUPPS Refresh",
     category: "Medium",
     year: 2025,
     products: ["CUSS", "CUPPS", "AODB"],
@@ -1096,7 +1102,7 @@ const MOCK_BENCHMARKS = [
   },
   {
     id: "bench-large-ops-2024",
-    name: "Northstar Airports - AODB/DDS Modernization",
+    name: "Northstar Airports - AODB and DDS Modernization",
     category: "Large",
     year: 2024,
     products: ["AODB", "DDS", "Integrations & APIs"],
@@ -1214,6 +1220,7 @@ export {
   formatNumber,
   clamp,
   dateDaysBefore,
+  dateDaysAfter,
   daysUntil,
   formatShortDate,
   pluralize,

@@ -3,12 +3,14 @@ import {
   GOVERNANCE_FORUMS,
   airportProfile,
   clamp,
+  dateDaysAfter,
   decision,
   driversForProduct,
   isDocumented,
   makeGovernanceItems,
   makeValidation,
   productScope,
+  referenceToday,
   stakeholderTemplates,
 } from "./data.js";
 import {
@@ -105,8 +107,8 @@ function newOpportunityRecord(id, overrides = {}) {
     presales_owner: "Pre-sales owner",
     opportunity_stage: "Qualification",
     estimated_value: 0,
-    close_date: new Date().toISOString().slice(0, 10),
-    submission_deadline: new Date().toISOString().slice(0, 10),
+    close_date: dateDaysAfter(referenceToday(), 45),
+    submission_deadline: dateDaysAfter(referenceToday(), 30),
     implementation_start: "",
     go_live_date: "",
     strategic_importance: "Medium",
@@ -304,16 +306,11 @@ function syncAirportProfileFromForm() {
   if (!elements.airportProfileForm) return;
   const profile = airportProfileFor(selectedId);
   const data = new FormData(elements.airportProfileForm);
-  profile.airport_name = data.get("airport_name").toString().trim() || selectedOpportunity().customer;
-  profile.airport_code = (data.get("airport_code") || "").toString().trim().toUpperCase();
-  profile.annual_passengers = Number(data.get("annual_passengers")) || 0;
-  profile.annual_movements = Number(data.get("annual_movements")) || 0;
-  profile.region = data.get("region").toString();
-  profile.categorization_override = data.get("categorization_override").toString();
-  profile.override_reason = data.get("override_reason").toString().trim();
+  // Airport identity is owned by Intake; the sizing form only edits the
+  // category override and its justification.
+  profile.categorization_override = (data.get("categorization_override") || "").toString();
+  profile.override_reason = (data.get("override_reason") || "").toString().trim();
   classifyAirport(profile);
-  selectedOpportunity().customer = profile.airport_name;
-  selectedOpportunity().region = profile.region;
 }
 
 function syncEstimateWorkflowAfterChange(estimate) {
@@ -413,23 +410,43 @@ function applyOwnerValidationAction(requestId, action, fields) {
   }
 
   request.status = action;
-  request.response_date = "2026-06-17";
+  request.response_date = referenceToday();
   request.adjustment_reason = reason;
   request.comments =
     comments ||
     reason ||
-    (action === "Approved" ? "Approved by resource owner in the mock validation workflow." : request.comments || "");
+    (action === "Approved" ? "Approved by resource owner." : request.comments || "");
   request.escalation_required = ["Rejected", "Overdue"].includes(action);
 
   syncEstimateWorkflowAfterChange(estimate);
-  request.adjustment_reason = reason;
-  request.comments =
-    comments ||
-    reason ||
-    (action === "Approved" ? "Approved by resource owner in the mock validation workflow." : request.comments || "");
   setSelectedValidationRequestId(request.id);
 
   return { ok: true, message: `Owner validation updated: ${action}. SRM/BAB readiness recalculated.`, tone: "success" };
+}
+
+// Bulk-approve every straightforward pending line for one owner. Lines the
+// owner explicitly flagged (Needs Adjustment / Rejected) are left untouched so
+// a fast "clear the easy ones" pass never silently overwrites a real exception.
+function bulkApproveRequests(requestIds = []) {
+  let approved = 0;
+  requestIds.forEach((requestId) => {
+    const request = mockDb.validationRequests.find((item) => item.id === requestId);
+    const estimate = request ? mockDb.sizingEstimates.find((item) => item.id === request.sizing_estimate_id) : null;
+    if (!request || !estimate) return;
+    if (["Needs Adjustment", "Rejected"].includes(estimate.status)) return;
+    estimate.status = "Approved";
+    estimate.final_validated_md = finalMdForEstimate(estimate);
+    request.status = "Approved";
+    request.response_date = referenceToday();
+    request.comments = request.comments || "Approved by resource owner (bulk approval).";
+    request.escalation_required = false;
+    syncEstimateWorkflowAfterChange(estimate);
+    approved += 1;
+  });
+  if (!approved) {
+    return { ok: false, message: "No pending lines were available to approve for this owner.", tone: "attention" };
+  }
+  return { ok: true, message: `Approved ${approved} sizing line${approved === 1 ? "" : "s"}. SRM/BAB readiness recalculated.`, tone: "success" };
 }
 
 export {
@@ -448,4 +465,5 @@ export {
   updateEstimateManualOverride,
   updateEstimateValidation,
   applyOwnerValidationAction,
+  bulkApproveRequests,
 };

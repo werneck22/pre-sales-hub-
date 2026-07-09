@@ -1,8 +1,10 @@
 import {
   clamp,
   complexityMultipliers,
+  dateDaysAfter,
   dateDaysBefore,
   daysUntil,
+  referenceToday,
   driverSummary,
   ensureScopeSizingInputs,
   formatNumber,
@@ -102,6 +104,17 @@ function defaultValidationRequestId(opportunityId) {
 
 function ownerActionStatuses() {
   return ["Not Started", "Pending Validation", "Needs Adjustment", "More Information Requested", "Overdue"];
+}
+
+// The most urgent line still needing an owner decision, excluding the one just
+// cleared, so "Approve & next" walks the queue without manual re-selection.
+function nextActionableRequestId(opportunity, excludeId) {
+  if (!opportunity) return "";
+  const next = validationRequestContexts([opportunity])
+    .filter(requestNeedsOwnerAction)
+    .filter((context) => context.request.id !== excludeId)
+    .sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn)[0];
+  return next?.request.id || "";
 }
 
 function effectiveRequestStatus(request, dueIn = daysUntil(request.due_date)) {
@@ -331,6 +344,15 @@ function runMockNotificationTrigger(button) {
   showToast(result.message, result.tone);
 }
 
+// Validation is due a week before the submission deadline, but a request
+// created today must never be born past-due. Floor the due date to a short
+// buffer ahead of today so freshly created BIDs read as actionable, not overdue.
+function validationDueDate(opportunity) {
+  const target = dateDaysBefore(opportunity.submission_deadline, 7);
+  const floor = dateDaysAfter(referenceToday(), 3);
+  return target < floor ? floor : target;
+}
+
 function upsertValidationWorkflow(opportunity, profile, estimate, owner) {
   const requestKey = requestId(estimate.id);
   let request = mockDb.validationRequests.find((item) => item.id === requestKey);
@@ -342,7 +364,7 @@ function upsertValidationWorkflow(opportunity, profile, estimate, owner) {
       resource_owner_id: owner.id,
       request_type: "Sizing Validation",
       status: estimate.status,
-      due_date: dateDaysBefore(opportunity.submission_deadline, 7),
+      due_date: validationDueDate(opportunity),
       sent_date: "",
       response_date: "",
       comments: "",
@@ -682,6 +704,7 @@ export {
   requestContextFor,
   validationRequestContexts,
   defaultValidationRequestId,
+  nextActionableRequestId,
   ownerActionStatuses,
   effectiveRequestStatus,
   requestNeedsOwnerAction,
