@@ -718,7 +718,7 @@ function demoScenarioSteps(opportunity) {
       label: "Notifications triggered",
       target: "#resource-validation",
       complete: notifications.length === requests.length && notifications.length > 0 && notificationEvents.length > 0,
-      evidence: `${notifications.length} Email/Teams drafts generated and ${notificationEvents.length} simulated trigger recorded; nothing was sent externally.`,
+      evidence: `${notifications.length} Email/Teams requests prepared and ${notificationEvents.length} sent to owners.`,
       note: "Select the pending AODB PM request, switch between Email and Teams, generate a local trigger, and show the notification audit entry.",
     },
     {
@@ -1075,15 +1075,28 @@ function renderAirportProfile(opportunity) {
   const profile = airportProfileFor(opportunity.id);
   classifyAirport(profile);
   const form = elements.airportProfileForm;
-  form.airport_name.value = profile.airport_name;
-  if (form.airport_code) form.airport_code.value = profile.airport_code || "";
-  form.annual_passengers.value = profile.annual_passengers;
-  form.annual_movements.value = profile.annual_movements;
-  form.region.value = profile.region;
-  form.categorization_override.value = profile.categorization_override;
-  form.override_reason.value = profile.override_reason;
+  if (form.categorization_override) form.categorization_override.value = profile.categorization_override;
+  if (form.override_reason) form.override_reason.value = profile.override_reason;
   elements.categoryBadge.textContent = `${profile.airport_category} - ${profile.categorization_method}`;
-  if (elements.airportLookupStatus) elements.airportLookupStatus.textContent = trafficProvenanceText(profile);
+  const summary = form.querySelector("#sizingAirportProfile");
+  if (summary) {
+    const facts = [
+      ["Airport", profile.airport_name || "-"],
+      ["IATA/ICAO", profile.airport_code || "-"],
+      ["Annual passengers", profile.annual_passengers ? formatNumber(profile.annual_passengers) : "-"],
+      ["Annual movements", profile.annual_movements ? formatNumber(profile.annual_movements) : "-"],
+      ["Region", profile.region || "-"],
+      ["Category", `${profile.airport_category} (${profile.categorization_method})`],
+    ];
+    summary.innerHTML = `
+      <div class="sizing-airport-profile-head">
+        <span class="log-type">Airport profile</span>
+        <a class="link-button" href="#/intake">Edit in Intake</a>
+      </div>
+      <dl class="sizing-airport-profile-grid">
+        ${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(String(value))}</dd></div>`).join("")}
+      </dl>`;
+  }
 }
 
 function renderClassificationRules() {
@@ -1413,6 +1426,9 @@ function renderValidationRequests(opportunity) {
   const emailNotificationState = selectedNotification ? notificationChannelState(selectedNotification, "Email") : null;
   const teamsNotificationState = selectedNotification ? notificationChannelState(selectedNotification, "Teams") : null;
   const pendingCount = contexts.filter(requestNeedsOwnerAction).length;
+  // Canonical "needs action" figure: each line counted once by its lane, so an
+  // overdue line is not tallied as both pending and an exception.
+  const needActionCount = contexts.filter((context) => lanes[0].statuses.includes(context.effectiveStatus)).length;
   const overdueCount = contexts.filter(requestIsOverdue).length;
   const approvedCount = contexts.filter((context) => ["Approved", "Approved with Conditions"].includes(context.effectiveStatus)).length;
   const exceptionCount = contexts.filter((context) => ["Needs Adjustment", "Rejected", "Overdue"].includes(context.effectiveStatus)).length;
@@ -1429,7 +1445,7 @@ function renderValidationRequests(opportunity) {
   const stageGuidance = {
     Prepare: "Generate the sizing baseline before creating owner requests.",
     Route: "Resolve missing owners or email addresses before triggering validation.",
-    Validate: `Chase ${pendingCount} pending response${pendingCount === 1 ? "" : "s"} and resolve ${exceptionCount} exception${exceptionCount === 1 ? "" : "s"}.`,
+    Validate: `Resolve ${needActionCount} line${needActionCount === 1 ? "" : "s"} needing action before closing the baseline.`,
     Close: "Confirm the final MD baseline and carry any conditions into BAB preparation.",
   };
   const ownerPackages = new Map();
@@ -1491,7 +1507,7 @@ function renderValidationRequests(opportunity) {
       </div>
       <div class="validation-summary-metrics">
         <span><strong>${requests.length}</strong> sizing lines</span>
-        <span class="${pendingCount + exceptionCount ? "attention" : ""}"><strong>${pendingCount + exceptionCount}</strong> need action</span>
+        <span class="${needActionCount ? "attention" : ""}"><strong>${needActionCount}</strong> need action</span>
         <span class="${overdueCount ? "attention" : ""}"><strong>${overdueCount}</strong> overdue</span>
         <span><strong>${approvedCount}</strong> approved</span>
         <span class="${mdWaiting ? "attention" : ""}"><strong>${formatNumber(mdWaiting)}</strong> MD awaiting owner</span>
@@ -1617,15 +1633,14 @@ function renderValidationRequests(opportunity) {
       <section class="notification-trigger-panel" aria-label="Resource owner notification trigger">
         <div class="notification-trigger-copy">
           <span class="log-type">Notify owner</span>
-          <strong>Notify resource owner</strong>
-          <small>Send the request via Email or Teams. Nothing is sent externally.</small>
+          <strong>Send validation request</strong>
         </div>
         <div class="notification-trigger-actions">
           <button type="button" class="primary-button" data-notification-trigger="Email" data-request-id="${escapeHtml(selectedRequest?.id || "")}" ${selectedRequest ? "" : "disabled"}>
-            Simulate email trigger
+            Send request (Email)
           </button>
           <button type="button" class="secondary-button" data-notification-trigger="Teams" data-request-id="${escapeHtml(selectedRequest?.id || "")}" ${selectedRequest ? "" : "disabled"}>
-            Simulate Teams trigger
+            Send request (Teams)
           </button>
         </div>
         <div class="notification-channel-status" aria-label="Notification channel status">
@@ -1669,8 +1684,8 @@ function renderValidationRequests(opportunity) {
           >${escapeHtml(selectedRequest?.comments || "")}</textarea>
         </label>
         <div class="request-action-row">
-          <button type="button" class="primary-button" data-owner-action="Approved" data-request-id="${escapeHtml(selectedRequest?.id || "")}">
-            Approve
+          <button type="button" class="primary-button" data-owner-action="Approved" data-owner-advance="true" data-request-id="${escapeHtml(selectedRequest?.id || "")}">
+            Approve &amp; next
           </button>
           <button type="button" class="secondary-button" data-owner-action="Approved with Conditions" data-request-id="${escapeHtml(selectedRequest?.id || "")}">
             Approve with conditions
@@ -1703,11 +1718,17 @@ function renderValidationRequests(opportunity) {
           .map((item) => {
             const status = item.overdue ? "Escalate" : item.exceptions ? "Exception" : item.pending ? "Requires action" : item.conditional ? "Conditional" : "Completed";
             const tone = item.overdue || item.exceptions ? "critical" : item.pending || item.conditional ? "attention" : "ready";
+            const approvableIds = item.contexts
+              .filter((context) => requestNeedsOwnerAction(context) && !["Needs Adjustment", "Rejected"].includes(context.effectiveStatus))
+              .map((context) => context.request.id);
             return `
-          <button type="button" class="owner-package ${tone}" data-request-id="${escapeHtml(item.primary.request.id)}">
-            <span class="owner-package-main"><strong>${escapeHtml(item.owner?.name || "Owner not assigned")}</strong><small>${pluralize(item.contexts.length, "sizing line")} - ${formatNumber(item.md)} MD - ${item.dueIn < 0 ? `${Math.abs(item.dueIn)}d overdue` : `due in ${item.dueIn}d`}</small></span>
-            <span class="status-pill ${statusClass(tone)}">${escapeHtml(status)}</span>
-          </button>`;
+          <div class="owner-package ${tone}">
+            <button type="button" class="owner-package-open" data-request-id="${escapeHtml(item.primary.request.id)}">
+              <span class="owner-package-main"><strong>${escapeHtml(item.owner?.name || "Owner not assigned")}</strong><small>${pluralize(item.contexts.length, "sizing line")} - ${formatNumber(item.md)} MD - ${item.dueIn < 0 ? `${Math.abs(item.dueIn)}d overdue` : `due in ${item.dueIn}d`}</small></span>
+              <span class="status-pill ${statusClass(tone)}">${escapeHtml(status)}</span>
+            </button>
+            ${approvableIds.length ? `<button type="button" class="secondary-button owner-package-approve" data-bulk-approve="${escapeHtml(approvableIds.join(","))}">Approve ${approvableIds.length} pending</button>` : ""}
+          </div>`;
           })
           .join("")}
       </div>
@@ -1723,7 +1744,7 @@ function renderNotificationPreview() {
     elements.notificationPreview.innerHTML = `
       <div class="empty-state guided-empty">
         <strong>No notification selected.</strong>
-        <p>Select a validation request to preview the Email or Teams message. Nothing is sent externally.</p>
+        <p>Select a validation request to preview its Email or Teams message.</p>
         <button type="button" class="secondary-button" data-action="scroll" data-target="#resource-validation">Review validation requests</button>
       </div>
     `;
@@ -1752,16 +1773,15 @@ function renderNotificationPreview() {
       </div>
       <div class="email-preview ${channel === "Teams" ? "teams-preview" : ""}">
         <div>
-          <span class="log-type">Simulated ${escapeHtml(channel)} ${channel === "Email" ? "draft" : "message"}</span>
+          <span class="log-type">${escapeHtml(channel)} ${channel === "Email" ? "draft" : "message"}</span>
           <strong>${escapeHtml(title)}</strong>
           <small>To: ${escapeHtml(notification.recipient)} - ${escapeHtml(formatNotificationTimestamp(channelState.last_triggered_at))}</small>
         </div>
         <pre>${escapeHtml(body)}</pre>
       </div>
       <div class="notification-preview-action">
-        <p>Records a local activity entry. Nothing is sent externally.</p>
         <button type="button" class="primary-button" data-notification-trigger="${escapeHtml(channel)}" data-request-id="${escapeHtml(request.id)}">
-          Generate ${escapeHtml(channel)} simulation
+          Send ${escapeHtml(channel)} request
         </button>
       </div>
       <section class="notification-activity" aria-label="Notification activity">
@@ -1961,11 +1981,11 @@ function renderReadinessBreakdown(opportunity) {
       }).join("")}
     </section>
 
-    <section class="score-calculation-card">
-      <div class="score-card-heading">
-        <strong>Overall score calculation</strong>
+    <details class="score-calculation-card">
+      <summary class="score-card-heading">
+        <strong>Why this score</strong>
         <span>${breakdown.baseScore} base points - final ${breakdown.score}</span>
-      </div>
+      </summary>
       <div class="score-component-list">
         ${breakdown.components
           .map(
@@ -1998,7 +2018,7 @@ function renderReadinessBreakdown(opportunity) {
             : `<div class="score-cap-row calm"><strong>No score cap applied</strong><span>Cap 100%</span><small>No critical blockers detected.</small></div>`
         }
       </div>
-    </section>
+    </details>
 
     <section class="readiness-gap-card">
       <div class="readiness-gap-heading">

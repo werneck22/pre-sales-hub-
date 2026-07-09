@@ -49,6 +49,7 @@ import {
   estimateId,
   generateSizingForOpportunity,
   initializeSizingEngine,
+  nextActionableRequestId,
   requestId,
   runMockNotificationTrigger,
 } from "./sizing-engine.js";
@@ -76,6 +77,7 @@ import {
   addProductScope,
   applyAirportCodeToProfile,
   applyOwnerValidationAction,
+  bulkApproveRequests,
   createOpportunity,
   executeJourneyAction,
   findProductScope,
@@ -389,6 +391,18 @@ if (elements.validationRequestList) {
       return;
     }
 
+    const bulkApproveButton = event.target.closest("[data-bulk-approve]");
+    if (bulkApproveButton) {
+      const ids = (bulkApproveButton.dataset.bulkApprove || "").split(",").filter(Boolean);
+      const result = bulkApproveRequests(ids);
+      if (result.ok) {
+        setSelectedValidationRequestId(nextActionableRequestId(selectedOpportunity(), "") || defaultValidationRequestId(selectedId));
+        renderAll();
+      }
+      showToast(result.message, result.tone);
+      return;
+    }
+
     const ownerActionButton = event.target.closest("[data-owner-action]");
     if (ownerActionButton) {
       const panel = ownerActionButton.closest("[data-request-action-panel]");
@@ -396,10 +410,15 @@ if (elements.validationRequestList) {
       panel?.querySelectorAll("[data-request-action-field]").forEach((input) => {
         fields[input.dataset.requestActionField] = input.value;
       });
-      const result = applyOwnerValidationAction(ownerActionButton.dataset.requestId, ownerActionButton.dataset.ownerAction, fields);
+      const currentRequestId = ownerActionButton.dataset.requestId;
+      const result = applyOwnerValidationAction(currentRequestId, ownerActionButton.dataset.ownerAction, fields);
       if (!result.ok) {
         showToast(result.message, result.tone);
         return;
+      }
+      if (ownerActionButton.dataset.ownerAdvance === "true") {
+        const nextId = nextActionableRequestId(selectedOpportunity(), currentRequestId);
+        if (nextId) setSelectedValidationRequestId(nextId);
       }
       renderAll();
       showToast(result.message, result.tone);

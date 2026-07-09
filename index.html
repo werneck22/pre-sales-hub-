@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260707-19" />
+    <link rel="stylesheet" href="./styles.css?v=20260709-20" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -51,14 +51,14 @@
         <div class="sync-panel">
           <span class="sync-dot"></span>
           <div>
-            <strong>Mock data only</strong>
+            <strong>Demo data</strong>
             <span>Salesforce remains system of record</span>
           </div>
         </div>
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v19</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v20</span></p>
       </aside>
 
       <main class="main-content">
@@ -102,6 +102,13 @@
             <a href="#/governance" data-workflow-route="governance"><span>5</span>Readiness</a>
             <a href="#/decisions" data-workflow-route="decisions"><span>6</span>Decision</a>
           </nav>
+          <div id="routeRecommendation" class="route-recommendation">
+            <div class="route-recommendation-copy">
+              <span class="log-type">Recommended next action</span>
+              <strong id="routeRecommendationText">Continue the workflow</strong>
+            </div>
+            <button id="routeRecommendationBtn" class="secondary-button" type="button">Continue</button>
+          </div>
         </section>
 
         <section id="dashboard" class="dashboard-grid executive-dashboard-grid" data-route-screen="dashboard" aria-label="Executive dashboard">
@@ -410,8 +417,7 @@
                 <div id="intakeNarrativeSummary" class="narrative-summary span-2"></div>
                 <details class="intake-detail-panel span-2">
                   <summary>
-                    <span>Governance narrative</span>
-                    <small>Edit the narrative fields</small>
+                    <span>Edit narrative fields</span>
                   </summary>
                   <div class="narrative-field-grid">
                     <label>
@@ -494,42 +500,7 @@
                   </div>
                   <p>The larger of the passenger or movement category applies.</p>
                 </div>
-                <label>
-                  Airport name
-                  <input name="airport_name" type="text" />
-                </label>
-                <label>
-                  Airport code
-                  <input name="airport_code" type="text" maxlength="4" placeholder="e.g. GRU" autocomplete="off" />
-                </label>
-                <div class="airport-lookup-bar span-2">
-                  <div class="airport-lookup-copy">
-                    <div class="context-help-title">
-                      <strong>Automated traffic lookup</strong>
-                      <button type="button" class="help-tooltip" data-help-key="airportLookup" data-help-label="Airport traffic lookup"><span aria-hidden="true">i</span></button>
-                    </div>
-                    <span id="airportLookupStatus">Traffic figures: manual entry.</span>
-                  </div>
-                  <button id="airportLookupBtn" class="secondary-button" type="button">Lookup airport data</button>
-                </div>
-                <label>
-                  Annual passengers
-                  <input name="annual_passengers" type="number" min="0" step="1000" />
-                </label>
-                <label>
-                  Annual aircraft movements
-                  <input name="annual_movements" type="number" min="0" step="100" />
-                </label>
-                <label>
-                  Region
-                  <select name="region">
-                    <option>AMS</option>
-                    <option>EMEA</option>
-                    <option>APAC</option>
-                    <option>NORAM</option>
-                    <option>LATAM</option>
-                  </select>
-                </label>
+                <div id="sizingAirportProfile" class="sizing-airport-profile span-2"></div>
                 <label>
                   Override category
                   <select name="categorization_override">
@@ -584,9 +555,8 @@
                           <h4>Owner notification and activity</h4>
                           <button type="button" class="help-tooltip" data-help-key="notificationPreview" data-help-label="Notification preview"><span aria-hidden="true">i</span></button>
                         </div>
-                        <p class="subsection-help">Preview Email or Teams for the selected validation package and record local trigger activity. Nothing is sent externally.</p>
+                        <p class="subsection-help">Preview and send the Email or Teams request for the selected validation line.</p>
                       </div>
-                      <span class="meta-chip">Preview only</span>
                     </summary>
                     <div id="notificationPreview"></div>
                   </details>
@@ -626,7 +596,10 @@
                 <span id="checklistScore" class="meta-chip">0 of 0 complete</span>
               </div>
               <div id="readinessBreakdown" class="readiness-breakdown"></div>
-              <div id="governanceChecklist" class="checklist-board"></div>
+              <details class="checklist-board-details">
+                <summary>Full BCM, SRM and BAB checklist</summary>
+                <div id="governanceChecklist" class="checklist-board"></div>
+              </details>
             </section>
 
             <section id="stakeholders" class="panel route-panel" data-route-screen="stakeholders" hidden>
@@ -739,6 +712,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260707-19"></script>
+    <script type="module" src="./modules/main.js?v=20260709-20"></script>
   </body>
 </html>
