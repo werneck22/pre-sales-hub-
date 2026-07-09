@@ -1,8 +1,6 @@
 import {
-  DEMO_OPPORTUNITY_ID,
   GOVERNANCE_FORUMS,
   airportProfile,
-  clamp,
   dateDaysAfter,
   decision,
   driversForProduct,
@@ -12,12 +10,10 @@ import {
   productScope,
   referenceToday,
   stakeholderTemplates,
-} from "./data.js?v=20260709-22";
+} from "./data.js?v=20260709-23";
 import {
   airportProfileFor,
   classifyAirport,
-  demoMode,
-  demoPresenterStep,
   elements,
   estimateProductFilter,
   estimateStatusFilter,
@@ -29,8 +25,6 @@ import {
   selectedId,
   selectedOpportunity,
   selectedValidationRequestId,
-  setDemoMode,
-  setDemoPresenterStep,
   setEstimateProductFilter,
   setEstimateStatusFilter,
   setSelectedId,
@@ -38,9 +32,8 @@ import {
   showToast,
   sizingEstimatesFor,
   validationRequestsFor,
-} from "./state.js?v=20260709-22";
+} from "./state.js?v=20260709-23";
 import {
-  applyDemoValidationOverrides,
   applyEstimateInitialMd,
   buildNotificationBody,
   defaultValidationRequestId,
@@ -48,20 +41,18 @@ import {
   generateSizingForOpportunity,
   ownerEmail,
   requestId,
-} from "./sizing-engine.js?v=20260709-22";
+} from "./sizing-engine.js?v=20260709-23";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260709-22";
+} from "./readiness-rules.js?v=20260709-23";
 import {
   airportByCode,
-} from "./airport-directory.js?v=20260709-22";
+} from "./airport-directory.js?v=20260709-23";
 import {
-  demoScenarioSteps,
   renderAll,
   renderIntakeNarrativeSummary,
-  renderJourneyGuide,
   renderRecordHeader,
-} from "./render.js?v=20260709-22";
+} from "./render.js?v=20260709-23";
 
 function syncIntakeFromForm() {
   const opportunity = selectedOpportunity();
@@ -146,8 +137,6 @@ function registerOpportunity(opportunity, profile, toastMessage) {
   );
   mockDb.governanceItems.push(...GOVERNANCE_FORUMS.flatMap((forum) => makeGovernanceItems(id, forum, [])));
   setSelectedId(id);
-  setDemoMode(false);
-  setDemoPresenterStep(0);
   setEstimateProductFilter("all");
   setEstimateStatusFilter("all");
   setSelectedValidationRequestId("");
@@ -211,7 +200,6 @@ function runSizingForSelected() {
     return;
   }
   generateSizingForOpportunity(selectedId);
-  if (selectedId === DEMO_OPPORTUNITY_ID && demoMode) applyDemoValidationOverrides();
   setEstimateProductFilter("all");
   setEstimateStatusFilter("all");
   setSelectedValidationRequestId(defaultValidationRequestId(selectedId));
@@ -221,7 +209,7 @@ function runSizingForSelected() {
   showToast(`Sizing refreshed: ${estimateCount} estimates and ${requestCount} validation requests. Existing owner validations were kept.`);
 }
 
-function executeJourneyAction(action, target, stepIndex) {
+function executeJourneyAction(action, target) {
   if (action === "create-opportunity") {
     createOpportunity();
     return;
@@ -229,13 +217,6 @@ function executeJourneyAction(action, target, stepIndex) {
   if (action === "run-sizing") {
     runSizingForSelected();
     scrollToSection(target || "#sizing");
-    return;
-  }
-  if (action === "demo-step") {
-    const steps = demoScenarioSteps(selectedOpportunity());
-    setDemoPresenterStep(clamp(Number(stepIndex), 0, Math.max(0, steps.length - 1)));
-    renderJourneyGuide(selectedOpportunity());
-    navigateToRoute("demo");
     return;
   }
   if (action === "focus-first-product") {

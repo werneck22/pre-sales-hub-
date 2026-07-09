@@ -14,7 +14,7 @@ import {
   sizingDriverFactor,
   sizingRuleCode,
   slug,
-} from "./data.js?v=20260709-22";
+} from "./data.js?v=20260709-23";
 import {
   airportProfileFor,
   classifyAirport,
@@ -28,11 +28,11 @@ import {
   setSelectedValidationRequestId,
   showToast,
   sizingEstimatesFor,
-} from "./state.js?v=20260709-22";
+} from "./state.js?v=20260709-23";
 import {
   renderNotificationPreview,
   renderValidationRequests,
-} from "./render.js?v=20260709-22";
+} from "./render.js?v=20260709-23";
 
 function confidenceFor(opportunity, scope) {
   if (opportunity.complexity === "Very High" || scope.risk_level === "High") return "Medium";
@@ -530,60 +530,9 @@ function generateSizingForOpportunity(opportunityId, options = {}) {
   );
 }
 
-function applyDemoValidationOverrides() {
-  sizingEstimatesFor("opp-est-00").forEach((estimate) => {
-    let status = "Approved";
-    let adjustedMd = "";
-    let reason = "Approved against the generated mock sizing baseline.";
-
-    if (estimate.product_name === "CUPPS" && estimate.workstream === "Implementation Engineer") {
-      status = "Approved with Conditions";
-      reason = "Approved subject to phased terminal sequencing and confirmed installation windows.";
-    }
-
-    if (estimate.product_name === "CUSS" && estimate.workstream === "Airline Onboarding") {
-      status = "Approved with Conditions";
-      adjustedMd = Number(estimate.initial_md || 0) + 4;
-      reason = "Airline onboarding increased by 4 MD to cover two additional carrier readiness workshops.";
-    }
-
-    if (estimate.product_name === "AODB" && estimate.workstream === "Project Management") {
-      status = "Pending Validation";
-      reason = "Final AODB project-management effort is the remaining BAB sizing blocker.";
-    }
-
-    estimate.status = status;
-    estimate.adjusted_md = adjustedMd;
-    estimate.final_validated_md = ["Approved", "Approved with Conditions"].includes(status)
-      ? Number(adjustedMd || estimate.initial_md)
-      : "";
-
-    const request = mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id);
-    if (!request) return;
-    request.status = status;
-    request.adjustment_reason = status === "Approved" ? "" : reason;
-    request.comments = reason;
-    request.response_date = ["Approved", "Approved with Conditions"].includes(status) ? "2026-06-17" : "";
-    request.escalation_required = false;
-
-    if (estimate.product_name === "AODB" && estimate.workstream === "Project Management") {
-      const notification = notificationForRequest(request.id);
-      if (notification && !notification.activity?.length) {
-        const teamsState = notificationChannelState(notification, "Teams");
-        teamsState.status = "Triggered (simulation)";
-        teamsState.last_triggered_at = "2026-06-17T14:30:00.000Z";
-        teamsState.trigger_count = 1;
-        notification.activity.unshift({
-          id: `activity-${request.id}-teams-demo`,
-          channel: "Teams",
-          recipient: notification.recipient,
-          status: "Simulation generated",
-          created_at: teamsState.last_triggered_at,
-        });
-      }
-    }
-  });
-
+// Seeds a couple of overdue owner validations on sample opportunities so the
+// dashboard shows realistic attention items out of the box.
+function applySeedValidationState() {
   [
     {
       opportunity: "opp-gru-03",
@@ -622,7 +571,7 @@ function applyDemoValidationOverrides() {
 function initializeSizingEngine() {
   mockDb.airportProfiles.forEach((profile) => classifyAirport(profile));
   mockDb.opportunities.forEach((opportunity) => generateSizingForOpportunity(opportunity.id));
-  applyDemoValidationOverrides();
+  applySeedValidationState();
 }
 
 function totalsForOpportunity(opportunityId) {
@@ -729,7 +678,6 @@ export {
   runMockNotificationTrigger,
   upsertValidationWorkflow,
   generateSizingForOpportunity,
-  applyDemoValidationOverrides,
   initializeSizingEngine,
   totalsForOpportunity,
   dashboardTotalsForOpportunity,

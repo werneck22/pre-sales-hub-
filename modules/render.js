@@ -1,6 +1,4 @@
 import {
-  DEMO_OPPORTUNITY_ID,
-  DEMO_SCENARIO_NAME,
   GOVERNANCE_FORUMS,
   HELP_TEXT,
   PRODUCT_NAMES,
@@ -10,7 +8,6 @@ import {
   WORKSTREAMS,
   benchmarkSignal,
   benchmarksForCategory,
-  clamp,
   currentForumStatus,
   daysUntil,
   defaultSizingInputs,
@@ -31,15 +28,13 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260709-22";
+} from "./data.js?v=20260709-23";
 import {
   activeRoute,
   airportProfileFor,
   assumptionsFor,
   classifyAirport,
   decisionsFor,
-  demoMode,
-  demoPresenterStep,
   elements,
   estimateExpansionOpportunityId,
   estimateProductFilter,
@@ -55,7 +50,6 @@ import {
   selectedNotificationChannel,
   selectedOpportunity,
   selectedValidationRequestId,
-  setDemoPresenterStep,
   setEstimateExpansionOpportunityId,
   setEstimateProductFilter,
   setSelectedValidationRequestId,
@@ -64,7 +58,7 @@ import {
   validationQueueFilter,
   validationRequestsFor,
   validationsFor,
-} from "./state.js?v=20260709-22";
+} from "./state.js?v=20260709-23";
 import {
   dashboardMdForEstimate,
   dashboardTotalsForOpportunity,
@@ -86,7 +80,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260709-22";
+} from "./sizing-engine.js?v=20260709-23";
 import {
   forumReadinessDetail,
   forumReadinessLabel,
@@ -99,10 +93,10 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260709-22";
+} from "./readiness-rules.js?v=20260709-23";
 import {
   trafficProvenanceText,
-} from "./airport-lookup.js?v=20260709-22";
+} from "./airport-lookup.js?v=20260709-23";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -180,8 +174,8 @@ function renderExecutiveDashboard() {
       ? ""
       : `<div class="empty-state guided-empty">
           <strong>No opportunities match the current filters.</strong>
-          <p>Clear the filter or create a new mock opportunity to walk through intake, sizing, validation, and readiness.</p>
-          <button type="button" class="primary-button" data-action="create-opportunity">Create demo opportunity</button>
+          <p>Clear the filter or create a new opportunity to walk through intake, sizing, validation, and readiness.</p>
+          <button type="button" class="primary-button" data-action="create-opportunity">Create opportunity</button>
         </div>`;
   }
 
@@ -440,8 +434,8 @@ function renderOpportunityList() {
     elements.opportunityList.innerHTML = `
       <div class="empty-state guided-empty">
         <strong>No opportunities match the current filters.</strong>
-        <p>Clear the search/filter or create a new mock opportunity to start the guided journey.</p>
-        <button type="button" class="primary-button" data-action="create-opportunity">Create demo opportunity</button>
+        <p>Clear the search/filter or create a new opportunity to start.</p>
+        <button type="button" class="primary-button" data-action="create-opportunity">Create opportunity</button>
       </div>
     `;
   }
@@ -555,7 +549,7 @@ function recommendedNextAction(opportunity) {
       cta: "Open airport profile",
       target: "#sizing",
       action: "scroll",
-      meta: "Step 2 of the demo journey",
+      meta: "Airport profile incomplete",
     };
   }
   if (!scopes.length) {
@@ -565,7 +559,7 @@ function recommendedNextAction(opportunity) {
       cta: "Open product scope",
       target: "#scope",
       action: "scroll",
-      meta: "Step 4 of the demo journey",
+      meta: "No products in scope yet",
     };
   }
   if (!estimates.length || !requests.length || !notifications.length) {
@@ -575,7 +569,7 @@ function recommendedNextAction(opportunity) {
       cta: "Run automated sizing",
       target: "#sizing",
       action: "run-sizing",
-      meta: `${scopes.length} products ready for mock sizing`,
+      meta: `${scopes.length} products ready for sizing`,
     };
   }
   if (pendingRequests.length) {
@@ -605,274 +599,17 @@ function recommendedNextAction(opportunity) {
       cta: "Open decision log",
       target: "#decisions",
       action: "scroll",
-      meta: "Final demo step",
+      meta: "No governance decision logged",
     };
   }
   return {
     title: "Ready for executive review",
-    body: "The opportunity has sizing, validation evidence, readiness scoring, and decision history for the demo flow.",
+    body: "The opportunity has sizing, validation evidence, readiness scoring, and decision history.",
     cta: "Open executive dashboard",
     target: "#dashboard",
     action: "scroll",
     meta: `${breakdown.score}% overall readiness`,
   };
-}
-
-function journeySteps(opportunity) {
-  const profile = airportProfileFor(opportunity.id);
-  const scopes = productScopesFor(opportunity.id);
-  const estimates = sizingEstimatesFor(opportunity.id);
-  const requests = validationRequestsFor(opportunity.id);
-  const notifications = requests.map((request) => notificationForRequest(request.id)).filter(Boolean);
-  const ownerActionCaptured = requests.length > 0 && requests.every((request) => !actionableValidationStatuses().includes(request.status));
-  const breakdown = readinessBreakdown(opportunity);
-
-  return [
-    { label: "Create opportunity", complete: Boolean(opportunity.id), target: "#intake" },
-    { label: "Enter airport profile", complete: airportProfileComplete(profile), target: "#sizing" },
-    { label: "Classify airport", complete: airportProfileComplete(profile) && isDocumented(profile.airport_category), target: "#sizing" },
-    { label: "Select product scope", complete: scopes.length > 0, target: "#scope" },
-    { label: "Generate sizing lines", complete: estimates.length > 0, target: "#sizing" },
-    { label: "Identify owners", complete: estimates.length > 0 && estimates.every((estimate) => estimate.owner_id && estimate.owner_email), target: "#resource-validation" },
-    { label: "Create requests", complete: requests.length > 0, target: "#resource-validation" },
-    { label: "Preview notifications", complete: notifications.length > 0, target: "#resource-validation" },
-    { label: "Capture owner action", complete: ownerActionCaptured, target: "#resource-validation" },
-    {
-      label: "Recalculate SRM/BAB",
-      complete: estimates.length > 0 && (breakdown.forumDetails.SRM.score > 0 || breakdown.forumDetails.BAB.score > 0),
-      target: "#governance",
-    },
-    { label: "Show next actions", complete: Boolean(recommendedNextAction(opportunity)), target: ".journey-panel" },
-    { label: "Update executive view", complete: true, target: "#dashboard" },
-  ];
-}
-
-function isDemoScenario(opportunity) {
-  return demoMode && opportunity.id === DEMO_OPPORTUNITY_ID;
-}
-
-function demoScenarioSteps(opportunity) {
-  const profile = airportProfileFor(opportunity.id);
-  const scopes = productScopesFor(opportunity.id);
-  const estimates = sizingEstimatesFor(opportunity.id);
-  const requests = validationRequestsFor(opportunity.id);
-  const notifications = requests.map((request) => notificationForRequest(request.id)).filter(Boolean);
-  const notificationEvents = notifications.flatMap((notification) => notification.activity || []);
-  const expectedProducts = ["CUPPS", "CUSS", "Standalone Biopod", "AODB", "Integrations & APIs"];
-  const productsAligned = scopes.length === expectedProducts.length && expectedProducts.every((product) => scopes.some((scope) => scope.product_name === product));
-  const ownersIdentified = estimates.length > 0 && estimates.every((estimate) => estimate.owner_id && isDocumented(estimate.owner_email));
-  const adjustedEstimate = estimates.find((estimate) => Number(estimate.adjusted_md || 0) > Number(estimate.initial_md || 0));
-  const adjustedRequest = adjustedEstimate
-    ? requests.find((request) => request.sizing_estimate_id === adjustedEstimate.id && isDocumented(request.adjustment_reason))
-    : null;
-  const pendingContexts = validationRequestContexts([opportunity]).filter(requestNeedsOwnerAction);
-  const breakdown = readinessBreakdown(opportunity);
-  const initialMd = estimates.reduce((sum, estimate) => sum + Number(estimate.initial_md || 0), 0);
-  const decisions = decisionsFor(opportunity.id);
-  const latestDecision = decisions[0];
-
-  return [
-    {
-      label: "Intake complete",
-      target: "#intake",
-      complete: breakdown.forumDetails.BCM.score === 100,
-      evidence: `BCM intake ${breakdown.forumDetails.BCM.score}% complete; owners and 15 July deadline captured.`,
-      note: "Start with the commercial context. Emphasize that Salesforce remains the system of record while this workspace organizes operational readiness evidence.",
-    },
-    {
-      label: "Airport classified",
-      target: "#sizing",
-      complete: profile.airport_category === "Medium" && Number(profile.annual_passengers) === 6500000 && Number(profile.annual_movements) === 72000,
-      evidence: `${formatNumber(profile.annual_passengers)} passengers and ${formatNumber(profile.annual_movements)} movements produce a ${profile.airport_category} category.`,
-      note: "Show that the larger passenger or movement category is applied and that the thresholds are configurable mock settings.",
-    },
-    {
-      label: "Scope confirmed",
-      target: "#scope",
-      complete: productsAligned,
-      evidence: `${scopes.length} products: ${scopes.map((scope) => scope.product_name).join(", ")}.`,
-      note: "Connect product selection to product-specific drivers such as CUPPS positions, CUSS kiosks, biometric positions, AODB interfaces, and API counts.",
-    },
-    {
-      label: "Sizing generated",
-      target: "#sizing",
-      complete: estimates.length > 0 && initialMd > 0,
-      evidence: `${estimates.length} product/workstream estimates generated for an initial total of ${formatNumber(initialMd)} MD.`,
-      note: "Open one estimate and use Why this estimate? to explain the rule, base MD, complexity, risk, and product-driver factors.",
-    },
-    {
-      label: "Owners identified",
-      target: "#resource-validation",
-      complete: ownersIdentified,
-      evidence: `${estimates.filter((estimate) => estimate.owner_id && estimate.owner_email).length}/${estimates.length} sizing lines have an owner and email.`,
-      note: "Explain that routing uses product, workstream, and region, with editable owner emails.",
-    },
-    {
-      label: "Requests created",
-      target: "#resource-validation",
-      complete: requests.length === estimates.length && requests.length > 0,
-      evidence: `${requests.length} validation requests created from ${estimates.length} sizing lines.`,
-      note: "Show the owner workflow lanes and point out that approvals, conditions, adjustments, and pending work are traceable by request.",
-    },
-    {
-      label: "Notifications triggered",
-      target: "#resource-validation",
-      complete: notifications.length === requests.length && notifications.length > 0 && notificationEvents.length > 0,
-      evidence: `${notifications.length} Email/Teams requests prepared and ${notificationEvents.length} sent to owners.`,
-      note: "Select the pending AODB PM request, switch between Email and Teams, generate a local trigger, and show the notification audit entry.",
-    },
-    {
-      label: "MD adjusted",
-      target: "#resource-validation",
-      complete: Boolean(adjustedEstimate && adjustedRequest),
-      evidence: adjustedEstimate
-        ? `${adjustedEstimate.product_name} ${adjustedEstimate.workstream} increased from ${adjustedEstimate.initial_md} to ${adjustedEstimate.adjusted_md} MD with justification.`
-        : "No justified upward adjustment found.",
-      note: "Use the CUSS Airline Onboarding line to demonstrate why an owner adjustment changes MD while preserving the original generated baseline.",
-    },
-    {
-      label: "Readiness recalculated",
-      target: "#governance",
-      complete: breakdown.forumDetails.SRM.status === "Ready with Conditions" && breakdown.forumDetails.BAB.status === "Not Ready",
-      evidence: `SRM is ${breakdown.forumDetails.SRM.status}; BAB is ${breakdown.forumDetails.BAB.status}; ${pendingContexts.length} owner validation remains open.`,
-      note: "Explain the distinction: critical technical evidence is sufficient for SRM with conditions, but BAB cannot be ready until every final validated MD is available.",
-    },
-    {
-      label: "Dashboard updated",
-      target: "#dashboard",
-      complete: opportunity.overall_readiness_score > 0 && pendingContexts.length === 1,
-      evidence: `${opportunity.overall_readiness_score}% overall readiness, ${pendingContexts.length} pending validation, and the MD delta visible on the executive dashboard.`,
-      note: "Return to the executive dashboard and show how the one remaining owner action appears in leadership attention, pending validations, and readiness metrics.",
-    },
-    {
-      label: "Next steps logged",
-      target: "#decisions",
-      complete: Boolean(latestDecision && isDocumented(latestDecision.next_steps)),
-      evidence: latestDecision
-        ? `${latestDecision.forum} decision logged by ${latestDecision.decision_owner}: ${latestDecision.next_steps}`
-        : "No governance decision has been logged.",
-      note: "Close with the decision trail: proceed to BAB preparation, validate AODB PM effort, refresh final MD, and return for the executive decision.",
-    },
-  ];
-}
-
-function renderDemoScenarioGuide(opportunity) {
-  const steps = demoScenarioSteps(opportunity);
-  setDemoPresenterStep(clamp(demoPresenterStep, 0, steps.length - 1));
-  const currentStep = steps[demoPresenterStep];
-  const readyEvidence = steps.filter((step) => step.complete).length;
-
-  elements.journeyPanel?.classList.add("demo-mode");
-  if (elements.journeyEyebrow) elements.journeyEyebrow.textContent = "Guided presenter mode";
-  if (elements.journeyTitle) elements.journeyTitle.textContent = DEMO_SCENARIO_NAME;
-  if (elements.journeyProgressBadge) elements.journeyProgressBadge.textContent = `Step ${demoPresenterStep + 1} of ${steps.length}`;
-  if (elements.demoModeBtn) {
-    elements.demoModeBtn.textContent = activeRoute === "demo" ? "Exit guided demo" : "Open guided demo";
-    elements.demoModeBtn.classList.add("active");
-  }
-
-  elements.journeyStepper.innerHTML = steps
-    .map((step, index) => {
-      const state = index < demoPresenterStep ? "complete" : index === demoPresenterStep ? "current" : "pending";
-      return `
-        <button type="button" class="journey-step ${state} ${step.complete ? "evidence-ready" : "evidence-attention"}" data-action="demo-step" data-demo-step="${index}" data-target="${escapeHtml(step.target)}">
-          <span>${index + 1}</span>
-          <div>
-            <strong>${escapeHtml(step.label)}</strong>
-            <em>${step.complete ? "Evidence ready" : "Attention"}</em>
-          </div>
-        </button>
-      `;
-    })
-    .join("");
-
-  if (elements.presenterNotes) {
-    elements.presenterNotes.hidden = false;
-    elements.presenterNotes.innerHTML = `
-      <div class="presenter-note-copy">
-        <span class="log-type">Presenter note - step ${demoPresenterStep + 1}</span>
-        <strong>${escapeHtml(currentStep.label)}</strong>
-        <p>${escapeHtml(currentStep.note)}</p>
-        <div class="presenter-evidence ${currentStep.complete ? "ready" : "attention"}">
-          <span>Live evidence</span>
-          <p>${escapeHtml(currentStep.evidence)}</p>
-        </div>
-      </div>
-      <div class="presenter-controls">
-        <button type="button" class="secondary-button" data-action="demo-step" data-demo-step="${demoPresenterStep - 1}" data-target="${escapeHtml(
-          steps[Math.max(0, demoPresenterStep - 1)].target,
-        )}" ${demoPresenterStep === 0 ? "disabled" : ""}>Previous</button>
-        <button type="button" class="secondary-button" data-action="scroll" data-target="${escapeHtml(currentStep.target)}">Show this step</button>
-        <button type="button" class="primary-button" data-action="demo-step" data-demo-step="${demoPresenterStep + 1}" data-target="${escapeHtml(
-          steps[Math.min(steps.length - 1, demoPresenterStep + 1)].target,
-        )}" ${demoPresenterStep === steps.length - 1 ? "disabled" : ""}>Next step</button>
-      </div>
-      <small class="presenter-progress">${readyEvidence}/${steps.length} scenario evidence checks ready</small>
-    `;
-  }
-
-  if (elements.nextActionPanel) elements.nextActionPanel.hidden = true;
-}
-
-function renderJourneyGuide(opportunity) {
-  if (!elements.journeyStepper || !elements.nextActionPanel) return;
-  if (isDemoScenario(opportunity)) {
-    renderDemoScenarioGuide(opportunity);
-    return;
-  }
-
-  elements.journeyPanel?.classList.remove("demo-mode");
-  if (elements.journeyEyebrow) elements.journeyEyebrow.textContent = "Demo journey";
-  if (elements.journeyTitle) elements.journeyTitle.textContent = "From intake to validated SRM/BAB readiness";
-  if (elements.presenterNotes) {
-    elements.presenterNotes.hidden = true;
-    elements.presenterNotes.innerHTML = "";
-  }
-  elements.nextActionPanel.hidden = false;
-  if (elements.demoModeBtn) {
-    elements.demoModeBtn.textContent = "Start guided demo";
-    elements.demoModeBtn.classList.remove("active");
-  }
-  const steps = journeySteps(opportunity);
-  const currentIndex = steps.findIndex((step) => !step.complete);
-  const completed = currentIndex === -1 ? steps.length : currentIndex;
-  if (elements.journeyProgressBadge) {
-    elements.journeyProgressBadge.textContent = `${completed} of ${steps.length} steps`;
-  }
-
-  elements.journeyStepper.innerHTML = steps
-    .map((step, index) => {
-      const state = index < completed ? "complete" : index === currentIndex ? "current" : "pending";
-      return `
-        <button type="button" class="journey-step ${state}" data-action="scroll" data-target="${escapeHtml(step.target)}">
-          <span>${index + 1}</span>
-          <strong>${escapeHtml(step.label)}</strong>
-        </button>
-      `;
-    })
-    .join("");
-
-  const nextAction = recommendedNextAction(opportunity);
-  const blockers = openBlockersFor(opportunity).slice(0, 3);
-  const pendingRequests = validationRequestsFor(opportunity.id).filter((request) => actionableValidationStatuses().includes(request.status));
-  elements.nextActionPanel.innerHTML = `
-    <div class="next-action-copy">
-      <span class="log-type">Recommended next action</span>
-      <strong>${escapeHtml(nextAction.title)}</strong>
-      <p>${escapeHtml(nextAction.body)}</p>
-      <div class="next-action-meta">
-        <span>${escapeHtml(nextAction.meta)}</span>
-        <span>${pendingRequests.length} pending validations</span>
-        <span>${blockers.length} visible blockers</span>
-      </div>
-    </div>
-    <div class="next-action-buttons">
-      <button type="button" class="primary-button" data-action="${escapeHtml(nextAction.action)}" data-target="${escapeHtml(nextAction.target)}">
-        ${escapeHtml(nextAction.cta)}
-      </button>
-      <button type="button" class="secondary-button" data-action="scroll" data-target="#governance">Review readiness</button>
-    </div>
-  `;
 }
 
 function renderScopeDriverControls(scope, airportCategory, selected) {
@@ -1803,7 +1540,7 @@ function renderNotificationPreview() {
               </div>`,
                 )
                 .join("")}</div>`
-            : `<div class="notification-activity-empty"><strong>No trigger activity yet</strong><small>Generate an Email or Teams simulation to demonstrate the workflow.</small></div>`
+            : `<div class="notification-activity-empty"><strong>No activity yet</strong><small>Send an Email or Teams request to record owner notifications here.</small></div>`
         }
       </section>
     </div>
@@ -2440,7 +2177,6 @@ function renderSelectedWorkspace() {
   fillIntakeForm(opportunity);
   renderIntakeNarrativeSummary(opportunity);
   renderRecordHeader(opportunity);
-  renderJourneyGuide(opportunity);
   renderProductScope(opportunity);
   renderSizingEngine(opportunity);
   renderGovernanceChecklist(opportunity);
@@ -2473,11 +2209,6 @@ export {
   airportProfileComplete,
   actionableValidationStatuses,
   recommendedNextAction,
-  journeySteps,
-  isDemoScenario,
-  demoScenarioSteps,
-  renderDemoScenarioGuide,
-  renderJourneyGuide,
   renderScopeDriverControls,
   renderProductScope,
   renderAirportProfile,

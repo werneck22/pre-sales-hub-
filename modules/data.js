@@ -98,25 +98,15 @@ const WORKSTREAMS = [
   "Agent Portal",
 ];
 
-// The guided demo narrative was authored against this frozen date; outside
-// demo mode all deadline/overdue math uses the real current date.
-const DEMO_FROZEN_TODAY = "2026-06-17";
-
 function localIsoDate(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
-let referenceTodayValue = localIsoDate();
+const referenceTodayValue = localIsoDate();
 
 function referenceToday() {
   return referenceTodayValue;
 }
-
-function setReferenceToday(value) {
-  referenceTodayValue = value || localIsoDate();
-}
-const DEMO_OPPORTUNITY_ID = "opp-est-00";
-const DEMO_SCENARIO_NAME = "Estephan Airport Modernization - From Intake to BAB Readiness";
 
 const HELP_TEXT = {
   airportCategorization:
@@ -160,7 +150,6 @@ const ROUTE_CONFIG = {
   risks: { area: "Governance", title: "Risks & Assumptions", previous: "stakeholders", next: "decisions" },
   decisions: { area: "Governance", title: "Decision Log", previous: "risks", next: "businessCase" },
   businessCase: { area: "Governance", title: "Business Case Pack", previous: "decisions", next: "dashboard" },
-  demo: { area: "Presentation", title: "Guided Demo Scenario", previous: "dashboard", next: "" },
 };
 
 const TARGET_ROUTE_MAP = {
@@ -176,7 +165,6 @@ const TARGET_ROUTE_MAP = {
   "#decisions": "decisions",
   "#business-case": "businessCase",
   "#businessCase": "businessCase",
-  ".journey-panel": "demo",
   ".workspace-grid": "intake",
 };
 
@@ -1172,11 +1160,7 @@ export {
   AMS_SUITE_PRODUCTS,
   PRODUCT_LINKS,
   computeDriverValue,
-  DEMO_FROZEN_TODAY,
   referenceToday,
-  setReferenceToday,
-  DEMO_OPPORTUNITY_ID,
-  DEMO_SCENARIO_NAME,
   HELP_TEXT,
   ROUTE_CONFIG,
   TARGET_ROUTE_MAP,
