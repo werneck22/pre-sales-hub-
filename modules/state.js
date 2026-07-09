@@ -16,17 +16,17 @@ import {
   productScope,
   risk,
   setReferenceToday,
-} from "./data.js";
+} from "./data.js?v=20260709-21";
 import {
   requestId,
-} from "./sizing-engine.js";
+} from "./sizing-engine.js?v=20260709-21";
 import {
   readiness,
-} from "./readiness-rules.js";
+} from "./readiness-rules.js?v=20260709-21";
 import {
   isDemoScenario,
   recommendedNextAction,
-} from "./render.js";
+} from "./render.js?v=20260709-21";
 
 let mockDb = {
   opportunities: [

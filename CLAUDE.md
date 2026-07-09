@@ -120,9 +120,19 @@ validation, governance, stakeholders, risks, decisions, businessCase, demo).
 ## Deploy flow (important)
 
 - `main` auto-deploys to GitHub Pages (`werneck22.github.io/pre-sales-hub-/`).
-- **Always bump the asset version** (`?v=YYYYMMDD-N` on the CSS/JS links in
-  `index.html`) and the visible **`Build vN`** tag in the sidebar footer on any
-  change, so cache busts and the deployed build is verifiable at a glance.
+- **Always bump the asset version** (`?v=YYYYMMDD-N`) and the visible
+  **`Build vN`** tag in the sidebar footer on any change, so cache busts and the
+  deployed build is verifiable at a glance.
+- **Version the WHOLE module graph, not just the entry.** The `?v=` must be on
+  the CSS/JS links in `index.html` **and on every internal `import` specifier**
+  in `modules/*.js` (e.g. `from "./data.js?v=YYYYMMDD-N"`). GitHub Pages caches
+  the ES modules; if only `main.js` is versioned, a returning visitor boots the
+  new `main.js` against stale cached modules and any new export it imports throws
+  a module-resolution error (blank/broken app). Keep the version identical across
+  `index.html` and all imports; bump to a NEW number every deploy (reusing a
+  number serves the previously-cached content from the same URL). One-shot bump:
+  `python3 - <<'PY'` replacing the old `YYYYMMDD-N` with the new one across
+  `index.html` + `modules/*.js`, then update the `Build vN` tag.
 - `index.html` carries `no-cache` meta tags; assets are `?v=` cache-busted.
 - After merging, **verify on `main`**: confirm the merge included your last
   commit and that the Pages build succeeded (the merge can miss a late commit —

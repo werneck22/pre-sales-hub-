@@ -1,7 +1,7 @@
 import {
   escapeHtml,
   formatNumber,
-} from "./data.js";
+} from "./data.js?v=20260709-21";
 import {
   elements,
   mockDb,
@@ -10,20 +10,20 @@ import {
   setEstimateStatusFilter,
   setSelectedId,
   setSelectedValidationRequestId,
-} from "./state.js";
+} from "./state.js?v=20260709-21";
 import {
   renderAll,
-} from "./render.js";
+} from "./render.js?v=20260709-21";
 import {
   createOpportunityFromAirport,
-} from "./actions.js";
+} from "./actions.js?v=20260709-21";
 import {
   searchAirportDirectory,
   normalizeSearchText,
-} from "./airport-directory.js";
+} from "./airport-directory.js?v=20260709-21";
 import {
   defaultValidationRequestId,
-} from "./sizing-engine.js";
+} from "./sizing-engine.js?v=20260709-21";
 
 // Header search doubles as an airport finder: airport matches from the
 // reference directory can be turned into a targeted opportunity, and existing

@@ -14,7 +14,7 @@ import {
   sizingDriverFactor,
   sizingRuleCode,
   slug,
-} from "./data.js";
+} from "./data.js?v=20260709-21";
 import {
   airportProfileFor,
   classifyAirport,
@@ -28,11 +28,11 @@ import {
   setSelectedValidationRequestId,
   showToast,
   sizingEstimatesFor,
-} from "./state.js";
+} from "./state.js?v=20260709-21";
 import {
   renderNotificationPreview,
   renderValidationRequests,
-} from "./render.js";
+} from "./render.js?v=20260709-21";
 
 function confidenceFor(opportunity, scope) {
   if (opportunity.complexity === "Very High" || scope.risk_level === "High") return "Medium";
