@@ -1,7 +1,5 @@
 import {
   AIRPORT_CATEGORIES,
-  DEMO_FROZEN_TODAY,
-  DEMO_OPPORTUNITY_ID,
   ROUTE_CONFIG,
   TARGET_ROUTE_MAP,
   airportProfile,
@@ -15,51 +13,19 @@ import {
   makeValidation,
   productScope,
   risk,
-  setReferenceToday,
-} from "./data.js?v=20260709-22";
+} from "./data.js?v=20260709-23";
 import {
   requestId,
-} from "./sizing-engine.js?v=20260709-22";
+} from "./sizing-engine.js?v=20260709-23";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260709-22";
+} from "./readiness-rules.js?v=20260709-23";
 import {
-  isDemoScenario,
   recommendedNextAction,
-} from "./render.js?v=20260709-22";
+} from "./render.js?v=20260709-23";
 
 let mockDb = {
   opportunities: [
-    {
-      id: "opp-est-00",
-      name: "Estephan Airport Modernization",
-      customer: "Estephan Airport",
-      region: "EMEA",
-      sales_owner: "Estephan Werneck",
-      presales_owner: "Airport IT Pre-Sales",
-      opportunity_stage: "Solutioning",
-      estimated_value: 5400000,
-      close_date: "2026-09-30",
-      submission_deadline: "2026-07-15",
-      implementation_start: "2026-10-01",
-      go_live_date: "2027-06-30",
-      strategic_importance: "Strategic",
-      complexity: "Medium",
-      current_governance_stage: "BAB",
-      bcm_status: "Approved",
-      srm_status: "Conditionally approved",
-      bab_status: "In progress",
-      strategic_rationale: "Modernize passenger processing, airport operations data and integration foundations with a traceable sizing baseline.",
-      bid_no_bid_recommendation: "Bid",
-      preliminary_architecture: "Common use and biometric services integrated with AODB and API layer for partner systems.",
-      delivery_dependency: "Resource owner validation required for implementation, integration, onboarding and testing effort.",
-      integration_assumptions: "Five initial integrations assumed for the sizing scenario.",
-      business_case_status: "In review",
-      pricing_readiness_status: "Ready",
-      executive_decision_required: "Confirm whether the validated sizing baseline can be used for the business case pack.",
-      exceptions_approval_conditions: "SRM is conditional on the recorded implementation sequencing condition. BAB remains blocked until AODB PM effort is validated.",
-      overall_readiness_score: 0,
-    },
     {
       id: "opp-ams-01",
       name: "North Terminal Common Use Renewal",
@@ -182,11 +148,6 @@ let mockDb = {
     },
   ],
   productScopes: [
-    productScope("opp-est-00", "CUPPS", "Sized", "CUPPS Product Owner", "Validated", "Medium", "CUPPS positions based on medium airport mock defaults."),
-    productScope("opp-est-00", "CUSS", "Sized", "CUSS Product Owner", "Validated", "Medium", "Kiosk effort based on medium airport mock defaults."),
-    productScope("opp-est-00", "Standalone Biopod", "Sized", "Standalone Biopod Owner", "Validated", "High", "Biopod touchpoints and API assumptions validated with conditions."),
-    productScope("opp-est-00", "AODB", "Sized", "AODB Product Owner", "Validated", "Medium", "AODB baseline includes operational data and display feed assumptions."),
-    productScope("opp-est-00", "Integrations & APIs", "Sized", "Integration Owner", "Validated", "High", "Five initial integrations assumed."),
     productScope("opp-ams-01", "CUSS", "Sized", "Elena Rossi", "Validated", "Medium", "86 kiosks, existing peripheral assumptions to confirm."),
     productScope("opp-ams-01", "CUPPS", "Draft", "Elena Rossi", "In review", "Medium", "142 workstations across terminal migration waves."),
     productScope("opp-ams-01", "Standalone Biopod", "Draft", "Product owner", "In review", "High", "Privacy and airline participation model pending."),
@@ -204,21 +165,12 @@ let mockDb = {
     productScope("opp-dfw-04", "CUSS", "Draft", "Jordan Lee", "In review", "Medium", "58 kiosks, airline branding assumptions open."),
     productScope("opp-dfw-04", "AODB", "Draft", "AODB SME", "In review", "Medium", "Operational data feed needed for concourse visibility."),
     productScope("opp-dfw-04", "Integrations & APIs", "Draft", "Integration SME", "Pending", "High", "12 candidate interfaces; airline ownership unclear."),
-    productScope("opp-est-00", "Amadeus Passenger Verification", "Sized", "Biometrics Product Owner", "Validated", "Medium", "Passenger verification baseline aligned with medium airport defaults."),
-    productScope("opp-est-00", "Seamless Journey Platform Lite", "Sized", "Journey Platform Owner", "Validated", "Medium", "Lite journey rollout scoped for the demo baseline terminal."),
     productScope("opp-ams-01", "Seamless Journey Full", "Draft", "Product owner", "In review", "High", "Full self-service journey pending airline participation model."),
     productScope("opp-sin-02", "Baggage Reconciliation System", "Draft", "SBD product owner", "In review", "High", "BRS scope tied to bag drop interface dependencies."),
     productScope("opp-gru-03", "Seamless GT11 eGate - Non Biometric", "Not started", "Camila Almeida", "Pending", "Medium", "One door hardware count pending incumbent discovery."),
     productScope("opp-dfw-04", "Seamless GT11 eGate - Biopod", "Draft", "Jordan Lee", "In review", "High", "Biopod placement pending gate concourse survey."),
   ],
   stakeholderValidations: [
-    makeValidation("opp-est-00", 0, { status: "Validated", due_date: "2026-06-24", comments: "Commercial context captured." }),
-    makeValidation("opp-est-00", 1, { status: "Validated", due_date: "2026-06-25", comments: "Initial solution scope prepared." }),
-    makeValidation("opp-est-00", 2, { status: "Validated", due_date: "2026-07-01", comments: "Product assumptions reviewed for the demo baseline." }),
-    makeValidation("opp-est-00", 3, { status: "Validated", due_date: "2026-07-02", comments: "Delivery workstreams reviewed; AODB PM line remains open in the owner workflow." }),
-    makeValidation("opp-est-00", 4, { status: "Validated", due_date: "2026-07-03", comments: "Pricing readiness captured against the current sizing baseline." }),
-    makeValidation("opp-est-00", 5, { status: "Validated", due_date: "2026-07-04", comments: "Support readiness assumptions accepted." }),
-    makeValidation("opp-est-00", 6, { status: "Validated", due_date: "2026-07-05", comments: "No special legal condition in mock scenario." }),
     makeValidation("opp-ams-01", 0, { status: "Validated", due_date: "2026-06-15", comments: "Commercial owner aligned." }),
     makeValidation("opp-ams-01", 1, { status: "Validated", due_date: "2026-06-18", comments: "Solution scope baseline ready." }),
     makeValidation("opp-ams-01", 2, { status: "In review", due_date: "2026-06-26", comments: "Biometrics assumptions under review." }),
@@ -249,7 +201,6 @@ let mockDb = {
     makeValidation("opp-dfw-04", 6, { status: "Pending", due_date: "2026-07-14" }),
   ],
   risks: [
-    risk("opp-est-00", "Technical", "Biometric and API integration effort requires resource owner validation.", "Medium", "Use generated validation requests and capture owner comments.", "Solution Consulting", "Open"),
     risk("opp-ams-01", "Regulatory", "Biometric privacy requirements vary by terminal and airline.", "High", "Confirm privacy model with product and legal.", "Product", "Open"),
     risk("opp-sin-02", "Delivery", "Field service coverage assumptions not aligned with support model.", "High", "Baseline support zones and escalation model.", "Support", "Mitigating"),
     risk("opp-gru-03", "Technical", "Incumbent systems landscape is incomplete and may affect integration sizing.", "High", "Request interface catalogue before SRM.", "Solution Consulting", "Open"),
@@ -257,16 +208,12 @@ let mockDb = {
     risk("opp-ams-01", "Exclusion", "Civil works and counter furniture are outside Amadeus scope.", "Low", "Keep exclusion visible in proposal assumptions.", "Sales", "Open"),
   ],
   assumptions: [
-    assumption("opp-est-00", "Annual passengers are 6.5M and annual movements are 72,000 for mock categorization.", "Technical", "Medium", "Pre-sales"),
-    assumption("opp-est-00", "Sizing uses configurable default rules only, not confidential delivery formulas.", "Commercial", "High", "Pre-sales"),
-    assumption("opp-est-00", "Five initial integrations are assumed for the demo scenario.", "Integration", "High", "Integration Owner"),
     assumption("opp-ams-01", "Existing CUPPS workstation footprint can be reused.", "Technical", "Medium", "Solution Consulting"),
     assumption("opp-sin-02", "Customer will provide airport network readiness evidence before SRM closure.", "Delivery", "Medium", "Delivery"),
     assumption("opp-gru-03", "Customer can provide interface catalogue within two weeks of kickoff.", "Technical", "High", "Sales"),
     assumption("opp-dfw-04", "Existing gate infrastructure can support the common use expansion.", "Technical", "Medium", "Solution Consulting"),
   ],
   decisions: [
-    decision("opp-est-00", "SRM", "Proceed to BAB preparation with SRM conditions recorded.", "SRM Chair", "2026-06-17", "Implementation sequencing condition accepted; AODB PM sizing remains pending.", "Obtain final AODB PM validation, refresh final MD, and return for BAB decision."),
     decision("opp-ams-01", "SRM", "Proceed to SME validation for biometrics and API scope.", "SRM Chair", "2026-06-03", "Product and legal validation required.", "Close privacy and API actions before BAB."),
     decision("opp-ams-01", "SRM", "Pricing model pending support volume confirmation.", "Pricing", "2026-06-10", "Support scope must be frozen.", "Confirm support volume by next SRM checkpoint."),
     decision("opp-sin-02", "BAB", "BAB can proceed after support coverage model is baselined.", "BAB Sponsor", "2026-06-04", "Support blocker resolved.", "Return with cost-to-serve summary."),
@@ -274,9 +221,6 @@ let mockDb = {
     decision("opp-dfw-04", "SRM", "Schedule stakeholder alignment workshop before final SRM slot.", "Sales", "2026-06-11", "Airline decision authority unclear.", "Confirm governance participants."),
   ],
   governanceItems: [
-    ...makeGovernanceItems("opp-est-00", "BCM", []),
-    ...makeGovernanceItems("opp-est-00", "SRM", []),
-    ...makeGovernanceItems("opp-est-00", "BAB", []),
     ...makeGovernanceItems("opp-ams-01", "BCM", [0, 1, 2, 3, 4]),
     ...makeGovernanceItems("opp-ams-01", "SRM", [0, 1, 3]),
     ...makeGovernanceItems("opp-ams-01", "BAB", [3]),
@@ -291,7 +235,6 @@ let mockDb = {
     ...makeGovernanceItems("opp-dfw-04", "BAB", []),
   ],
   airportProfiles: [
-    airportProfile("opp-est-00", "Estephan Airport", 6500000, 72000, "EMEA"),
     airportProfile("opp-ams-01", "Amsterdam Airport Partner", 28000000, 230000, "EMEA"),
     airportProfile("opp-sin-02", "Changi Regional Ventures", 42000000, 260000, "APAC"),
     airportProfile("opp-gru-03", "Sao Paulo Airport Authority", 18000000, 160000, "LATAM"),
@@ -344,6 +287,27 @@ function migrateMockDb(db) {
     "notifications",
   ].forEach((collection) => {
     if (!Array.isArray(db[collection])) db[collection] = [];
+  });
+  // The guided demo and its "Estephan Airport Modernization" scenario were
+  // removed; drop the seeded demo opportunity and everything scoped to it so
+  // returning users no longer see it.
+  const removedOpportunityIds = new Set(["opp-est-00"]);
+  db.opportunities = db.opportunities.filter((item) => !removedOpportunityIds.has(item.id));
+  [
+    "productScopes",
+    "stakeholderValidations",
+    "risks",
+    "assumptions",
+    "decisions",
+    "governanceItems",
+    "airportProfiles",
+    "sizingEstimates",
+    "validationRequests",
+    "notifications",
+  ].forEach((collection) => {
+    db[collection] = db[collection].filter(
+      (item) => !removedOpportunityIds.has(item.opportunity_id) && !removedOpportunityIds.has(item.opportunityId),
+    );
   });
   // Rename products in any persisted scopes/estimates so returning users pick
   // up the restructured catalog without needing a reset.
@@ -416,8 +380,6 @@ let estimateExpansionOpportunityId = "";
 const expandedEstimateProducts = new Set();
 let selectedNotificationChannel = "Email";
 let validationQueueFilter = "all";
-let demoMode = false;
-let demoPresenterStep = 0;
 let activeRoute = "dashboard";
 const elements = {
   dashboard: document.querySelector("#dashboard"),
@@ -439,7 +401,6 @@ const elements = {
   stageFilter: document.querySelector("#stageFilter"),
   sortReadinessBtn: document.querySelector("#sortReadinessBtn"),
   newOpportunityBtn: document.querySelector("#newOpportunityBtn"),
-  demoModeBtn: document.querySelector("#demoModeBtn"),
   resetDataBtn: document.querySelector("#resetDataBtn"),
   exportSizingCsvBtn: document.querySelector("#exportSizingCsvBtn"),
   printBusinessCaseBtn: document.querySelector("#printBusinessCaseBtn"),
@@ -491,13 +452,6 @@ const elements = {
   stageBadge: document.querySelector("#stageBadge"),
   readinessBadge: document.querySelector("#readinessBadge"),
   forumBadge: document.querySelector("#forumBadge"),
-  journeyProgressBadge: document.querySelector("#journeyProgressBadge"),
-  journeyPanel: document.querySelector("#journeyPanel"),
-  journeyEyebrow: document.querySelector("#journeyEyebrow"),
-  journeyTitle: document.querySelector("#journeyTitle"),
-  journeyStepper: document.querySelector("#journeyStepper"),
-  presenterNotes: document.querySelector("#presenterNotes"),
-  nextActionPanel: document.querySelector("#nextActionPanel"),
   metricPipeline: document.querySelector("#metricPipeline"),
   metricBlockers: document.querySelector("#metricBlockers"),
   metricReadiness: document.querySelector("#metricReadiness"),
@@ -565,10 +519,6 @@ function updateRouteChrome(route) {
   if (elements.routeContextBar) elements.routeContextBar.hidden = isDashboard;
   if (elements.routeWorkflowNav) elements.routeWorkflowNav.hidden = isDashboard;
   if (elements.routeRecommendation) elements.routeRecommendation.hidden = isDashboard;
-  if (elements.demoModeBtn && isDemoScenario(opportunity)) {
-    elements.demoModeBtn.textContent = route === "demo" ? "Exit guided demo" : "Open guided demo";
-    elements.demoModeBtn.classList.add("active");
-  }
 
   if (elements.routePreviousBtn) {
     elements.routePreviousBtn.hidden = !config.previous;
@@ -709,10 +659,6 @@ function classifyAirport(profile) {
   return profile.airport_category;
 }
 function filteredOpportunities() {
-  if (demoMode && selectedId === DEMO_OPPORTUNITY_ID) {
-    const demoOpportunity = mockDb.opportunities.find((opportunity) => opportunity.id === DEMO_OPPORTUNITY_ID);
-    return demoOpportunity ? [demoOpportunity] : [];
-  }
   const query = elements.searchInput.value.trim().toLowerCase();
   const forum = elements.stageFilter.value;
   const result = mockDb.opportunities.filter((opportunity) => {
@@ -770,8 +716,6 @@ export {
   expandedEstimateProducts,
   selectedNotificationChannel,
   validationQueueFilter,
-  demoMode,
-  demoPresenterStep,
   activeRoute,
   elements,
   selectedOpportunity,
@@ -806,8 +750,6 @@ export {
   setEstimateExpansionOpportunityId,
   setSelectedNotificationChannel,
   setValidationQueueFilter,
-  setDemoMode,
-  setDemoPresenterStep,
   setActiveRoute,
 };
 
@@ -840,15 +782,6 @@ function setSelectedNotificationChannel(value) {
 }
 function setValidationQueueFilter(value) {
   validationQueueFilter = value;
-}
-function setDemoMode(value) {
-  demoMode = value;
-  // The guided demo narrates a scenario authored against a frozen date; the
-  // operational views always use the real current date.
-  setReferenceToday(value ? DEMO_FROZEN_TODAY : "");
-}
-function setDemoPresenterStep(value) {
-  demoPresenterStep = value;
 }
 function setActiveRoute(value) {
   activeRoute = value;

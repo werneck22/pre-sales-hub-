@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260709-22" />
+    <link rel="stylesheet" href="./styles.css?v=20260709-23" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -44,13 +44,11 @@
           <a href="#/risks" class="nav-link" data-route-link="risks">Risks &amp; Assumptions</a>
           <a href="#/decisions" class="nav-link" data-route-link="decisions">Decision Log</a>
           <a href="#/businessCase" class="nav-link" data-route-link="businessCase">Business Case Pack</a>
-          <span class="nav-section-label">Presentation</span>
-          <a href="#/demo" class="nav-link" data-route-link="demo">Guided Demo</a>
         </nav>
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v22</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v23</span></p>
       </aside>
 
       <main class="main-content">
@@ -66,7 +64,6 @@
               </label>
               <div id="searchResults" class="search-results" role="listbox" hidden></div>
             </div>
-            <button id="demoModeBtn" class="secondary-button" type="button">Start guided demo</button>
             <button id="newOpportunityBtn" class="primary-button" type="button">New opportunity</button>
           </div>
         </header>
@@ -230,19 +227,6 @@
 
         <section class="workspace-grid routed-workspace" hidden>
           <article class="workspace-main" aria-label="Opportunity workspace">
-            <section id="journeyPanel" class="journey-panel" data-route-screen="demo" aria-label="End-to-end demo journey" hidden>
-              <div class="journey-heading">
-                <div>
-                  <p id="journeyEyebrow" class="eyebrow">Demo journey</p>
-                  <h3 id="journeyTitle">From intake to validated SRM/BAB readiness</h3>
-                </div>
-                <span id="journeyProgressBadge" class="meta-chip">0 of 12 steps</span>
-              </div>
-              <div id="journeyStepper" class="journey-stepper"></div>
-              <div id="presenterNotes" class="presenter-notes" hidden></div>
-              <div id="nextActionPanel" class="next-action-panel"></div>
-            </section>
-
             <section id="intake" class="panel route-panel" data-route-screen="intake" hidden>
               <div class="section-heading">
                 <div>
@@ -704,6 +688,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260709-22"></script>
+    <script type="module" src="./modules/main.js?v=20260709-23"></script>
   </body>
 </html>

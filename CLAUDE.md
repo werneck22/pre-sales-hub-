@@ -83,7 +83,7 @@ package.
 - When you rename/add a product, update **all** of: `PRODUCT_NAMES`,
   `PRODUCT_FAMILY_MAP`/`productFamily`, `productRuleCodes`,
   `productWorkstreamBase`, `productSizingDrivers`, `buildResourceOwners`, the
-  seed `productScopes` in `state.js`, `demoScenarioSteps` in `render.js`, and
+  seed `productScopes` in `state.js` and
   `MOCK_BENCHMARKS`. Add a rename entry to the migration in `state.js`
   `migrateMockDb`. (The `catalog-consistency` agent checks this.)
 
@@ -94,8 +94,7 @@ package.
   sizing rules, owners) from the current build and renames products, so
   returning users pick up catalog changes without a reset.
 - "Reset demo data" (sidebar) clears `localStorage` and reloads the seed.
-- Dates: real current date drives deadlines/overdue. Guided demo temporarily
-  freezes the clock to `DEMO_FROZEN_TODAY` (see `setReferenceToday`).
+- Dates: the real current date drives deadlines/overdue.
 
 ## Governance domain
 
@@ -115,7 +114,7 @@ Playwright (playwright-core, Chromium at `/opt/pw-browsers/...`) is the
 verification pattern used in this repo: load `#/<route>`, `localStorage.clear()`,
 reload, screenshot / assert. Capture `pageerror` + console errors and require
 **zero JS errors** across all routes (dashboard, intake, scope, sizing,
-validation, governance, stakeholders, risks, decisions, businessCase, demo).
+validation, governance, stakeholders, risks, decisions, businessCase).
 
 ## Deploy flow (important)
 

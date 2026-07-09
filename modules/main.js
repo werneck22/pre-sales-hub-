@@ -1,19 +1,16 @@
 import {
-  DEMO_OPPORTUNITY_ID,
   VALIDATION_STATUSES,
   assumption,
   decision,
   productScope,
   risk,
   slug,
-} from "./data.js?v=20260709-22";
+} from "./data.js?v=20260709-23";
 import {
   activeRoute,
   airportProfileFor,
   applyRoute,
   clearPersistedState,
-  demoMode,
-  demoPresenterStep,
   elements,
   estimateProductFilter,
   estimateStatusFilter,
@@ -29,8 +26,6 @@ import {
   selectedOpportunity,
   selectedValidationRequestId,
   setActiveRoute,
-  setDemoMode,
-  setDemoPresenterStep,
   setEstimateProductFilter,
   setEstimateStatusFilter,
   setMockDb,
@@ -42,7 +37,7 @@ import {
   showToast,
   sizingEstimatesFor,
   sortByReadiness,
-} from "./state.js?v=20260709-22";
+} from "./state.js?v=20260709-23";
 import {
   buildSizingCsv,
   defaultValidationRequestId,
@@ -52,27 +47,26 @@ import {
   nextActionableRequestId,
   requestId,
   runMockNotificationTrigger,
-} from "./sizing-engine.js?v=20260709-22";
+} from "./sizing-engine.js?v=20260709-23";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260709-22";
+} from "./readiness-rules.js?v=20260709-23";
 import {
   airportProfileComplete,
   buildBusinessCaseText,
-  isDemoScenario,
   renderAll,
   renderNotificationPreview,
   renderSizingEstimates,
   renderValidationRequests,
-} from "./render.js?v=20260709-22";
+} from "./render.js?v=20260709-23";
 import {
   lookupAirportData,
-} from "./airport-lookup.js?v=20260709-22";
+} from "./airport-lookup.js?v=20260709-23";
 import {
   handleSearchResultClick,
   hideSearchResults,
   renderSearchResults,
-} from "./airport-search.js?v=20260709-22";
+} from "./airport-search.js?v=20260709-23";
 import {
   addProductScope,
   applyAirportCodeToProfile,
@@ -88,7 +82,7 @@ import {
   updateEstimateManualOverride,
   updateEstimateValidation,
   updateScopeDriverValue,
-} from "./actions.js?v=20260709-22";
+} from "./actions.js?v=20260709-23";
 
 elements.opportunityList.addEventListener("click", (event) => {
   const card = event.target.closest("[data-id]");
@@ -144,7 +138,7 @@ document.addEventListener("click", (event) => {
   const button = event.target.closest("[data-action]");
   if (!button) return;
   event.preventDefault();
-  executeJourneyAction(button.dataset.action, button.dataset.target, button.dataset.demoStep);
+  executeJourneyAction(button.dataset.action, button.dataset.target);
 });
 
 if (elements.executiveNextActions) {
@@ -187,24 +181,6 @@ elements.sortReadinessBtn.addEventListener("click", () => {
   renderAll();
 });
 elements.newOpportunityBtn.addEventListener("click", createOpportunity);
-if (elements.demoModeBtn) {
-  elements.demoModeBtn.addEventListener("click", () => {
-    const exitingDemo = activeRoute === "demo" && isDemoScenario(selectedOpportunity());
-    setDemoMode(!exitingDemo);
-    setDemoPresenterStep(0);
-    if (demoMode) {
-      setSelectedId(DEMO_OPPORTUNITY_ID);
-      setEstimateProductFilter("all");
-      setEstimateStatusFilter("all");
-      setSelectedValidationRequestId(defaultValidationRequestId(selectedId));
-      elements.searchInput.value = "";
-      elements.stageFilter.value = "all";
-    }
-    renderAll();
-    navigateToRoute(demoMode ? "demo" : "dashboard");
-    showToast(demoMode ? "Guided demo started at the intake step." : "Guided demo closed; operational journey restored.");
-  });
-}
 if (elements.airportProfileForm) {
   elements.airportProfileForm.addEventListener("input", () => {
     syncAirportProfileFromForm();
