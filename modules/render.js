@@ -28,7 +28,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260710-28";
+} from "./data.js?v=20260710-29";
 import {
   activeRoute,
   airportProfileFor,
@@ -61,7 +61,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260710-28";
+} from "./state.js?v=20260710-29";
 import {
   dashboardMdForEstimate,
   dashboardTotalsForOpportunity,
@@ -81,7 +81,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260710-28";
+} from "./sizing-engine.js?v=20260710-29";
 import {
   forumReadinessDetail,
   forumReadinessLabel,
@@ -94,10 +94,10 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260710-28";
+} from "./readiness-rules.js?v=20260710-29";
 import {
   trafficProvenanceText,
-} from "./airport-lookup.js?v=20260710-28";
+} from "./airport-lookup.js?v=20260710-29";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(

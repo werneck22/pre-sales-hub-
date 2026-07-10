@@ -15,13 +15,13 @@ import {
   productScope,
   risk,
   sizingOwnerKey,
-} from "./data.js?v=20260710-28";
+} from "./data.js?v=20260710-29";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260710-28";
+} from "./readiness-rules.js?v=20260710-29";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260710-28";
+} from "./render.js?v=20260710-29";
 
 let mockDb = {
   opportunities: [
