@@ -13,16 +13,13 @@ import {
   makeValidation,
   productScope,
   risk,
-} from "./data.js?v=20260709-23";
-import {
-  requestId,
-} from "./sizing-engine.js?v=20260709-23";
+} from "./data.js?v=20260709-24";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260709-23";
+} from "./readiness-rules.js?v=20260709-24";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260709-23";
+} from "./render.js?v=20260709-24";
 
 let mockDb = {
   opportunities: [
@@ -309,6 +306,17 @@ function migrateMockDb(db) {
       (item) => !removedOpportunityIds.has(item.opportunity_id) && !removedOpportunityIds.has(item.opportunityId),
     );
   });
+  // Validation moved from one request per product/workstream line to one
+  // request per product. Old-format requests (keyed by sizing_estimate_id) and
+  // their notifications are dropped; the product-level workflow is regenerated
+  // from the persisted estimates on load, so owner decisions on the estimates
+  // are preserved.
+  if (db.validationRequests.some((request) => request.sizing_estimate_id)) {
+    db.validationRequests = db.validationRequests.filter((request) => !request.sizing_estimate_id);
+    db.notifications = db.notifications.filter((item) =>
+      db.validationRequests.some((request) => request.id === item.validation_request_id),
+    );
+  }
   // Rename products in any persisted scopes/estimates so returning users pick
   // up the restructured catalog without needing a reset.
   const productRenames = {
@@ -379,7 +387,9 @@ let estimateStatusFilter = "all";
 let estimateExpansionOpportunityId = "";
 const expandedEstimateProducts = new Set();
 let selectedNotificationChannel = "Email";
-let validationQueueFilter = "all";
+// Sub-tab on the Resource Validation screen: product owner validation vs the
+// internal function sign-off matrix (formerly the Stakeholders screen).
+let validationTab = "owners";
 let activeRoute = "dashboard";
 const elements = {
   dashboard: document.querySelector("#dashboard"),
@@ -433,7 +443,9 @@ const elements = {
   sizingEstimateTable: document.querySelector("#sizingEstimateTable"),
   validationRequestList: document.querySelector("#validationRequestList"),
   notificationPreview: document.querySelector("#notificationPreview"),
-  resourceOwnerRegistry: document.querySelector("#resourceOwnerRegistry"),
+  validationTabs: document.querySelector("#validationTabs"),
+  validationOwnersPanel: document.querySelector("#validationOwnersPanel"),
+  functionSignoffPanel: document.querySelector("#functionSignoffPanel"),
   governanceChecklist: document.querySelector("#governanceChecklist"),
   readinessBreakdown: document.querySelector("#readinessBreakdown"),
   validationMatrix: document.querySelector("#validationMatrix"),
@@ -495,7 +507,7 @@ function routeFromHash(hash = window.location.hash) {
     .replace(/^#\/?/, "")
     .split("?")[0]
     .replace(/^\/+|\/+$/g, "");
-  const legacyRoutes = { "risk-log": "risks", validation: "validation" };
+  const legacyRoutes = { "risk-log": "risks", validation: "validation", stakeholders: "validation", demo: "dashboard" };
   const route = legacyRoutes[raw] || raw;
   return ROUTE_CONFIG[route] ? route : "dashboard";
 }
@@ -715,7 +727,7 @@ export {
   estimateExpansionOpportunityId,
   expandedEstimateProducts,
   selectedNotificationChannel,
-  validationQueueFilter,
+  validationTab,
   activeRoute,
   elements,
   selectedOpportunity,
@@ -749,7 +761,7 @@ export {
   setEstimateStatusFilter,
   setEstimateExpansionOpportunityId,
   setSelectedNotificationChannel,
-  setValidationQueueFilter,
+  setValidationTab,
   setActiveRoute,
 };
 
@@ -780,8 +792,8 @@ function setEstimateExpansionOpportunityId(value) {
 function setSelectedNotificationChannel(value) {
   selectedNotificationChannel = value;
 }
-function setValidationQueueFilter(value) {
-  validationQueueFilter = value;
+function setValidationTab(value) {
+  validationTab = value === "signoff" ? "signoff" : "owners";
 }
 function setActiveRoute(value) {
   activeRoute = value;

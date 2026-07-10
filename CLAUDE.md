@@ -80,6 +80,15 @@ package.
   "Generate sizing" on Product Scope runs it and opens Automated Sizing.
   Opportunity carries `implementation_start` / `go_live_date`, included in the
   owner notification Email/Teams bodies.
+- **Validation is per product, not per activity line.** One validation request
+  per product in scope (`vr-<opp>-<productSlug>`, keyed by `product_name`) with
+  an editable owner contact (`owner_name` / `owner_email`) on the request. The
+  owner decision applies to every activity line of the product; per-line
+  `adjusted_md` edits are preserved. "Send request (Email)" opens the user's
+  mail client via `mailto:`; "Schedule Teams meeting" opens a pre-filled Teams
+  meeting deep link — both are recorded in the notification activity trail.
+  The former Stakeholders screen lives as the "Function sign-off" sub-tab of
+  Resource Validation (`#/stakeholders` redirects there).
 - When you rename/add a product, update **all** of: `PRODUCT_NAMES`,
   `PRODUCT_FAMILY_MAP`/`productFamily`, `productRuleCodes`,
   `productWorkstreamBase`, `productSizingDrivers`, `buildResourceOwners`, the
@@ -114,7 +123,7 @@ Playwright (playwright-core, Chromium at `/opt/pw-browsers/...`) is the
 verification pattern used in this repo: load `#/<route>`, `localStorage.clear()`,
 reload, screenshot / assert. Capture `pageerror` + console errors and require
 **zero JS errors** across all routes (dashboard, intake, scope, sizing,
-validation, governance, stakeholders, risks, decisions, businessCase).
+validation, governance, risks, decisions, businessCase).
 
 ## Deploy flow (important)
 

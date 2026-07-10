@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260709-23" />
+    <link rel="stylesheet" href="./styles.css?v=20260709-24" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -38,7 +38,6 @@
           <a href="#/sizing" class="nav-link" data-route-link="sizing">Automated Sizing</a>
           <span class="nav-section-label">Validation</span>
           <a href="#/validation" class="nav-link" data-route-link="validation">Resource Validation</a>
-          <a href="#/stakeholders" class="nav-link" data-route-link="stakeholders">Stakeholders</a>
           <span class="nav-section-label">Governance</span>
           <a href="#/governance" class="nav-link" data-route-link="governance">Readiness</a>
           <a href="#/risks" class="nav-link" data-route-link="risks">Risks &amp; Assumptions</a>
@@ -48,7 +47,7 @@
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v23</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v24</span></p>
       </aside>
 
       <main class="main-content">
@@ -464,7 +463,11 @@
                     <h3>Resource validation</h3>
                     <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Each sizing line is routed to its resource owner for sign-off. Function-level sign-off lives in Stakeholders.</p>
+                  <p class="section-help">One validation request per product, sent to the owner you define.</p>
+                </div>
+                <div id="validationTabs" class="validation-tabs" role="tablist" aria-label="Validation views">
+                  <button type="button" data-validation-tab="owners" class="active" role="tab" aria-selected="true">Product validation</button>
+                  <button type="button" data-validation-tab="signoff" role="tab" aria-selected="false">Function sign-off</button>
                 </div>
               </div>
 
@@ -522,26 +525,31 @@
                   </div>
                   <div id="sizingEstimateTable" class="matrix-wrap" data-route-view="sizing"></div>
 
-                  <div id="validationRequestList" class="request-list" data-route-view="validation"></div>
+                  <div id="validationOwnersPanel" data-route-view="validation">
+                    <div id="validationRequestList" class="request-list"></div>
 
-                  <details class="notification-section-details" data-route-view="validation">
-                    <summary class="subsection-heading notification-section-heading">
-                      <div>
-                        <div class="title-with-help compact-title">
-                          <h4>Owner notification and activity</h4>
-                          <button type="button" class="help-tooltip" data-help-key="notificationPreview" data-help-label="Notification preview"><span aria-hidden="true">i</span></button>
+                    <details class="notification-section-details">
+                      <summary class="subsection-heading notification-section-heading">
+                        <div>
+                          <div class="title-with-help compact-title">
+                            <h4>Message preview and activity</h4>
+                            <button type="button" class="help-tooltip" data-help-key="notificationPreview" data-help-label="Notification preview"><span aria-hidden="true">i</span></button>
+                          </div>
                         </div>
-                        <p class="subsection-help">Preview and send the Email or Teams request for the selected validation line.</p>
-                      </div>
-                    </summary>
-                    <div id="notificationPreview"></div>
-                  </details>
+                      </summary>
+                      <div id="notificationPreview"></div>
+                    </details>
+                  </div>
 
-                  <details class="reference-registry" data-route-view="validation">
-                    <summary>Resource owner registry</summary>
-                    <p>Reference data used to resolve owners by product, workstream, and region.</p>
-                    <div id="resourceOwnerRegistry" class="matrix-wrap"></div>
-                  </details>
+                  <div id="functionSignoffPanel" data-route-view="validation" hidden>
+                    <div class="subsection-heading">
+                      <div>
+                        <h4>Function sign-off matrix</h4>
+                        <p class="subsection-help">Internal sign-off by function. Click a status to cycle.</p>
+                      </div>
+                    </div>
+                    <div id="validationMatrix" class="matrix-wrap"></div>
+                  </div>
                 </div>
 
                 <aside class="sizing-side" data-route-view="sizing">
@@ -576,17 +584,6 @@
                 <summary>Full BCM, SRM and BAB checklist</summary>
                 <div id="governanceChecklist" class="checklist-board"></div>
               </details>
-            </section>
-
-            <section id="stakeholders" class="panel route-panel" data-route-screen="stakeholders" hidden>
-              <div class="section-heading">
-                <div>
-                  <h3>Function sign-off matrix</h3>
-                  <p class="section-help">Internal sign-off by function.</p>
-                </div>
-                <span class="meta-chip">Click a status to cycle</span>
-              </div>
-              <div id="validationMatrix" class="matrix-wrap"></div>
             </section>
 
             <section id="businessCase" class="panel route-panel" data-route-screen="businessCase" hidden>
@@ -688,6 +685,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260709-23"></script>
+    <script type="module" src="./modules/main.js?v=20260709-24"></script>
   </body>
 </html>

@@ -20,7 +20,7 @@ python3 -m http.server 4173 &
 ```
 
 For each route — dashboard, intake, scope, sizing, validation, governance,
-stakeholders, risks, decisions, businessCase — navigate to
+risks, decisions, businessCase — navigate to
 `http://127.0.0.1:4173/index.html#/<route>`, `localStorage.clear()` once, reload,
 wait, and screenshot (full page for dense screens). Select a content-rich
 opportunity (e.g. click the "North Terminal" card) before the workspace routes.
