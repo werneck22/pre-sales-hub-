@@ -28,7 +28,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260709-24";
+} from "./data.js?v=20260710-25";
 import {
   activeRoute,
   airportProfileFor,
@@ -58,7 +58,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260709-24";
+} from "./state.js?v=20260710-25";
 import {
   dashboardMdForEstimate,
   dashboardTotalsForOpportunity,
@@ -78,7 +78,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260709-24";
+} from "./sizing-engine.js?v=20260710-25";
 import {
   forumReadinessDetail,
   forumReadinessLabel,
@@ -91,10 +91,10 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260709-24";
+} from "./readiness-rules.js?v=20260710-25";
 import {
   trafficProvenanceText,
-} from "./airport-lookup.js?v=20260709-24";
+} from "./airport-lookup.js?v=20260710-25";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -1314,28 +1314,35 @@ function renderValidationRequests(opportunity) {
       </div>
 
       <div class="owner-action-panel" data-request-action-panel="${escapeHtml(selectedContext.request.id)}">
-        <div>
-          <strong class="fact-label-with-help">Owner decision ${helpTooltip("resourceValidation", "Resource owner validation")}</strong>
-          <small>${escapeHtml(requestGovernanceImpact(selectedContext))} - the decision covers the whole ${escapeHtml(
-            selectedContext.request.product_name,
-          )} package.</small>
+        <div class="owner-action-head">
+          <div>
+            <strong class="fact-label-with-help">Owner decision ${helpTooltip("resourceValidation", "Resource owner validation")}</strong>
+            <small>Applies to all ${pluralize(selectedContext.estimates.length, "activity", "activities")} of ${escapeHtml(
+              selectedContext.request.product_name,
+            )}.</small>
+          </div>
+          <span class="status-pill ${requestNeedsOwnerAction(selectedContext) ? "attention" : "calm"}">${escapeHtml(
+            requestGovernanceImpact(selectedContext),
+          )}</span>
         </div>
-        <label>
-          Reason / conditions
-          <textarea
-            class="matrix-input owner-action-reason"
-            data-request-action-field="reason"
-            placeholder="Required for conditions, adjustment, rejection, or more information"
-          >${escapeHtml(selectedContext.request.adjustment_reason || "")}</textarea>
-        </label>
-        <label>
-          Owner comments
-          <textarea
-            class="matrix-input owner-action-comments"
-            data-request-action-field="comments"
-            placeholder="Optional owner comments for the validation trail"
-          >${escapeHtml(selectedContext.request.comments || "")}</textarea>
-        </label>
+        <div class="owner-action-fields">
+          <label>
+            Reason / conditions
+            <textarea
+              class="matrix-input owner-action-reason"
+              data-request-action-field="reason"
+              placeholder="Required when approving with conditions, adjusting, rejecting, or requesting information"
+            >${escapeHtml(selectedContext.request.adjustment_reason || "")}</textarea>
+          </label>
+          <label>
+            Owner comments
+            <textarea
+              class="matrix-input owner-action-comments"
+              data-request-action-field="comments"
+              placeholder="Optional comments for the validation trail"
+            >${escapeHtml(selectedContext.request.comments || "")}</textarea>
+          </label>
+        </div>
         <div class="request-action-row">
           <button type="button" class="primary-button" data-owner-action="Approved" data-owner-advance="true" data-request-id="${escapeHtml(
             selectedContext.request.id,

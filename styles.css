@@ -3482,40 +3482,51 @@ button:disabled {
 
 .owner-action-panel {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(110px, 0.35fr) minmax(0, 1fr) minmax(0, 1fr);
-  gap: 8px;
-  align-items: end;
-  padding: 10px;
+  gap: 12px;
+  padding: 14px;
   border: 1px solid #dbe4f5;
   border-radius: 8px;
   background: #f6f9fd;
 }
 
-.owner-action-panel > div,
-.owner-action-panel label {
+.owner-action-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.owner-action-head > div {
   min-width: 0;
 }
 
-.owner-action-panel > div strong,
-.owner-action-panel > div small {
+.owner-action-head strong,
+.owner-action-head small {
   display: block;
 }
 
-.owner-action-panel > div strong {
+.owner-action-head strong {
   color: var(--teal-dark);
-  font-size: 0.84rem;
+  font-size: 0.86rem;
 }
 
-.owner-action-panel > div small {
-  margin-top: 3px;
+.owner-action-head small {
+  margin-top: 2px;
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   line-height: 1.35;
+}
+
+.owner-action-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .owner-action-panel label {
   display: grid;
   gap: 6px;
+  min-width: 0;
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 820;
@@ -3523,15 +3534,31 @@ button:disabled {
 
 .owner-action-reason,
 .owner-action-comments {
-  min-height: 72px;
+  min-height: 64px;
   resize: vertical;
 }
 
 .request-action-row {
-  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #dbe4f5;
+}
+
+.request-action-row .danger-action {
+  margin-left: auto;
+}
+
+@media (max-width: 860px) {
+  .owner-action-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .request-action-row .danger-action {
+    margin-left: 0;
+  }
 }
 
 .email-preview {
