@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260710-25" />
+    <link rel="stylesheet" href="./styles.css?v=20260710-26" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -47,7 +47,7 @@
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v25</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v26</span></p>
       </aside>
 
       <main class="main-content">
@@ -463,10 +463,11 @@
                     <h3>Resource validation</h3>
                     <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Resource owner validation"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">One validation request per product, sent to the owner you define.</p>
+                  <p class="section-help">One validation request per activity, routed to its registered owner.</p>
                 </div>
                 <div id="validationTabs" class="validation-tabs" role="tablist" aria-label="Validation views">
-                  <button type="button" data-validation-tab="owners" class="active" role="tab" aria-selected="true">Product validation</button>
+                  <button type="button" data-validation-tab="owners" class="active" role="tab" aria-selected="true">Activity validation</button>
+                  <button type="button" data-validation-tab="registry" role="tab" aria-selected="false">Owner registry</button>
                   <button type="button" data-validation-tab="signoff" role="tab" aria-selected="false">Function sign-off</button>
                 </div>
               </div>
@@ -539,6 +540,18 @@
                       </summary>
                       <div id="notificationPreview"></div>
                     </details>
+                  </div>
+
+                  <div id="ownerRegistryPanel" data-route-view="validation" hidden>
+                    <div class="subsection-heading">
+                      <div>
+                        <div class="title-with-help compact-title">
+                          <h4>Owner registry</h4>
+                          <button type="button" class="help-tooltip" data-help-key="resourceValidation" data-help-label="Owner registry"><span aria-hidden="true">i</span></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="ownerRegistryTable"></div>
                   </div>
 
                   <div id="functionSignoffPanel" data-route-view="validation" hidden>
@@ -685,6 +698,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260710-25"></script>
+    <script type="module" src="./modules/main.js?v=20260710-26"></script>
   </body>
 </html>

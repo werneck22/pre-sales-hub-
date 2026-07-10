@@ -10,7 +10,7 @@ import {
   productScope,
   referenceToday,
   stakeholderTemplates,
-} from "./data.js?v=20260710-25";
+} from "./data.js?v=20260710-26";
 import {
   airportProfileFor,
   classifyAirport,
@@ -32,7 +32,7 @@ import {
   showToast,
   sizingEstimatesFor,
   validationRequestsFor,
-} from "./state.js?v=20260710-25";
+} from "./state.js?v=20260710-26";
 import {
   applyEstimateInitialMd,
   buildNotificationBody,
@@ -40,19 +40,18 @@ import {
   defaultValidationRequestId,
   finalMdForEstimate,
   generateSizingForOpportunity,
-  worstStatus,
-} from "./sizing-engine.js?v=20260710-25";
+} from "./sizing-engine.js?v=20260710-26";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260710-25";
+} from "./readiness-rules.js?v=20260710-26";
 import {
   airportByCode,
-} from "./airport-directory.js?v=20260710-25";
+} from "./airport-directory.js?v=20260710-26";
 import {
   renderAll,
   renderIntakeNarrativeSummary,
   renderRecordHeader,
-} from "./render.js?v=20260710-25";
+} from "./render.js?v=20260710-26";
 
 function syncIntakeFromForm() {
   const opportunity = selectedOpportunity();
@@ -272,62 +271,54 @@ function updateScopeDriverValue(opportunityId, productName, driverKey, value) {
   scope.sizing_inputs[driverKey] = driver?.type === "select" ? String(value) : Number(value) || 0;
 }
 
-function productValidationRequest(opportunityId, productName) {
-  return mockDb.validationRequests.find((item) => item.opportunity_id === opportunityId && item.product_name === productName);
+function lineValidationRequest(estimateId) {
+  return mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimateId);
 }
 
-function syncScopeOwnerEmailToEstimates(opportunityId, productName, email) {
-  sizingEstimatesFor(opportunityId)
-    .filter((estimate) => estimate.product_name === productName)
-    .forEach((estimate) => {
-      estimate.owner_email = email;
-    });
-  const request = productValidationRequest(opportunityId, productName);
-  if (request) {
-    request.owner_email = email;
-    const notification = notificationForRequest(request.id);
-    if (notification) notification.recipient = email;
+// Rebuilds one line's outgoing Email/Teams bodies from its current owner + estimate.
+function refreshLineNotification(request) {
+  const notification = notificationForRequest(request.id);
+  if (!notification) return;
+  notification.recipient = request.owner_email;
+  const opportunity = mockDb.opportunities.find((item) => item.id === request.opportunity_id);
+  const profile = airportProfileFor(request.opportunity_id);
+  const estimate = mockDb.sizingEstimates.find((item) => item.id === request.sizing_estimate_id);
+  if (opportunity && estimate) {
+    notification.body = buildNotificationBody(opportunity, profile, estimate, request.owner_name || "Owner");
+    notification.teams_body = buildTeamsNotificationBody(opportunity, profile, estimate, request.owner_name || "Owner", request.due_date);
   }
 }
 
-// Updates the owner contact for one product's validation request and keeps the
-// scope, estimates, and the outgoing notification in sync.
+// Overrides the owner contact for ONE activity line in this opportunity only.
+// The global registry (cadastro) is untouched; edit that on the registry tab.
 function updateValidationOwnerContact(requestId, field, value) {
   const request = mockDb.validationRequests.find((item) => item.id === requestId);
   if (!request) return;
-  const scope = findProductScope(request.opportunity_id, request.product_name);
   const text = String(value || "").trim();
-  if (field === "owner_name") {
-    request.owner_name = text;
-    if (scope) scope.owner = text;
-  }
-  if (field === "owner_email") {
-    request.owner_email = text;
-    if (scope) scope.owner_email = text;
-    sizingEstimatesFor(request.opportunity_id)
-      .filter((estimate) => estimate.product_name === request.product_name)
-      .forEach((estimate) => {
-        estimate.owner_email = text;
-      });
-  }
-  const notification = notificationForRequest(request.id);
-  if (notification) {
-    notification.recipient = request.owner_email;
-    const opportunity = mockDb.opportunities.find((item) => item.id === request.opportunity_id);
-    const profile = airportProfileFor(request.opportunity_id);
-    const estimates = sizingEstimatesFor(request.opportunity_id).filter((estimate) => estimate.product_name === request.product_name);
-    if (opportunity && scope && estimates.length) {
-      notification.body = buildNotificationBody(opportunity, profile, scope, estimates, request.owner_name || "Product owner");
-      notification.teams_body = buildTeamsNotificationBody(
-        opportunity,
-        profile,
-        scope,
-        estimates,
-        request.owner_name || "Product owner",
-        request.due_date,
-      );
-    }
-  }
+  if (field === "owner_name") request.owner_name = text;
+  if (field === "owner_email") request.owner_email = text;
+  refreshLineNotification(request);
+}
+
+// Edits the global owner registry (product + workstream). Newly generated
+// sizing lines pick this up; lines already created keep their snapshot unless
+// they never had a value (kept in sync here for the current portfolio so the
+// cadastro edit is visible immediately).
+function updateSizingOwner(key, field, value) {
+  const entry = (mockDb.sizingOwners || []).find((owner) => owner.key === key);
+  if (!entry) return;
+  const text = String(value || "").trim();
+  if (field === "owner_name") entry.owner_name = text;
+  if (field === "owner_email") entry.owner_email = text;
+  // Propagate to existing line requests that still carry the previous registry
+  // value (i.e. were never overridden locally to something different).
+  mockDb.validationRequests
+    .filter((request) => request.product_name === entry.product_name && request.workstream === entry.workstream)
+    .forEach((request) => {
+      if (field === "owner_name") request.owner_name = text;
+      if (field === "owner_email") request.owner_email = text;
+      refreshLineNotification(request);
+    });
 }
 
 function syncAirportProfileFromForm() {
@@ -341,32 +332,21 @@ function syncAirportProfileFromForm() {
   classifyAirport(profile);
 }
 
-// After a per-line estimate edit (status or MD), the product-level request
-// re-derives its status from the worst line and the notification is rebuilt.
+// Keeps one line's validation request in step with its estimate after a
+// status or MD edit made on the sizing screen.
 function syncEstimateWorkflowAfterChange(estimate) {
-  const request = productValidationRequest(estimate.opportunity_id, estimate.product_name);
+  const request = lineValidationRequest(estimate.id);
   if (!request) return;
-  const estimates = sizingEstimatesFor(estimate.opportunity_id).filter((item) => item.product_name === estimate.product_name);
-  request.status = worstStatus(estimates);
+  request.status = estimate.status;
   request.response_date = ["Approved", "Approved with Conditions", "Needs Adjustment", "More Information Requested", "Rejected"].includes(
-    request.status,
+    estimate.status,
   )
     ? referenceToday()
     : "";
   if (estimate.status === "Needs Adjustment" && estimate.adjusted_md) {
     request.adjustment_reason = `Owner adjusted ${estimate.workstream} to ${estimate.adjusted_md} MD.`;
   }
-
-  const notification = notificationForRequest(request.id);
-  if (notification) {
-    const opportunity = mockDb.opportunities.find((item) => item.id === estimate.opportunity_id);
-    const profile = airportProfileFor(estimate.opportunity_id);
-    const scope = findProductScope(estimate.opportunity_id, estimate.product_name);
-    notification.recipient = request.owner_email;
-    if (opportunity && scope && estimates.length) {
-      notification.body = buildNotificationBody(opportunity, profile, scope, estimates, request.owner_name || "Product owner");
-    }
-  }
+  refreshLineNotification(request);
 }
 
 function updateEstimateManualOverride(estimate, field, value) {
@@ -410,18 +390,17 @@ function updateEstimateValidation(estimate, field, value) {
   syncEstimateWorkflowAfterChange(estimate);
 }
 
-// Records the product owner's decision for a whole product package: the
-// request and every activity line move together. Per-line adjusted MDs entered
-// in the breakdown are preserved and feed the final validated baseline.
+// Records the owner's decision for ONE activity line (its own validation
+// request + estimate). An adjusted MD entered in the panel feeds the final
+// validated baseline on approval.
 function applyOwnerValidationAction(requestId, action, fields) {
   const request = mockDb.validationRequests.find((item) => item.id === requestId);
-  const estimates = request
-    ? sizingEstimatesFor(request.opportunity_id).filter((estimate) => estimate.product_name === request.product_name)
-    : [];
-  if (!request || !estimates.length) {
-    return { ok: false, message: "Select a product validation before applying an owner action.", tone: "attention" };
+  const estimate = request ? mockDb.sizingEstimates.find((item) => item.id === request.sizing_estimate_id) : null;
+  if (!request || !estimate) {
+    return { ok: false, message: "Select an activity validation before applying an owner action.", tone: "attention" };
   }
 
+  const adjustedMd = Number(fields.adjusted_md || 0);
   const reason = String(fields.reason || "").trim();
   const comments = String(fields.comments || "").trim();
   const requiresReason = ["Approved with Conditions", "Needs Adjustment", "More Information Requested", "Rejected"].includes(action);
@@ -429,20 +408,13 @@ function applyOwnerValidationAction(requestId, action, fields) {
   if (requiresReason && !isDocumented(reason)) {
     return { ok: false, message: "A reason is required for this owner action.", tone: "attention" };
   }
-
-  const hasAdjustment = estimates.some((estimate) => Number(estimate.adjusted_md || 0) > 0);
-  if (action === "Needs Adjustment" && !hasAdjustment) {
-    return { ok: false, message: "Enter an adjusted MD on at least one activity line before marking the package as Needs Adjustment.", tone: "attention" };
+  if (action === "Needs Adjustment" && adjustedMd <= 0) {
+    return { ok: false, message: "Enter an adjusted MD before marking the estimate as Needs Adjustment.", tone: "attention" };
   }
 
-  estimates.forEach((estimate) => {
-    estimate.status = action;
-    if (["Approved", "Approved with Conditions"].includes(action)) {
-      estimate.final_validated_md = finalMdForEstimate(estimate);
-    } else {
-      estimate.final_validated_md = "";
-    }
-  });
+  if (adjustedMd > 0) estimate.adjusted_md = adjustedMd;
+  estimate.status = action;
+  estimate.final_validated_md = ["Approved", "Approved with Conditions"].includes(action) ? finalMdForEstimate(estimate) : "";
 
   request.status = action;
   request.response_date = referenceToday();
@@ -450,12 +422,13 @@ function applyOwnerValidationAction(requestId, action, fields) {
   request.comments =
     comments ||
     reason ||
-    (action === "Approved" ? `${request.product_name} baseline approved by ${request.owner_name || "the product owner"}.` : request.comments || "");
+    (action === "Approved" ? `Approved by ${request.owner_name || "the owner"}.` : request.comments || "");
   request.escalation_required = ["Rejected", "Overdue"].includes(action);
 
+  refreshLineNotification(request);
   setSelectedValidationRequestId(request.id);
 
-  return { ok: true, message: `${request.product_name} validation updated: ${action}. SRM/BAB readiness recalculated.`, tone: "success" };
+  return { ok: true, message: `${request.product_name} ${request.workstream} updated: ${action}. Readiness recalculated.`, tone: "success" };
 }
 
 export {
@@ -467,12 +440,12 @@ export {
   runSizingForSelected,
   executeJourneyAction,
   updateScopeDriverValue,
-  syncScopeOwnerEmailToEstimates,
   syncAirportProfileFromForm,
   applyAirportCodeToProfile,
   syncEstimateWorkflowAfterChange,
   updateEstimateManualOverride,
   updateEstimateValidation,
   updateValidationOwnerContact,
+  updateSizingOwner,
   applyOwnerValidationAction,
 };

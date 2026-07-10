@@ -7,7 +7,7 @@ import {
   forumStatusField,
   isDocumented,
   pluralize,
-} from "./data.js?v=20260710-25";
+} from "./data.js?v=20260710-26";
 import {
   airportProfileFor,
   assumptionsFor,
@@ -17,8 +17,9 @@ import {
   risksFor,
   sizingEstimatesFor,
   validationsFor,
-} from "./state.js?v=20260710-25";
+} from "./state.js?v=20260710-26";
 import {
+  effectiveRequestStatus,
   finalMdForEstimate,
   requestActionLabel,
   requestGovernanceImpact,
@@ -26,7 +27,7 @@ import {
   requestNeedsOwnerAction,
   requestPriorityScore,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260710-25";
+} from "./sizing-engine.js?v=20260710-26";
 
 function sizingReadinessImpact(opportunity, forum) {
   const estimates = sizingEstimatesFor(opportunity.id);
@@ -64,11 +65,9 @@ function hasAssumptionCategory(opportunity, category) {
 }
 
 function estimateValidationStatus(opportunity, estimate) {
-  const context = validationRequestContexts([opportunity]).find((item) => item.request.product_name === estimate.product_name);
-  // Product-level overdue trumps the line status; otherwise the line's own
-  // status (set by the product decision or a per-line edit) is authoritative.
-  if (context && context.effectiveStatus === "Overdue") return "Overdue";
-  return estimate.status || context?.effectiveStatus || "Not Started";
+  const request = mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id);
+  if (request) return effectiveRequestStatus(request);
+  return estimate.status || "Not Started";
 }
 
 function workstreamValidationEvidence(opportunity, workstream) {
@@ -172,12 +171,14 @@ function readinessRuleResults(opportunity, forum) {
   const allProductsSized =
     scopes.length > 0 &&
     scopes.every((scope) => estimates.some((estimate) => estimate.product_name === scope.product_name && Number(estimate.initial_md) > 0));
+  // Every activity line must have a registered owner with an email on its
+  // validation request (owners come from the global registry now).
   const ownersIdentified =
-    scopes.length > 0 &&
-    scopes.every((scope) => isDocumented(scope.owner) && isDocumented(scope.owner_email)) &&
-    estimates.every(
-      (estimate) => mockDb.resourceOwners.some((owner) => owner.id === estimate.owner_id && owner.active) && isDocumented(estimate.owner_email),
-    );
+    estimates.length > 0 &&
+    estimates.every((estimate) => {
+      const request = mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id);
+      return request && isDocumented(request.owner_name) && isDocumented(request.owner_email);
+    });
   const technicalAssumptions = assumptionsFor(opportunity.id).filter((item) => ["Technical", "Integration", "Delivery"].includes(item.category));
   const risksWithMitigation = risks.filter((riskItem) => isDocumented(riskItem.mitigation));
   const srmDetail = forum === "BAB" ? forumReadinessDetail(opportunity, "SRM") : null;
@@ -322,9 +323,11 @@ function openBlockersFor(opportunity) {
     .filter(
       (context) =>
         ["Rejected", "Overdue"].includes(context.effectiveStatus) &&
-        !context.estimates.some((estimate) => ["Rejected", "Overdue"].includes(estimate.status)),
+        !["Rejected", "Overdue"].includes(context.estimate.status),
     )
-    .forEach((context) => blockers.push(`Owner validation ${context.effectiveStatus.toLowerCase()}: ${context.request.product_name}`));
+    .forEach((context) =>
+      blockers.push(`Owner validation ${context.effectiveStatus.toLowerCase()}: ${context.request.product_name} ${context.request.workstream}`),
+    );
   return blockers;
 }
 
@@ -519,8 +522,8 @@ function readinessGapsForOpportunity(opportunity) {
       opportunity,
       source: "Owner validation",
       severity,
-      label: `${context.request.product_name}: ${requestActionLabel(context)}`,
-      detail: `${context.owner.name} - ${requestGovernanceImpact(context)} - ${formatNumber(context.totalMd)} MD - ${formatShortDate(
+      label: `${context.request.product_name} ${context.request.workstream}: ${requestActionLabel(context)}`,
+      detail: `${context.owner.name} - ${requestGovernanceImpact(context)} - ${formatNumber(context.md)} MD - ${formatShortDate(
         context.request.due_date,
       )}`,
       action: readinessGapAction("Owner validation"),

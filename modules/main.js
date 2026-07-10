@@ -5,7 +5,7 @@ import {
   productScope,
   risk,
   slug,
-} from "./data.js?v=20260710-25";
+} from "./data.js?v=20260710-26";
 import {
   activeRoute,
   airportProfileFor,
@@ -32,12 +32,13 @@ import {
   setSelectedId,
   setSelectedNotificationChannel,
   setSelectedValidationRequestId,
+  setRegistryShowAll,
   setSortByReadiness,
   setValidationTab,
   showToast,
   sizingEstimatesFor,
   sortByReadiness,
-} from "./state.js?v=20260710-25";
+} from "./state.js?v=20260710-26";
 import {
   buildSizingCsv,
   defaultValidationRequestId,
@@ -45,10 +46,10 @@ import {
   initializeSizingEngine,
   nextActionableRequestId,
   runNotificationTrigger,
-} from "./sizing-engine.js?v=20260710-25";
+} from "./sizing-engine.js?v=20260710-26";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260710-25";
+} from "./readiness-rules.js?v=20260710-26";
 import {
   airportProfileComplete,
   buildBusinessCaseText,
@@ -56,31 +57,31 @@ import {
   renderNotificationPreview,
   renderSizingEstimates,
   renderValidationRequests,
-} from "./render.js?v=20260710-25";
+} from "./render.js?v=20260710-26";
 import {
   lookupAirportData,
-} from "./airport-lookup.js?v=20260710-25";
+} from "./airport-lookup.js?v=20260710-26";
 import {
   handleSearchResultClick,
   hideSearchResults,
   renderSearchResults,
-} from "./airport-search.js?v=20260710-25";
+} from "./airport-search.js?v=20260710-26";
 import {
   addProductScope,
   applyAirportCodeToProfile,
   applyOwnerValidationAction,
   updateValidationOwnerContact,
+  updateSizingOwner,
   createOpportunity,
   executeJourneyAction,
   findProductScope,
   runSizingForSelected,
   syncAirportProfileFromForm,
   syncIntakeFromForm,
-  syncScopeOwnerEmailToEstimates,
   updateEstimateManualOverride,
   updateEstimateValidation,
   updateScopeDriverValue,
-} from "./actions.js?v=20260710-25";
+} from "./actions.js?v=20260710-26";
 
 elements.opportunityList.addEventListener("click", (event) => {
   const card = event.target.closest("[data-id]");
@@ -290,10 +291,7 @@ elements.productScope.addEventListener("change", (event) => {
 
   if (scopeProduct && field) {
     const scope = findProductScope(selectedId, scopeProduct);
-    if (scope) {
-      scope[field] = event.target.value;
-      if (field === "owner_email") syncScopeOwnerEmailToEstimates(selectedId, scopeProduct, event.target.value);
-    }
+    if (scope) scope[field] = event.target.value;
     generateSizingForOpportunity(selectedId);
     renderAll();
     showToast(`${scopeProduct} scope details updated; sizing and readiness refreshed.`);
@@ -366,7 +364,7 @@ elements.validationTabs?.addEventListener("click", (event) => {
 
 if (elements.validationRequestList) {
   elements.validationRequestList.addEventListener("click", (event) => {
-    if (event.target.closest("[data-owner-contact-field], [data-estimate-adjust]")) return;
+    if (event.target.closest("[data-owner-contact-field], [data-request-action-field]")) return;
 
     const notificationTrigger = event.target.closest("[data-notification-trigger]");
     if (notificationTrigger) {
@@ -410,17 +408,7 @@ if (elements.validationRequestList) {
       updateValidationOwnerContact(contactField.dataset.requestId, contactField.dataset.ownerContactField, contactField.value);
       renderValidationRequests(selectedOpportunity());
       renderNotificationPreview();
-      showToast("Owner contact updated for this product validation.");
-      return;
-    }
-
-    const adjustField = event.target.closest("[data-estimate-adjust]");
-    if (adjustField) {
-      const estimate = mockDb.sizingEstimates.find((item) => item.id === adjustField.dataset.estimateAdjust);
-      if (!estimate) return;
-      updateEstimateValidation(estimate, "adjusted_md", adjustField.value);
-      renderValidationRequests(selectedOpportunity());
-      renderNotificationPreview();
+      showToast("Owner contact overridden for this activity.");
     }
   });
 
@@ -448,6 +436,23 @@ if (elements.notificationPreview) {
     const notificationTrigger = event.target.closest("[data-notification-trigger]");
     if (notificationTrigger) {
       runNotificationTrigger(notificationTrigger);
+    }
+  });
+}
+
+if (elements.ownerRegistryTable) {
+  elements.ownerRegistryTable.addEventListener("change", (event) => {
+    const registryField = event.target.closest("[data-owner-registry]");
+    if (registryField) {
+      updateSizingOwner(registryField.dataset.ownerRegistry, registryField.dataset.registryField, registryField.value);
+      renderAll();
+      showToast("Owner registry updated.");
+      return;
+    }
+    const showAll = event.target.closest("[data-registry-show-all]");
+    if (showAll) {
+      setRegistryShowAll(showAll.checked);
+      renderValidationRequests(selectedOpportunity());
     }
   });
 }

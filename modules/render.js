@@ -28,7 +28,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260710-25";
+} from "./data.js?v=20260710-26";
 import {
   activeRoute,
   airportProfileFor,
@@ -52,13 +52,14 @@ import {
   selectedValidationRequestId,
   setEstimateExpansionOpportunityId,
   setEstimateProductFilter,
+  registryShowAll,
   setSelectedValidationRequestId,
   sizingEstimatesFor,
   updateRouteChrome,
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260710-25";
+} from "./state.js?v=20260710-26";
 import {
   dashboardMdForEstimate,
   dashboardTotalsForOpportunity,
@@ -78,7 +79,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260710-25";
+} from "./sizing-engine.js?v=20260710-26";
 import {
   forumReadinessDetail,
   forumReadinessLabel,
@@ -91,10 +92,10 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260710-25";
+} from "./readiness-rules.js?v=20260710-26";
 import {
   trafficProvenanceText,
-} from "./airport-lookup.js?v=20260710-25";
+} from "./airport-lookup.js?v=20260710-26";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -271,7 +272,7 @@ function renderExecutiveDashboard() {
           needsAdjustment: context.effectiveStatus === "Needs Adjustment",
           pending: requestNeedsOwnerAction(context),
           conditional: context.effectiveStatus === "Approved with Conditions",
-          md: context.totalMd,
+          md: context.md,
           score: Math.max(1, Math.round(requestPriorityScore(context) / 15)),
           opportunityId: context.opportunity.id,
         }),
@@ -723,10 +724,6 @@ function selectedProductCardHtml(opportunity, scope, airportCategory) {
           <span class="scope-readout ${rollup.tone}">${escapeHtml(rollup.validation)}</span>
         </label>
         <label>
-          Owner email override
-          <input type="email" data-scope-product="${escapeHtml(productName)}" data-field="owner_email" value="${escapeHtml(scope.owner_email)}" />
-        </label>
-        <label>
           Risk level
           <select data-scope-product="${escapeHtml(productName)}" data-field="risk_level">
             ${statusOptions(RISK_LEVELS, scope.risk_level)}
@@ -1047,18 +1044,12 @@ function renderSizingEstimates(opportunity) {
                 <strong>${finalMd || "-"}</strong>
               </div>
               <div class="estimate-row-owner">
-                <span class="estimate-mobile-label">Product owner</span>
+                <span class="estimate-mobile-label">Activity owner</span>
                 <strong>${escapeHtml(
-                  mockDb.validationRequests.find(
-                    (item) => item.opportunity_id === estimate.opportunity_id && item.product_name === estimate.product_name,
-                  )?.owner_name || "Owner pending",
+                  mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id)?.owner_name || "Owner not registered",
                 )}</strong>
                 <small>${escapeHtml(
-                  mockDb.validationRequests.find(
-                    (item) => item.opportunity_id === estimate.opportunity_id && item.product_name === estimate.product_name,
-                  )?.owner_email ||
-                    estimate.owner_email ||
-                    "Set the contact in Resource Validation",
+                  mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id)?.owner_email || "Register in the Owner registry",
                 )}</small>
               </div>
               <div class="estimate-status-field">
@@ -1140,18 +1131,76 @@ function renderValidationTabs() {
     });
   }
   if (elements.validationOwnersPanel) elements.validationOwnersPanel.hidden = validationTab !== "owners";
+  if (elements.ownerRegistryPanel) elements.ownerRegistryPanel.hidden = validationTab !== "registry";
   if (elements.functionSignoffPanel) elements.functionSignoffPanel.hidden = validationTab !== "signoff";
+}
+
+// Global owner registry (cadastro): every product+workstream scope with its
+// owner name + email, editable in place. Filtered to the products in the
+// selected opportunity's scope, with a toggle to show the full catalogue.
+function renderOwnerRegistry(opportunity) {
+  if (!elements.ownerRegistryTable) return;
+  const scopedProducts = new Set(productScopesFor(opportunity.id).map((scope) => scope.product_name));
+  const owners = (mockDb.sizingOwners || []).filter((owner) => registryShowAll || scopedProducts.has(owner.product_name));
+  const grouped = new Map();
+  owners.forEach((owner) => {
+    if (!grouped.has(owner.product_name)) grouped.set(owner.product_name, []);
+    grouped.get(owner.product_name).push(owner);
+  });
+
+  elements.ownerRegistryTable.innerHTML = `
+    <div class="registry-toolbar">
+      <p class="subsection-help">Owners are reused across every opportunity. Editing here updates the default for this product activity; a specific opportunity can still override its own line on the validation tab.</p>
+      <label class="registry-scope-toggle">
+        <input type="checkbox" data-registry-show-all ${registryShowAll ? "checked" : ""} />
+        Show all products (${(mockDb.sizingOwners || []).length})
+      </label>
+    </div>
+    <div class="matrix-wrap">
+      <table class="owner-registry-grid">
+        <thead>
+          <tr><th>Product</th><th>Activity (workstream)</th><th>Owner name</th><th>Owner email</th></tr>
+        </thead>
+        <tbody>
+          ${
+            owners.length
+              ? Array.from(grouped.entries())
+                  .map(
+                    ([product, rows]) => rows
+                      .map(
+                        (owner, index) => `
+              <tr>
+                ${index === 0 ? `<th scope="row" rowspan="${rows.length}" class="registry-product-cell">${escapeHtml(product)}</th>` : ""}
+                <td>${escapeHtml(owner.workstream)}</td>
+                <td><input class="matrix-input" type="text" data-owner-registry="${escapeHtml(owner.key)}" data-registry-field="owner_name" value="${escapeHtml(
+                          owner.owner_name,
+                        )}" placeholder="Owner name" /></td>
+                <td><input class="matrix-input" type="email" data-owner-registry="${escapeHtml(owner.key)}" data-registry-field="owner_email" value="${escapeHtml(
+                          owner.owner_email,
+                        )}" placeholder="owner@company.com" /></td>
+              </tr>`,
+                      )
+                      .join(""),
+                  )
+                  .join("")
+              : `<tr><td colspan="4" class="empty-state">No products in scope yet. Turn on "Show all products" to register owners ahead of time.</td></tr>`
+          }
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 function renderValidationRequests(opportunity) {
   if (!elements.validationRequestList) return;
   renderValidationTabs();
+  renderOwnerRegistry(opportunity);
   const requests = validationRequestsFor(opportunity.id);
   if (!requests.length) {
     elements.validationRequestList.innerHTML = `
       <div class="empty-state guided-empty">
         <strong>No validations created.</strong>
-        <p>Run sizing to create one validation request per product in scope.</p>
+        <p>Run sizing to create one validation request per activity, each routed to its registered owner.</p>
         <button type="button" class="primary-button" data-action="${productScopesFor(opportunity.id).length ? "run-sizing" : "focus-first-product"}" data-target="${
           productScopesFor(opportunity.id).length ? "#sizing" : "#scope"
         }">${productScopesFor(opportunity.id).length ? "Create validation requests" : "Select products first"}</button>
@@ -1168,6 +1217,7 @@ function renderValidationRequests(opportunity) {
   const needActionStatuses = ["Overdue", "Rejected", "Needs Adjustment", "More Information Requested", "Pending Validation", "Not Started"];
   const selectedContext = contexts.find((context) => context.request.id === selectedValidationRequestId) || contexts[0] || null;
   const selectedRequest = selectedContext?.request || null;
+  const selectedEstimate = selectedContext?.estimate || null;
   const selectedNotification = selectedRequest ? notificationForRequest(selectedRequest.id) : null;
   const emailNotificationState = selectedNotification ? notificationChannelState(selectedNotification, "Email") : null;
   const teamsNotificationState = selectedNotification ? notificationChannelState(selectedNotification, "Teams") : null;
@@ -1176,24 +1226,36 @@ function renderValidationRequests(opportunity) {
   const approvedCount = contexts.filter((context) => ["Approved", "Approved with Conditions"].includes(context.effectiveStatus)).length;
   const mdWaiting = contexts
     .filter((context) => requestNeedsOwnerAction(context) || context.effectiveStatus === "Rejected")
-    .reduce((sum, context) => sum + Number(context.totalMd || 0), 0);
+    .reduce((sum, context) => sum + Number(context.md || 0), 0);
   const allResolved = needActionCount === 0;
-  const rows = contexts
-    .slice()
-    .sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn);
   const decisionLocked = selectedContext && ["Approved", "Approved with Conditions", "Rejected"].includes(selectedContext.effectiveStatus);
+
+  // Group the queue by product; each product shows its activity lines.
+  const groups = new Map();
+  contexts.forEach((context) => {
+    if (!groups.has(context.request.product_name)) groups.set(context.request.product_name, []);
+    groups.get(context.request.product_name).push(context);
+  });
+  const groupRows = Array.from(groups.entries())
+    .map(([product, rows]) => ({
+      product,
+      rows: rows.sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn),
+      pending: rows.filter((context) => needActionStatuses.includes(context.effectiveStatus)).length,
+      md: rows.reduce((sum, context) => sum + Number(context.md || 0), 0),
+    }))
+    .sort((a, b) => b.pending - a.pending || b.md - a.md || a.product.localeCompare(b.product));
 
   elements.validationRequestList.innerHTML = `
     <section class="validation-summary-bar ${allResolved ? "complete" : "attention"}" aria-label="Validation progress summary">
       <div class="validation-summary-copy">
         <strong>${
           allResolved
-            ? "All product baselines are validated."
-            : `Resolve ${needActionCount} product validation${needActionCount === 1 ? "" : "s"} to close the baseline.`
+            ? "All activity validations are complete."
+            : `Resolve ${needActionCount} activity validation${needActionCount === 1 ? "" : "s"} to close the baseline.`
         }</strong>
       </div>
       <div class="validation-summary-metrics">
-        <span><strong>${contexts.length}</strong> products</span>
+        <span><strong>${contexts.length}</strong> activities</span>
         <span class="${needActionCount ? "attention" : ""}"><strong>${needActionCount}</strong> need action</span>
         <span class="${overdueCount ? "attention" : ""}"><strong>${overdueCount}</strong> overdue</span>
         <span><strong>${approvedCount}</strong> approved</span>
@@ -1201,12 +1263,12 @@ function renderValidationRequests(opportunity) {
       </div>
     </section>
 
-    <section class="validation-queue-board" aria-label="Product validation queue">
+    <section class="validation-queue-board" aria-label="Activity validation queue">
       <div class="validation-queue-scroll matrix-wrap">
         <table class="validation-queue-table">
           <thead>
             <tr>
-              <th>Product</th>
+              <th>Activity</th>
               <th>Owner</th>
               <th>MD</th>
               <th>Due</th>
@@ -1214,24 +1276,30 @@ function renderValidationRequests(opportunity) {
             </tr>
           </thead>
           <tbody>
-            ${rows
+            ${groupRows
               .map(
-                (context) => `
-              <tr data-request-id="${escapeHtml(context.request.id)}" class="queue-line-row ${context.request.id === selectedRequest?.id ? "selected" : ""} ${
-                needActionStatuses.includes(context.effectiveStatus) ? "attention" : ""
-              }" tabindex="0">
-                <td><strong>${escapeHtml(context.request.product_name)}</strong><small class="queue-substat">${pluralize(
-                  context.estimates.length,
-                  "activity",
-                  "activities",
-                )}</small></td>
-                <td>${escapeHtml(context.owner.name)}<small class="queue-substat">${escapeHtml(context.owner.email || "email pending")}</small></td>
-                <td>${formatNumber(context.currentMd)}</td>
-                <td class="${context.dueIn < 0 ? "overdue-cell" : ""}">${escapeHtml(formatShortDate(context.request.due_date))} (${
-                  context.dueIn < 0 ? `${Math.abs(context.dueIn)}d overdue` : `${context.dueIn}d`
-                })</td>
-                <td><span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span></td>
-              </tr>`,
+                (group) => `
+              <tr class="queue-product-row ${group.pending ? "attention" : ""}">
+                <th colspan="5">${escapeHtml(group.product)}<span>${pluralize(group.rows.length, "activity", "activities")} - ${formatNumber(
+                  group.md,
+                )} MD${group.pending ? ` - ${group.pending} need action` : ""}</span></th>
+              </tr>
+              ${group.rows
+                .map(
+                  (context) => `
+                <tr data-request-id="${escapeHtml(context.request.id)}" class="queue-line-row ${context.request.id === selectedRequest?.id ? "selected" : ""} ${
+                    needActionStatuses.includes(context.effectiveStatus) ? "attention" : ""
+                  }" tabindex="0">
+                  <td>${escapeHtml(context.request.workstream)}</td>
+                  <td>${escapeHtml(context.owner.name)}<small class="queue-substat">${escapeHtml(context.owner.email || "email pending")}</small></td>
+                  <td>${formatNumber(context.currentMd)}</td>
+                  <td class="${context.dueIn < 0 ? "overdue-cell" : ""}">${escapeHtml(formatShortDate(context.request.due_date))} (${
+                    context.dueIn < 0 ? `${Math.abs(context.dueIn)}d overdue` : `${context.dueIn}d`
+                  })</td>
+                  <td><span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span></td>
+                </tr>`,
+                )
+                .join("")}`,
               )
               .join("")}
           </tbody>
@@ -1245,16 +1313,14 @@ function renderValidationRequests(opportunity) {
     <aside class="request-detail-card">
       <div class="request-detail-head">
         <div>
-          <span class="log-type">Selected product</span>
-          <strong>${escapeHtml(selectedContext.request.product_name)}</strong>
-          <small>${pluralize(selectedContext.estimates.length, "activity", "activities")} - ${formatNumber(selectedContext.currentMd)} MD - due ${escapeHtml(
-            formatShortDate(selectedContext.request.due_date),
-          )}</small>
+          <span class="log-type">Selected activity</span>
+          <strong>${escapeHtml(selectedContext.request.product_name)} - ${escapeHtml(selectedContext.request.workstream)}</strong>
+          <small>${formatNumber(selectedContext.currentMd)} MD - due ${escapeHtml(formatShortDate(selectedContext.request.due_date))}</small>
         </div>
         <span class="status-pill ${statusClass(selectedContext.effectiveStatus)}">${escapeHtml(selectedContext.effectiveStatus)}</span>
       </div>
 
-      <div class="owner-contact-panel" aria-label="Product owner contact">
+      <div class="owner-contact-panel" aria-label="Activity owner contact">
         <div class="owner-contact-fields">
           <label>
             Owner name
@@ -1269,6 +1335,7 @@ function renderValidationRequests(opportunity) {
             )}" value="${escapeHtml(selectedContext.owner.email)}" placeholder="owner@company.com" />
           </label>
         </div>
+        <small class="owner-contact-note">Overrides the registered owner for this opportunity only. Manage defaults on the Owner registry tab.</small>
         <div class="notification-trigger-actions">
           <button type="button" class="primary-button" data-notification-trigger="Email" data-request-id="${escapeHtml(selectedContext.request.id)}">
             Send request (Email)
@@ -1283,49 +1350,23 @@ function renderValidationRequests(opportunity) {
         </div>
       </div>
 
-      <div class="validation-breakdown" aria-label="Activity breakdown">
-        <div class="validation-breakdown-head">
-          <strong>Activity breakdown</strong>
-          <span>${formatNumber(selectedContext.totalMd)} MD initial</span>
-        </div>
-        <table class="validation-breakdown-table">
-          <thead>
-            <tr>
-              <th>Activity</th>
-              <th>Initial MD</th>
-              <th>Adjusted MD</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${selectedContext.estimates
-              .map(
-                (estimate) => `
-              <tr>
-                <td>${escapeHtml(estimate.workstream)}</td>
-                <td>${formatNumber(estimate.initial_md)}</td>
-                <td><input class="matrix-input md-input" type="number" min="0" data-estimate-adjust="${escapeHtml(estimate.id)}" value="${escapeHtml(
-                  estimate.adjusted_md || "",
-                )}" ${decisionLocked ? "disabled" : ""} /></td>
-              </tr>`,
-              )
-              .join("")}
-          </tbody>
-        </table>
-      </div>
-
       <div class="owner-action-panel" data-request-action-panel="${escapeHtml(selectedContext.request.id)}">
         <div class="owner-action-head">
           <div>
             <strong class="fact-label-with-help">Owner decision ${helpTooltip("resourceValidation", "Resource owner validation")}</strong>
-            <small>Applies to all ${pluralize(selectedContext.estimates.length, "activity", "activities")} of ${escapeHtml(
-              selectedContext.request.product_name,
-            )}.</small>
+            <small>${escapeHtml(requestGovernanceImpact(selectedContext))} - ${formatNumber(selectedEstimate?.initial_md || 0)} MD initial for this activity.</small>
           </div>
           <span class="status-pill ${requestNeedsOwnerAction(selectedContext) ? "attention" : "calm"}">${escapeHtml(
             requestGovernanceImpact(selectedContext),
           )}</span>
         </div>
         <div class="owner-action-fields">
+          <label>
+            Adjusted MD
+            <input class="matrix-input md-input" type="number" min="0" data-request-action-field="adjusted_md" value="${escapeHtml(
+              selectedEstimate?.adjusted_md || "",
+            )}" ${decisionLocked ? "disabled" : ""} placeholder="${escapeHtml(String(selectedEstimate?.initial_md || 0))}" />
+          </label>
           <label>
             Reason / conditions
             <textarea

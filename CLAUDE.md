@@ -80,15 +80,25 @@ package.
   "Generate sizing" on Product Scope runs it and opens Automated Sizing.
   Opportunity carries `implementation_start` / `go_live_date`, included in the
   owner notification Email/Teams bodies.
-- **Validation is per product, not per activity line.** One validation request
-  per product in scope (`vr-<opp>-<productSlug>`, keyed by `product_name`) with
-  an editable owner contact (`owner_name` / `owner_email`) on the request. The
-  owner decision applies to every activity line of the product; per-line
-  `adjusted_md` edits are preserved. "Send request (Email)" opens the user's
+- **Validation is per activity, driven by a global owner registry.** Each
+  product+workstream sizing line has its own owner and its own validation
+  request (`vr-<opp>-<product>-<workstream>`, keyed by `sizing_estimate_id`).
+  Owners come from the **global registry** `sizingOwners` (`buildSizingOwners`
+  in `data.js`, one row per product+workstream: `owner_name` / `owner_email`) —
+  the reusable "cadastro" that maps to a Postgres reference table later. On
+  sizing generation each request snapshots its registry owner; editing the
+  owner on a line overrides it **for that opportunity only**, while editing the
+  registry tab changes the global default (and propagates to lines that still
+  carry the old default). Resource Validation has three sub-tabs: **Activity
+  validation** (queue grouped by product, per-line owner decision + Email/Teams),
+  **Owner registry** (the cadastro table, editable, `Show all products` toggle),
+  and **Function sign-off** (former Stakeholders screen; `#/stakeholders`
+  redirects there). There is no per-product owner — the "Owner email override"
+  field was removed from Product Scope. "Send request (Email)" opens the user's
   mail client via `mailto:`; "Schedule Teams meeting" opens a pre-filled Teams
-  meeting deep link — both are recorded in the notification activity trail.
-  The former Stakeholders screen lives as the "Function sign-off" sub-tab of
-  Resource Validation (`#/stakeholders` redirects there).
+  meeting deep link. `migrateMockDb` merges the registry (keeps registered
+  names/emails, adds new scopes) and drops any product-level requests so the
+  per-line workflow regenerates from persisted estimates.
 - When you rename/add a product, update **all** of: `PRODUCT_NAMES`,
   `PRODUCT_FAMILY_MAP`/`productFamily`, `productRuleCodes`,
   `productWorkstreamBase`, `productSizingDrivers`, `buildResourceOwners`, the

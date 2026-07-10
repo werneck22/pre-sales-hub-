@@ -842,6 +842,30 @@ function buildResourceOwners() {
   return owners;
 }
 
+// Global owner registry: one entry per (product, workstream) that automated
+// sizing can produce. This is the reusable "cadastro" of who validates each
+// activity; each opportunity snapshots these owners and can override them
+// locally. Maps cleanly to a Postgres reference table later.
+function sizingOwnerKey(productName, workstream) {
+  return `${productName}||${workstream}`;
+}
+
+function buildSizingOwners() {
+  const owners = [];
+  PRODUCT_NAMES.forEach((productName) => {
+    Object.keys(productWorkstreamBase[productName] || {}).forEach((workstream) => {
+      owners.push({
+        key: sizingOwnerKey(productName, workstream),
+        product_name: productName,
+        workstream,
+        owner_name: `${workstream} owner`,
+        owner_email: `${slug(productName)}.${slug(workstream)}@example.com`,
+      });
+    });
+  });
+  return owners;
+}
+
 function productScope(opportunityId, productName, sizingStatus, owner, validationStatus, riskLevel, comments, sizingInputs = {}) {
   return {
     id: `ps-${opportunityId}-${slug(productName)}`,
@@ -1181,6 +1205,8 @@ export {
   buildDefaultSizingRules,
   resourceOwner,
   buildResourceOwners,
+  buildSizingOwners,
+  sizingOwnerKey,
   productScope,
   risk,
   assumption,
