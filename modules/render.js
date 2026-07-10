@@ -28,7 +28,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260710-27";
+} from "./data.js?v=20260710-28";
 import {
   activeRoute,
   airportProfileFor,
@@ -61,7 +61,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260710-27";
+} from "./state.js?v=20260710-28";
 import {
   dashboardMdForEstimate,
   dashboardTotalsForOpportunity,
@@ -81,7 +81,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260710-27";
+} from "./sizing-engine.js?v=20260710-28";
 import {
   forumReadinessDetail,
   forumReadinessLabel,
@@ -94,10 +94,10 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260710-27";
+} from "./readiness-rules.js?v=20260710-28";
 import {
   trafficProvenanceText,
-} from "./airport-lookup.js?v=20260710-27";
+} from "./airport-lookup.js?v=20260710-28";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -1337,108 +1337,112 @@ function renderValidationRequests(opportunity) {
 
       ${
         selectedContext
-          ? `    <aside class="request-detail-card">
-      <div class="request-detail-head">
-        <div>
-          <span class="log-type">Selected activity</span>
-          <strong>${escapeHtml(selectedContext.request.product_name)} - ${escapeHtml(selectedContext.request.workstream)}</strong>
-          <small>${formatNumber(selectedContext.currentMd)} MD - due ${escapeHtml(formatShortDate(selectedContext.request.due_date))}</small>
+          ? `    <aside class="request-detail-card" data-request-action-panel="${escapeHtml(selectedContext.request.id)}">
+      <header class="detail-head">
+        <span class="log-type">Selected activity</span>
+        <h4>${escapeHtml(selectedContext.request.workstream)}</h4>
+        <div class="detail-head-meta">
+          <span>${escapeHtml(selectedContext.request.product_name)}</span>
+          <span>${formatNumber(selectedContext.currentMd)} MD</span>
+          <span>due ${escapeHtml(formatShortDate(selectedContext.request.due_date))}</span>
+          <span class="status-pill ${statusClass(selectedContext.effectiveStatus)}">${escapeHtml(selectedContext.effectiveStatus)}</span>
         </div>
-        <span class="status-pill ${statusClass(selectedContext.effectiveStatus)}">${escapeHtml(selectedContext.effectiveStatus)}</span>
-      </div>
+      </header>
 
-      <div class="owner-contact-panel" aria-label="Activity owner contact">
-        <div class="owner-contact-fields">
-          <label>
-            Owner name
-            <input class="matrix-input" type="text" data-owner-contact-field="owner_name" data-request-id="${escapeHtml(
-              selectedContext.request.id,
-            )}" value="${escapeHtml(selectedContext.owner.name)}" placeholder="Owner name" />
-          </label>
-          <label>
-            Owner email
-            <input class="matrix-input" type="email" data-owner-contact-field="owner_email" data-request-id="${escapeHtml(
-              selectedContext.request.id,
-            )}" value="${escapeHtml(selectedContext.owner.email)}" placeholder="owner@company.com" />
-          </label>
+      <section class="detail-section">
+        <div class="detail-section-title">
+          <span>Owner (this opportunity)</span>
+          <small>Overrides the registry default; edit shared defaults on the Owner registry tab.</small>
         </div>
-        <small class="owner-contact-note">Overrides the registered owner for this opportunity only. Manage defaults on the Owner registry tab.</small>
-        <div class="notification-trigger-actions">
+        <label class="detail-field">
+          Name
+          <input class="matrix-input" type="text" data-owner-contact-field="owner_name" data-request-id="${escapeHtml(
+            selectedContext.request.id,
+          )}" value="${escapeHtml(selectedContext.owner.name)}" placeholder="Owner name" />
+        </label>
+        <label class="detail-field">
+          Email
+          <input class="matrix-input" type="email" data-owner-contact-field="owner_email" data-request-id="${escapeHtml(
+            selectedContext.request.id,
+          )}" value="${escapeHtml(selectedContext.owner.email)}" placeholder="owner@company.com" />
+        </label>
+        <div class="detail-send-row">
           <button type="button" class="primary-button" data-notification-trigger="Email" data-request-id="${escapeHtml(selectedContext.request.id)}">
-            Send request (Email)
+            Send email
           </button>
           <button type="button" class="secondary-button" data-notification-trigger="Teams" data-request-id="${escapeHtml(selectedContext.request.id)}">
-            Schedule Teams meeting
+            Teams meeting
           </button>
         </div>
-        <div class="notification-channel-status" aria-label="Notification channel status">
-          <span><strong>Email</strong><small>${escapeHtml(emailNotificationState?.trigger_count ? formatNotificationTimestamp(emailNotificationState.last_triggered_at) : "Not sent")}</small></span>
-          <span><strong>Teams</strong><small>${escapeHtml(teamsNotificationState?.trigger_count ? formatNotificationTimestamp(teamsNotificationState.last_triggered_at) : "Not sent")}</small></span>
-        </div>
-      </div>
+        <p class="detail-send-status">Email ${escapeHtml(
+          emailNotificationState?.trigger_count ? formatNotificationTimestamp(emailNotificationState.last_triggered_at) : "not sent",
+        )} · Teams ${escapeHtml(
+          teamsNotificationState?.trigger_count ? formatNotificationTimestamp(teamsNotificationState.last_triggered_at) : "not sent",
+        )}</p>
+      </section>
 
-      <div class="owner-action-panel" data-request-action-panel="${escapeHtml(selectedContext.request.id)}">
-        <div class="owner-action-head">
-          <div>
-            <strong class="fact-label-with-help">Owner decision ${helpTooltip("resourceValidation", "Resource owner validation")}</strong>
-            <small>${escapeHtml(requestGovernanceImpact(selectedContext))} - ${formatNumber(selectedEstimate?.initial_md || 0)} MD initial for this activity.</small>
-          </div>
+      <section class="detail-section">
+        <div class="detail-section-title">
+          <span class="fact-label-with-help">Owner decision ${helpTooltip("resourceValidation", "Resource owner validation")}</span>
           <span class="status-pill ${requestNeedsOwnerAction(selectedContext) ? "attention" : "calm"}">${escapeHtml(
             requestGovernanceImpact(selectedContext),
           )}</span>
         </div>
-        <div class="owner-action-fields">
-          <label>
-            Adjusted MD
-            <input class="matrix-input md-input" type="number" min="0" data-request-action-field="adjusted_md" value="${escapeHtml(
-              selectedEstimate?.adjusted_md || "",
-            )}" ${decisionLocked ? "disabled" : ""} placeholder="${escapeHtml(String(selectedEstimate?.initial_md || 0))}" />
-          </label>
-          <label>
-            Reason / conditions
-            <textarea
-              class="matrix-input owner-action-reason"
-              data-request-action-field="reason"
-              placeholder="Required when approving with conditions, adjusting, rejecting, or requesting information"
-            >${escapeHtml(selectedContext.request.adjustment_reason || "")}</textarea>
-          </label>
-          <label>
-            Owner comments
-            <textarea
-              class="matrix-input owner-action-comments"
-              data-request-action-field="comments"
-              placeholder="Optional comments for the validation trail"
-            >${escapeHtml(selectedContext.request.comments || "")}</textarea>
-          </label>
-        </div>
-        <div class="request-action-row">
-          <button type="button" class="primary-button" data-owner-action="Approved" data-owner-advance="true" data-request-id="${escapeHtml(
+        <label class="detail-field detail-field-inline">
+          <span>Adjusted MD</span>
+          <input class="matrix-input md-input" type="number" min="0" data-request-action-field="adjusted_md" value="${escapeHtml(
+            selectedEstimate?.adjusted_md || "",
+          )}" ${decisionLocked ? "disabled" : ""} placeholder="${escapeHtml(String(selectedEstimate?.initial_md || 0))}" />
+          <small>Initial ${formatNumber(selectedEstimate?.initial_md || 0)} MD</small>
+        </label>
+        <label class="detail-field">
+          Reason / conditions
+          <textarea
+            class="matrix-input owner-action-reason"
+            data-request-action-field="reason"
+            rows="3"
+            placeholder="Required for conditions, adjustment, rejection, or more information"
+          >${escapeHtml(selectedContext.request.adjustment_reason || "")}</textarea>
+        </label>
+        <label class="detail-field">
+          Owner comments <span class="detail-optional">optional</span>
+          <textarea
+            class="matrix-input owner-action-comments"
+            data-request-action-field="comments"
+            rows="2"
+            placeholder="Notes for the validation trail"
+          >${escapeHtml(selectedContext.request.comments || "")}</textarea>
+        </label>
+        <div class="detail-decision-actions">
+          <button type="button" class="primary-button block" data-owner-action="Approved" data-owner-advance="true" data-request-id="${escapeHtml(
             selectedContext.request.id,
           )}">
             Approve &amp; next
           </button>
-          <button type="button" class="secondary-button" data-owner-action="Approved with Conditions" data-request-id="${escapeHtml(
-            selectedContext.request.id,
-          )}">
-            Approve with conditions
-          </button>
-          <button type="button" class="secondary-button" data-owner-action="Needs Adjustment" data-request-id="${escapeHtml(
-            selectedContext.request.id,
-          )}">
-            Needs adjustment
-          </button>
-          <button type="button" class="secondary-button" data-owner-action="More Information Requested" data-request-id="${escapeHtml(
-            selectedContext.request.id,
-          )}">
-            Request more information
-          </button>
-          <button type="button" class="secondary-button danger-action" data-owner-action="Rejected" data-request-id="${escapeHtml(
-            selectedContext.request.id,
-          )}">
-            Reject
-          </button>
+          <div class="detail-decision-secondary">
+            <button type="button" class="secondary-button" data-owner-action="Approved with Conditions" data-request-id="${escapeHtml(
+              selectedContext.request.id,
+            )}">
+              With conditions
+            </button>
+            <button type="button" class="secondary-button" data-owner-action="Needs Adjustment" data-request-id="${escapeHtml(
+              selectedContext.request.id,
+            )}">
+              Needs adjustment
+            </button>
+            <button type="button" class="secondary-button" data-owner-action="More Information Requested" data-request-id="${escapeHtml(
+              selectedContext.request.id,
+            )}">
+              Request info
+            </button>
+            <button type="button" class="ghost-danger" data-owner-action="Rejected" data-request-id="${escapeHtml(
+              selectedContext.request.id,
+            )}">
+              Reject
+            </button>
+          </div>
         </div>
-      </div>
+      </section>
     </aside>`
           : `<aside class="request-detail-card empty"><div class="empty-state guided-empty"><strong>Select an activity</strong><p>Pick a line on the left to review its owner and record the decision.</p></div></aside>`
       }
