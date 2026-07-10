@@ -4,13 +4,13 @@ import {
   elements,
   selectedId,
   showToast,
-} from "./state.js?v=20260709-24";
+} from "./state.js?v=20260710-25";
 import {
   renderAll,
-} from "./render.js?v=20260709-24";
+} from "./render.js?v=20260710-25";
 import {
   applyAirportCodeToProfile,
-} from "./actions.js?v=20260709-24";
+} from "./actions.js?v=20260710-25";
 
 // Public SPARQL endpoint, CORS-enabled, no key required. Wikidata stores
 // annual passenger traffic as "patronage" (P3872) statements with a
