@@ -6871,6 +6871,156 @@ textarea:focus-visible {
   min-height: 220px;
 }
 
+/* Selected-activity detail: flat sections separated by rules, single column. */
+.request-detail-card {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.detail-head {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+}
+
+.detail-head h4 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.detail-head-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.detail-head-meta .status-pill {
+  margin-left: auto;
+}
+
+.detail-section {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.detail-section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.detail-section-title > span:first-child {
+  font-size: 0.82rem;
+  font-weight: 820;
+  color: var(--ink);
+}
+
+.detail-section-title small {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-align: right;
+  max-width: 22ch;
+  line-height: 1.3;
+}
+
+.detail-section-title .status-pill {
+  flex: 0 0 auto;
+}
+
+.detail-field {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.detail-field .matrix-input {
+  width: 100%;
+}
+
+.detail-field-inline {
+  grid-template-columns: auto 90px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-field-inline .md-input {
+  width: 90px;
+}
+
+.detail-field-inline small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.detail-optional {
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: none;
+}
+
+.detail-send-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.detail-send-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.detail-decision-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.primary-button.block {
+  width: 100%;
+}
+
+.detail-decision-secondary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.detail-decision-secondary .secondary-button {
+  width: 100%;
+}
+
+.ghost-danger {
+  grid-column: 1 / -1;
+  justify-self: end;
+  padding: 6px 10px;
+  border: 0;
+  background: none;
+  color: var(--red);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.ghost-danger:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 1080px) {
   .validation-workbench {
     grid-template-columns: minmax(0, 1fr);
