@@ -15,13 +15,13 @@ import {
   productScope,
   risk,
   sizingOwnerKey,
-} from "./data.js?v=20260710-26";
+} from "./data.js?v=20260710-27";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260710-26";
+} from "./readiness-rules.js?v=20260710-27";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260710-26";
+} from "./render.js?v=20260710-27";
 
 let mockDb = {
   opportunities: [
@@ -403,6 +403,11 @@ let validationTab = "owners";
 // Owner registry tab: false = only products in the selected opportunity's
 // scope; true = the full catalogue.
 let registryShowAll = false;
+// Activity-validation queue: which product groups are expanded (accordion) and
+// the status filter. An empty open-set means "auto-open the selected line's
+// product only" so a multi-product queue stays compact.
+const validationOpenProducts = new Set();
+let validationLineFilter = "all";
 let activeRoute = "dashboard";
 const elements = {
   dashboard: document.querySelector("#dashboard"),
@@ -744,6 +749,8 @@ export {
   selectedNotificationChannel,
   validationTab,
   registryShowAll,
+  validationOpenProducts,
+  validationLineFilter,
   activeRoute,
   elements,
   selectedOpportunity,
@@ -779,6 +786,8 @@ export {
   setSelectedNotificationChannel,
   setValidationTab,
   setRegistryShowAll,
+  toggleValidationProduct,
+  setValidationLineFilter,
   setActiveRoute,
 };
 
@@ -814,6 +823,13 @@ function setValidationTab(value) {
 }
 function setRegistryShowAll(value) {
   registryShowAll = Boolean(value);
+}
+function toggleValidationProduct(product) {
+  if (validationOpenProducts.has(product)) validationOpenProducts.delete(product);
+  else validationOpenProducts.add(product);
+}
+function setValidationLineFilter(value) {
+  validationLineFilter = value;
 }
 function setActiveRoute(value) {
   activeRoute = value;

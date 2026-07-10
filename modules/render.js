@@ -28,7 +28,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260710-26";
+} from "./data.js?v=20260710-27";
 import {
   activeRoute,
   airportProfileFor,
@@ -56,10 +56,12 @@ import {
   setSelectedValidationRequestId,
   sizingEstimatesFor,
   updateRouteChrome,
+  validationLineFilter,
+  validationOpenProducts,
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260710-26";
+} from "./state.js?v=20260710-27";
 import {
   dashboardMdForEstimate,
   dashboardTotalsForOpportunity,
@@ -79,7 +81,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260710-26";
+} from "./sizing-engine.js?v=20260710-27";
 import {
   forumReadinessDetail,
   forumReadinessLabel,
@@ -92,10 +94,10 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260710-26";
+} from "./readiness-rules.js?v=20260710-27";
 import {
   trafficProvenanceText,
-} from "./airport-lookup.js?v=20260710-26";
+} from "./airport-lookup.js?v=20260710-27";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -1230,7 +1232,15 @@ function renderValidationRequests(opportunity) {
   const allResolved = needActionCount === 0;
   const decisionLocked = selectedContext && ["Approved", "Approved with Conditions", "Rejected"].includes(selectedContext.effectiveStatus);
 
-  // Group the queue by product; each product shows its activity lines.
+  // Group the queue by product; the queue is an accordion + status filter so a
+  // multi-product opportunity stays compact and selection is one click away.
+  const filterDefs = [
+    { key: "all", label: "All", match: () => true },
+    { key: "attention", label: "Needs action", match: (context) => needActionStatuses.includes(context.effectiveStatus) },
+    { key: "approved", label: "Approved", match: (context) => ["Approved", "Approved with Conditions"].includes(context.effectiveStatus) },
+  ];
+  const activeFilter = filterDefs.find((item) => item.key === validationLineFilter) || filterDefs[0];
+  const selectedProductName = selectedContext?.request.product_name || "";
   const groups = new Map();
   contexts.forEach((context) => {
     if (!groups.has(context.request.product_name)) groups.set(context.request.product_name, []);
@@ -1239,10 +1249,15 @@ function renderValidationRequests(opportunity) {
   const groupRows = Array.from(groups.entries())
     .map(([product, rows]) => ({
       product,
-      rows: rows.sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn),
+      total: rows.length,
       pending: rows.filter((context) => needActionStatuses.includes(context.effectiveStatus)).length,
       md: rows.reduce((sum, context) => sum + Number(context.md || 0), 0),
+      visibleRows: rows
+        .filter(activeFilter.match)
+        .sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn),
+      open: product === selectedProductName || validationOpenProducts.has(product),
     }))
+    .filter((group) => group.visibleRows.length > 0)
     .sort((a, b) => b.pending - a.pending || b.md - a.md || a.product.localeCompare(b.product));
 
   elements.validationRequestList.innerHTML = `
@@ -1263,54 +1278,66 @@ function renderValidationRequests(opportunity) {
       </div>
     </section>
 
-    <section class="validation-queue-board" aria-label="Activity validation queue">
-      <div class="validation-queue-scroll matrix-wrap">
-        <table class="validation-queue-table">
-          <thead>
-            <tr>
-              <th>Activity</th>
-              <th>Owner</th>
-              <th>MD</th>
-              <th>Due</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${groupRows
-              .map(
-                (group) => `
-              <tr class="queue-product-row ${group.pending ? "attention" : ""}">
-                <th colspan="5">${escapeHtml(group.product)}<span>${pluralize(group.rows.length, "activity", "activities")} - ${formatNumber(
-                  group.md,
-                )} MD${group.pending ? ` - ${group.pending} need action` : ""}</span></th>
-              </tr>
-              ${group.rows
-                .map(
-                  (context) => `
-                <tr data-request-id="${escapeHtml(context.request.id)}" class="queue-line-row ${context.request.id === selectedRequest?.id ? "selected" : ""} ${
-                    needActionStatuses.includes(context.effectiveStatus) ? "attention" : ""
-                  }" tabindex="0">
-                  <td>${escapeHtml(context.request.workstream)}</td>
-                  <td>${escapeHtml(context.owner.name)}<small class="queue-substat">${escapeHtml(context.owner.email || "email pending")}</small></td>
-                  <td>${formatNumber(context.currentMd)}</td>
-                  <td class="${context.dueIn < 0 ? "overdue-cell" : ""}">${escapeHtml(formatShortDate(context.request.due_date))} (${
-                    context.dueIn < 0 ? `${Math.abs(context.dueIn)}d overdue` : `${context.dueIn}d`
-                  })</td>
-                  <td><span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span></td>
-                </tr>`,
-                )
-                .join("")}`,
-              )
-              .join("")}
-          </tbody>
-        </table>
+    <div class="validation-workbench">
+      <div class="validation-queue-col">
+        <div class="validation-line-filters" role="group" aria-label="Filter activities by status">
+          ${filterDefs
+            .map((item) => {
+              const count = contexts.filter(item.match).length;
+              return `<button type="button" data-line-filter="${item.key}" class="${item.key === activeFilter.key ? "active" : ""}">${escapeHtml(
+                item.label,
+              )} (${count})</button>`;
+            })
+            .join("")}
+        </div>
+        <div class="validation-accordion">
+          ${groupRows
+            .map(
+              (group) => `
+            <section class="validation-product ${group.open ? "open" : ""} ${group.pending ? "attention" : ""}">
+              <button type="button" class="validation-product-head" data-product-toggle="${escapeHtml(group.product)}" aria-expanded="${group.open}">
+                <span class="vp-caret" aria-hidden="true">▸</span>
+                <span class="vp-name">${escapeHtml(group.product)}</span>
+                <span class="vp-meta">${pluralize(group.total, "activity", "activities")} · ${formatNumber(group.md)} MD</span>
+                ${
+                  group.pending
+                    ? `<span class="vp-flag attention">${group.pending} need action</span>`
+                    : `<span class="vp-flag ready">All validated</span>`
+                }
+              </button>
+              ${
+                group.open
+                  ? `<div class="validation-product-lines">
+                ${group.visibleRows
+                  .map(
+                    (context) => `
+                  <button type="button" class="validation-line ${context.request.id === selectedRequest?.id ? "selected" : ""} ${
+                        needActionStatuses.includes(context.effectiveStatus) ? "attention" : ""
+                      }" data-request-id="${escapeHtml(context.request.id)}">
+                    <span class="vl-activity"><strong>${escapeHtml(context.request.workstream)}</strong><small>${escapeHtml(
+                        context.owner.name,
+                      )}</small></span>
+                    <span class="vl-md">${formatNumber(context.currentMd)} MD</span>
+                    <span class="vl-due ${context.dueIn < 0 ? "overdue-cell" : ""}">${escapeHtml(formatShortDate(context.request.due_date))}${
+                        context.dueIn < 0 ? ` · ${Math.abs(context.dueIn)}d late` : ""
+                      }</span>
+                    <span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span>
+                  </button>`,
+                  )
+                  .join("")}
+              </div>`
+                  : ""
+              }
+            </section>`,
+            )
+            .join("")}
+          ${groupRows.length ? "" : `<div class="empty-state">No activities match this filter.</div>`}
+        </div>
       </div>
-    </section>
 
-    ${
-      selectedContext
-        ? `
-    <aside class="request-detail-card">
+      ${
+        selectedContext
+          ? `    <aside class="request-detail-card">
       <div class="request-detail-head">
         <div>
           <span class="log-type">Selected activity</span>
@@ -1413,8 +1440,9 @@ function renderValidationRequests(opportunity) {
         </div>
       </div>
     </aside>`
-        : ""
-    }
+          : `<aside class="request-detail-card empty"><div class="empty-state guided-empty"><strong>Select an activity</strong><p>Pick a line on the left to review its owner and record the decision.</p></div></aside>`
+      }
+    </div>
   `;
 }
 

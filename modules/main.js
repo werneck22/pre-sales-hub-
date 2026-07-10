@@ -5,7 +5,7 @@ import {
   productScope,
   risk,
   slug,
-} from "./data.js?v=20260710-26";
+} from "./data.js?v=20260710-27";
 import {
   activeRoute,
   airportProfileFor,
@@ -34,11 +34,13 @@ import {
   setSelectedValidationRequestId,
   setRegistryShowAll,
   setSortByReadiness,
+  setValidationLineFilter,
   setValidationTab,
   showToast,
+  toggleValidationProduct,
   sizingEstimatesFor,
   sortByReadiness,
-} from "./state.js?v=20260710-26";
+} from "./state.js?v=20260710-27";
 import {
   buildSizingCsv,
   defaultValidationRequestId,
@@ -46,10 +48,10 @@ import {
   initializeSizingEngine,
   nextActionableRequestId,
   runNotificationTrigger,
-} from "./sizing-engine.js?v=20260710-26";
+} from "./sizing-engine.js?v=20260710-27";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260710-26";
+} from "./readiness-rules.js?v=20260710-27";
 import {
   airportProfileComplete,
   buildBusinessCaseText,
@@ -57,15 +59,15 @@ import {
   renderNotificationPreview,
   renderSizingEstimates,
   renderValidationRequests,
-} from "./render.js?v=20260710-26";
+} from "./render.js?v=20260710-27";
 import {
   lookupAirportData,
-} from "./airport-lookup.js?v=20260710-26";
+} from "./airport-lookup.js?v=20260710-27";
 import {
   handleSearchResultClick,
   hideSearchResults,
   renderSearchResults,
-} from "./airport-search.js?v=20260710-26";
+} from "./airport-search.js?v=20260710-27";
 import {
   addProductScope,
   applyAirportCodeToProfile,
@@ -81,7 +83,7 @@ import {
   updateEstimateManualOverride,
   updateEstimateValidation,
   updateScopeDriverValue,
-} from "./actions.js?v=20260710-26";
+} from "./actions.js?v=20260710-27";
 
 elements.opportunityList.addEventListener("click", (event) => {
   const card = event.target.closest("[data-id]");
@@ -365,6 +367,20 @@ elements.validationTabs?.addEventListener("click", (event) => {
 if (elements.validationRequestList) {
   elements.validationRequestList.addEventListener("click", (event) => {
     if (event.target.closest("[data-owner-contact-field], [data-request-action-field]")) return;
+
+    const filterButton = event.target.closest("[data-line-filter]");
+    if (filterButton) {
+      setValidationLineFilter(filterButton.dataset.lineFilter);
+      renderValidationRequests(selectedOpportunity());
+      return;
+    }
+
+    const productToggle = event.target.closest("[data-product-toggle]");
+    if (productToggle) {
+      toggleValidationProduct(productToggle.dataset.productToggle);
+      renderValidationRequests(selectedOpportunity());
+      return;
+    }
 
     const notificationTrigger = event.target.closest("[data-notification-trigger]");
     if (notificationTrigger) {
