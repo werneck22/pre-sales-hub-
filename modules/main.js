@@ -5,7 +5,7 @@ import {
   productScope,
   risk,
   slug,
-} from "./data.js?v=20260709-23";
+} from "./data.js?v=20260709-24";
 import {
   activeRoute,
   airportProfileFor,
@@ -33,24 +33,22 @@ import {
   setSelectedNotificationChannel,
   setSelectedValidationRequestId,
   setSortByReadiness,
-  setValidationQueueFilter,
+  setValidationTab,
   showToast,
   sizingEstimatesFor,
   sortByReadiness,
-} from "./state.js?v=20260709-23";
+} from "./state.js?v=20260709-24";
 import {
   buildSizingCsv,
   defaultValidationRequestId,
-  estimateId,
   generateSizingForOpportunity,
   initializeSizingEngine,
   nextActionableRequestId,
-  requestId,
-  runMockNotificationTrigger,
-} from "./sizing-engine.js?v=20260709-23";
+  runNotificationTrigger,
+} from "./sizing-engine.js?v=20260709-24";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260709-23";
+} from "./readiness-rules.js?v=20260709-24";
 import {
   airportProfileComplete,
   buildBusinessCaseText,
@@ -58,20 +56,20 @@ import {
   renderNotificationPreview,
   renderSizingEstimates,
   renderValidationRequests,
-} from "./render.js?v=20260709-23";
+} from "./render.js?v=20260709-24";
 import {
   lookupAirportData,
-} from "./airport-lookup.js?v=20260709-23";
+} from "./airport-lookup.js?v=20260709-24";
 import {
   handleSearchResultClick,
   hideSearchResults,
   renderSearchResults,
-} from "./airport-search.js?v=20260709-23";
+} from "./airport-search.js?v=20260709-24";
 import {
   addProductScope,
   applyAirportCodeToProfile,
   applyOwnerValidationAction,
-  bulkApproveRequests,
+  updateValidationOwnerContact,
   createOpportunity,
   executeJourneyAction,
   findProductScope,
@@ -82,7 +80,7 @@ import {
   updateEstimateManualOverride,
   updateEstimateValidation,
   updateScopeDriverValue,
-} from "./actions.js?v=20260709-23";
+} from "./actions.js?v=20260709-24";
 
 elements.opportunityList.addEventListener("click", (event) => {
   const card = event.target.closest("[data-id]");
@@ -359,23 +357,20 @@ if (elements.sizingEstimateTable) {
   });
 }
 
+elements.validationTabs?.addEventListener("click", (event) => {
+  const tabButton = event.target.closest("[data-validation-tab]");
+  if (!tabButton) return;
+  setValidationTab(tabButton.dataset.validationTab);
+  renderValidationRequests(selectedOpportunity());
+});
+
 if (elements.validationRequestList) {
   elements.validationRequestList.addEventListener("click", (event) => {
+    if (event.target.closest("[data-owner-contact-field], [data-estimate-adjust]")) return;
+
     const notificationTrigger = event.target.closest("[data-notification-trigger]");
     if (notificationTrigger) {
-      runMockNotificationTrigger(notificationTrigger);
-      return;
-    }
-
-    const bulkApproveButton = event.target.closest("[data-bulk-approve]");
-    if (bulkApproveButton) {
-      const ids = (bulkApproveButton.dataset.bulkApprove || "").split(",").filter(Boolean);
-      const result = bulkApproveRequests(ids);
-      if (result.ok) {
-        setSelectedValidationRequestId(nextActionableRequestId(selectedOpportunity(), "") || defaultValidationRequestId(selectedId));
-        renderAll();
-      }
-      showToast(result.message, result.tone);
+      runNotificationTrigger(notificationTrigger);
       return;
     }
 
@@ -401,29 +396,6 @@ if (elements.validationRequestList) {
       return;
     }
 
-    const statusButton = event.target.closest("[data-request-status]");
-    if (statusButton) {
-      const request = mockDb.validationRequests.find((item) => item.id === statusButton.dataset.requestId);
-      const estimate = request ? mockDb.sizingEstimates.find((item) => item.id === request.sizing_estimate_id) : null;
-      if (!request || !estimate) return;
-      const nextStatus = statusButton.dataset.requestStatus;
-      if (nextStatus === "Needs Adjustment" && !estimate.adjusted_md) {
-        updateEstimateValidation(estimate, "adjusted_md", Number(estimate.initial_md || 0) + 5);
-      }
-      updateEstimateValidation(estimate, "status", nextStatus);
-      setSelectedValidationRequestId(request.id);
-      renderAll();
-      showToast(`Owner validation marked as ${nextStatus}; readiness recalculated.`);
-      return;
-    }
-
-    const filterButton = event.target.closest("[data-validation-filter]");
-    if (filterButton) {
-      setValidationQueueFilter(filterButton.dataset.validationFilter);
-      renderValidationRequests(selectedOpportunity());
-      return;
-    }
-
     const row = event.target.closest("[data-request-id]");
     if (!row) return;
     setSelectedValidationRequestId(row.dataset.requestId);
@@ -432,8 +404,29 @@ if (elements.validationRequestList) {
     elements.validationRequestList.querySelector(".request-detail-card")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
 
+  elements.validationRequestList.addEventListener("change", (event) => {
+    const contactField = event.target.closest("[data-owner-contact-field]");
+    if (contactField) {
+      updateValidationOwnerContact(contactField.dataset.requestId, contactField.dataset.ownerContactField, contactField.value);
+      renderValidationRequests(selectedOpportunity());
+      renderNotificationPreview();
+      showToast("Owner contact updated for this product validation.");
+      return;
+    }
+
+    const adjustField = event.target.closest("[data-estimate-adjust]");
+    if (adjustField) {
+      const estimate = mockDb.sizingEstimates.find((item) => item.id === adjustField.dataset.estimateAdjust);
+      if (!estimate) return;
+      updateEstimateValidation(estimate, "adjusted_md", adjustField.value);
+      renderValidationRequests(selectedOpportunity());
+      renderNotificationPreview();
+    }
+  });
+
   elements.validationRequestList.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
+    if (event.target.closest("input, textarea")) return;
     const row = event.target.closest("tr[data-request-id]");
     if (!row) return;
     event.preventDefault();
@@ -454,7 +447,7 @@ if (elements.notificationPreview) {
 
     const notificationTrigger = event.target.closest("[data-notification-trigger]");
     if (notificationTrigger) {
-      runMockNotificationTrigger(notificationTrigger);
+      runNotificationTrigger(notificationTrigger);
     }
   });
 }
@@ -657,6 +650,9 @@ if (persisted) {
       ? persisted.selectedId
       : mockDb.opportunities[0].id,
   );
+  // Rebuild the per-product validation workflow from the persisted estimates
+  // (existing owner decisions and adjustments are preserved).
+  mockDb.opportunities.forEach((opportunity) => generateSizingForOpportunity(opportunity.id));
 } else {
   initializeSizingEngine();
 }

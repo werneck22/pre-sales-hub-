@@ -28,7 +28,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260709-23";
+} from "./data.js?v=20260709-24";
 import {
   activeRoute,
   airportProfileFor,
@@ -55,10 +55,10 @@ import {
   setSelectedValidationRequestId,
   sizingEstimatesFor,
   updateRouteChrome,
-  validationQueueFilter,
   validationRequestsFor,
+  validationTab,
   validationsFor,
-} from "./state.js?v=20260709-23";
+} from "./state.js?v=20260709-24";
 import {
   dashboardMdForEstimate,
   dashboardTotalsForOpportunity,
@@ -68,8 +68,6 @@ import {
   formatFactor,
   formatNotificationTimestamp,
   notificationChannelState,
-  ownerEmail,
-  ownerName,
   requestActionLabel,
   requestContextFor,
   requestGovernanceImpact,
@@ -80,7 +78,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260709-23";
+} from "./sizing-engine.js?v=20260709-24";
 import {
   forumReadinessDetail,
   forumReadinessLabel,
@@ -93,10 +91,10 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260709-23";
+} from "./readiness-rules.js?v=20260709-24";
 import {
   trafficProvenanceText,
-} from "./airport-lookup.js?v=20260709-23";
+} from "./airport-lookup.js?v=20260709-24";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -189,7 +187,7 @@ function renderExecutiveDashboard() {
       )}">
         <span class="dashboard-row-main">
           <strong>${escapeHtml(context.opportunity.name)}</strong>
-          <small>${escapeHtml(context.estimate.product_name)} - ${escapeHtml(context.estimate.workstream)} - ${escapeHtml(requestActionLabel(context))}</small>
+          <small>${escapeHtml(context.request.product_name)} - ${escapeHtml(context.owner.name)} - ${escapeHtml(requestActionLabel(context))}</small>
         </span>
         <span class="dashboard-row-meta">
           <span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span>
@@ -267,13 +265,13 @@ function renderExecutiveDashboard() {
     requestContexts
       .filter((context) => requestNeedsOwnerAction(context) || ["Rejected", "Approved with Conditions"].includes(context.effectiveStatus))
       .forEach((context) =>
-        addBottleneck(context.owner?.function || context.estimate.workstream, {
+        addBottleneck(context.request.product_name, {
           overdue: requestIsOverdue(context),
           rejected: context.effectiveStatus === "Rejected",
           needsAdjustment: context.effectiveStatus === "Needs Adjustment",
           pending: requestNeedsOwnerAction(context),
           conditional: context.effectiveStatus === "Approved with Conditions",
-          md: context.estimate.initial_md,
+          md: context.totalMd,
           score: Math.max(1, Math.round(requestPriorityScore(context) / 15)),
           opportunityId: context.opportunity.id,
         }),
@@ -1049,9 +1047,19 @@ function renderSizingEstimates(opportunity) {
                 <strong>${finalMd || "-"}</strong>
               </div>
               <div class="estimate-row-owner">
-                <span class="estimate-mobile-label">Resource owner</span>
-                <strong>${escapeHtml(ownerName(estimate.owner_id))}</strong>
-                <small>${escapeHtml(estimate.owner_email || ownerEmail(estimate.owner_id))}</small>
+                <span class="estimate-mobile-label">Product owner</span>
+                <strong>${escapeHtml(
+                  mockDb.validationRequests.find(
+                    (item) => item.opportunity_id === estimate.opportunity_id && item.product_name === estimate.product_name,
+                  )?.owner_name || "Owner pending",
+                )}</strong>
+                <small>${escapeHtml(
+                  mockDb.validationRequests.find(
+                    (item) => item.opportunity_id === estimate.opportunity_id && item.product_name === estimate.product_name,
+                  )?.owner_email ||
+                    estimate.owner_email ||
+                    "Set the contact in Resource Validation",
+                )}</small>
               </div>
               <div class="estimate-status-field">
                 <span class="estimate-mobile-label">Validation status</span>
@@ -1089,12 +1097,6 @@ function renderSizingEstimates(opportunity) {
                     <div><span>Rule-calculated MD</span><strong>${formatNumber(estimate.calculated_md || estimate.initial_md)}</strong></div>
                     <div><span>Final initial MD</span><strong>${formatNumber(estimate.initial_md)}</strong></div>
                   </div>
-                  <label class="estimate-owner-editor">
-                    Owner email
-                    <input class="matrix-input" type="email" data-estimate-id="${escapeHtml(estimate.id)}" data-field="owner_email" value="${escapeHtml(
-                      estimate.owner_email || ownerEmail(estimate.owner_id),
-                    )}" />
-                  </label>
                   <div class="manual-override-panel ${overridePending ? "attention" : ""}">
                     <div>
                       <strong>${helpTerm("manualOverrides", "Manual override")}</strong>
@@ -1129,14 +1131,27 @@ function renderSizingEstimates(opportunity) {
   `;
 }
 
+function renderValidationTabs() {
+  if (elements.validationTabs) {
+    elements.validationTabs.querySelectorAll("[data-validation-tab]").forEach((button) => {
+      const active = button.dataset.validationTab === validationTab;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+  }
+  if (elements.validationOwnersPanel) elements.validationOwnersPanel.hidden = validationTab !== "owners";
+  if (elements.functionSignoffPanel) elements.functionSignoffPanel.hidden = validationTab !== "signoff";
+}
+
 function renderValidationRequests(opportunity) {
   if (!elements.validationRequestList) return;
+  renderValidationTabs();
   const requests = validationRequestsFor(opportunity.id);
   if (!requests.length) {
     elements.validationRequestList.innerHTML = `
       <div class="empty-state guided-empty">
         <strong>No validations created.</strong>
-        <p>Run sizing to create owner-specific validation requests and simulated email drafts.</p>
+        <p>Run sizing to create one validation request per product in scope.</p>
         <button type="button" class="primary-button" data-action="${productScopesFor(opportunity.id).length ? "run-sizing" : "focus-first-product"}" data-target="${
           productScopesFor(opportunity.id).length ? "#sizing" : "#scope"
         }">${productScopesFor(opportunity.id).length ? "Create validation requests" : "Select products first"}</button>
@@ -1150,100 +1165,35 @@ function renderValidationRequests(opportunity) {
   }
 
   const contexts = requests.map((request) => requestContextFor(request, opportunity)).filter(Boolean);
-  const lanes = [
-    { title: "Requires action", subtitle: "Waiting, rework, or escalation", statuses: ["Overdue", "Rejected", "Needs Adjustment", "More Information Requested", "Pending Validation", "Not Started"], tone: "attention" },
-    { title: "Conditional", subtitle: "Accepted with open conditions", statuses: ["Approved with Conditions"], tone: "warning" },
-    { title: "Completed", subtitle: "Final owner decisions", statuses: ["Approved"], tone: "ready" },
-  ];
-  const selectedRequest = requests.find((request) => request.id === selectedValidationRequestId);
-  const selectedContext = selectedRequest ? requestContextFor(selectedRequest, opportunity) : null;
-  const selectedEstimate = selectedContext?.estimate || null;
-  const selectedOwner = selectedContext?.owner || null;
+  const needActionStatuses = ["Overdue", "Rejected", "Needs Adjustment", "More Information Requested", "Pending Validation", "Not Started"];
+  const selectedContext = contexts.find((context) => context.request.id === selectedValidationRequestId) || contexts[0] || null;
+  const selectedRequest = selectedContext?.request || null;
   const selectedNotification = selectedRequest ? notificationForRequest(selectedRequest.id) : null;
   const emailNotificationState = selectedNotification ? notificationChannelState(selectedNotification, "Email") : null;
   const teamsNotificationState = selectedNotification ? notificationChannelState(selectedNotification, "Teams") : null;
-  const pendingCount = contexts.filter(requestNeedsOwnerAction).length;
-  // Canonical "needs action" figure: each line counted once by its lane, so an
-  // overdue line is not tallied as both pending and an exception.
-  const needActionCount = contexts.filter((context) => lanes[0].statuses.includes(context.effectiveStatus)).length;
+  const needActionCount = contexts.filter((context) => needActionStatuses.includes(context.effectiveStatus)).length;
   const overdueCount = contexts.filter(requestIsOverdue).length;
   const approvedCount = contexts.filter((context) => ["Approved", "Approved with Conditions"].includes(context.effectiveStatus)).length;
-  const exceptionCount = contexts.filter((context) => ["Needs Adjustment", "Rejected", "Overdue"].includes(context.effectiveStatus)).length;
   const mdWaiting = contexts
     .filter((context) => requestNeedsOwnerAction(context) || context.effectiveStatus === "Rejected")
-    .reduce((sum, context) => sum + Number(context.estimate.initial_md || 0), 0);
-  const finalCount = contexts.filter((context) => Number(finalMdForEstimate(context.estimate) || 0) > 0).length;
-  const finalMd = contexts.reduce((sum, context) => sum + Number(finalMdForEstimate(context.estimate) || 0), 0);
-  const unresolvedCount = Math.max(0, requests.length - approvedCount);
-  const routesComplete = contexts.every((context) => context.owner && isDocumented(context.estimate.owner_email || context.owner.email));
-  const validationComplete = pendingCount === 0 && exceptionCount === 0;
-  const closeComplete = finalCount === requests.length && validationComplete;
-  const currentStage = !contexts.length ? "Prepare" : !routesComplete ? "Route" : !validationComplete ? "Validate" : "Close";
-  const stageGuidance = {
-    Prepare: "Generate the sizing baseline before creating owner requests.",
-    Route: "Resolve missing owners or email addresses before triggering validation.",
-    Validate: `Resolve ${needActionCount} line${needActionCount === 1 ? "" : "s"} needing action before closing the baseline.`,
-    Close: "Confirm the final MD baseline and carry any conditions into BAB preparation.",
-  };
-  const ownerPackages = new Map();
-  contexts.forEach((context) => {
-    const key = context.owner?.id || `unassigned-${context.estimate.product_name}-${context.estimate.workstream}`;
-    const item = ownerPackages.get(key) || {
-      owner: context.owner,
-      contexts: [],
-      md: 0,
-      dueIn: context.dueIn,
-      overdue: 0,
-      pending: 0,
-      conditional: 0,
-      exceptions: 0,
-    };
-    item.contexts.push(context);
-    item.md += Number(context.estimate.initial_md || 0);
-    item.dueIn = Math.min(item.dueIn, context.dueIn);
-    if (context.effectiveStatus === "Overdue") item.overdue += 1;
-    if (requestNeedsOwnerAction(context)) item.pending += 1;
-    if (context.effectiveStatus === "Approved with Conditions") item.conditional += 1;
-    if (["Needs Adjustment", "Rejected", "Overdue", "More Information Requested"].includes(context.effectiveStatus)) item.exceptions += 1;
-    ownerPackages.set(key, item);
-  });
-  const packageRows = Array.from(ownerPackages.values())
-    .map((item) => ({
-      ...item,
-      primary: item.contexts.slice().sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn)[0],
-    }))
-    .sort((a, b) => b.overdue - a.overdue || b.exceptions - a.exceptions || b.pending - a.pending || b.md - a.md);
-
-  const filterDefs = [
-    { key: "all", label: "All lines", match: () => true },
-    { key: "attention", label: "Needs action", match: (context) => lanes[0].statuses.includes(context.effectiveStatus) },
-    { key: "conditional", label: "Conditional", match: (context) => context.effectiveStatus === "Approved with Conditions" },
-    { key: "approved", label: "Approved", match: (context) => context.effectiveStatus === "Approved" },
-  ];
-  const activeFilter = filterDefs.find((item) => item.key === validationQueueFilter) || filterDefs[0];
-  const productGroups = new Map();
-  contexts.forEach((context) => {
-    const key = context.estimate.product_name;
-    const group = productGroups.get(key) || { product: key, contexts: [], md: 0, pending: 0, conditional: 0 };
-    group.contexts.push(context);
-    group.md += Number(context.estimate.initial_md || 0);
-    if (lanes[0].statuses.includes(context.effectiveStatus)) group.pending += 1;
-    if (context.effectiveStatus === "Approved with Conditions") group.conditional += 1;
-    productGroups.set(key, group);
-  });
-  const groupRows = Array.from(productGroups.values()).sort(
-    (a, b) => b.pending - a.pending || b.conditional - a.conditional || a.product.localeCompare(b.product),
-  );
-  const visibleLineCount = contexts.filter(activeFilter.match).length;
+    .reduce((sum, context) => sum + Number(context.totalMd || 0), 0);
+  const allResolved = needActionCount === 0;
+  const rows = contexts
+    .slice()
+    .sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn);
+  const decisionLocked = selectedContext && ["Approved", "Approved with Conditions", "Rejected"].includes(selectedContext.effectiveStatus);
 
   elements.validationRequestList.innerHTML = `
-    <section class="validation-summary-bar ${closeComplete ? "complete" : "attention"}" aria-label="Validation progress summary">
+    <section class="validation-summary-bar ${allResolved ? "complete" : "attention"}" aria-label="Validation progress summary">
       <div class="validation-summary-copy">
-        <span class="log-type">Current step: ${escapeHtml(currentStage)}</span>
-        <strong>${closeComplete ? "Validation baseline complete" : escapeHtml(stageGuidance[currentStage])}</strong>
+        <strong>${
+          allResolved
+            ? "All product baselines are validated."
+            : `Resolve ${needActionCount} product validation${needActionCount === 1 ? "" : "s"} to close the baseline.`
+        }</strong>
       </div>
       <div class="validation-summary-metrics">
-        <span><strong>${requests.length}</strong> sizing lines</span>
+        <span><strong>${contexts.length}</strong> products</span>
         <span class="${needActionCount ? "attention" : ""}"><strong>${needActionCount}</strong> need action</span>
         <span class="${overdueCount ? "attention" : ""}"><strong>${overdueCount}</strong> overdue</span>
         <span><strong>${approvedCount}</strong> approved</span>
@@ -1251,166 +1201,132 @@ function renderValidationRequests(opportunity) {
       </div>
     </section>
 
-    <section class="validation-queue-board" aria-label="Validation queue">
-      <div class="validation-queue-heading">
-        <div>
-          <strong>Validation queue</strong>
-          <small>Grouped by product. Select a line to record the owner decision.</small>
-        </div>
-        <span class="section-count">${pluralize(visibleLineCount, "line")}</span>
-      </div>
-      <div class="validation-queue-filters" role="group" aria-label="Filter validation lines by status">
-        ${filterDefs
-          .map((item) => {
-            const count = contexts.filter(item.match).length;
-            return `<button type="button" data-validation-filter="${item.key}" class="${item.key === activeFilter.key ? "active" : ""}">${escapeHtml(item.label)} (${count})</button>`;
-          })
-          .join("")}
-      </div>
+    <section class="validation-queue-board" aria-label="Product validation queue">
       <div class="validation-queue-scroll matrix-wrap">
         <table class="validation-queue-table">
           <thead>
             <tr>
-              <th>Product / workstream</th>
-              <th>Resource owner</th>
+              <th>Product</th>
+              <th>Owner</th>
               <th>MD</th>
               <th>Due</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            ${groupRows
-              .map((group) => {
-                const groupLines = group.contexts.filter(activeFilter.match);
-                if (!groupLines.length) return "";
-                const groupSummary = [
-                  group.pending ? `${group.pending} need action` : "",
-                  group.conditional ? `${group.conditional} conditional` : "",
-                  !group.pending && !group.conditional ? "all approved" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" - ");
-                return `
-              <tr class="queue-product-row ${group.pending ? "attention" : ""}">
-                <th colspan="5" scope="colgroup">${escapeHtml(group.product)} <span>${pluralize(group.contexts.length, "line")} - ${formatNumber(group.md)} MD - ${escapeHtml(groupSummary)}</span></th>
-              </tr>
-              ${groupLines
-                .map((context) => {
-                  const needsAction = lanes[0].statuses.includes(context.effectiveStatus);
-                  const tone = requestIsOverdue(context)
-                    ? "critical"
-                    : needsAction
-                      ? "attention"
-                      : context.effectiveStatus === "Approved with Conditions"
-                        ? "warning"
-                        : "ready";
-                  return `
-                <tr class="queue-line-row ${tone} ${context.request.id === selectedValidationRequestId ? "selected" : ""}" data-request-id="${escapeHtml(context.request.id)}" tabindex="0">
-                  <td><strong>${escapeHtml(context.estimate.workstream)}</strong></td>
-                  <td>${escapeHtml(context.owner?.name || "Owner not assigned")}</td>
-                  <td>${formatNumber(dashboardMdForEstimate(context.estimate))}</td>
-                  <td class="${context.dueIn < 0 ? "overdue-cell" : ""}">${escapeHtml(formatShortDate(context.request.due_date))} (${context.dueIn < 0 ? `${Math.abs(context.dueIn)}d overdue` : `${context.dueIn}d`})</td>
-                  <td><span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span></td>
-                </tr>`;
-                })
-                .join("")}`;
-              })
+            ${rows
+              .map(
+                (context) => `
+              <tr data-request-id="${escapeHtml(context.request.id)}" class="queue-line-row ${context.request.id === selectedRequest?.id ? "selected" : ""} ${
+                needActionStatuses.includes(context.effectiveStatus) ? "attention" : ""
+              }" tabindex="0">
+                <td><strong>${escapeHtml(context.request.product_name)}</strong><small class="queue-substat">${pluralize(
+                  context.estimates.length,
+                  "activity",
+                  "activities",
+                )}</small></td>
+                <td>${escapeHtml(context.owner.name)}<small class="queue-substat">${escapeHtml(context.owner.email || "email pending")}</small></td>
+                <td>${formatNumber(context.currentMd)}</td>
+                <td class="${context.dueIn < 0 ? "overdue-cell" : ""}">${escapeHtml(formatShortDate(context.request.due_date))} (${
+                  context.dueIn < 0 ? `${Math.abs(context.dueIn)}d overdue` : `${context.dueIn}d`
+                })</td>
+                <td><span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span></td>
+              </tr>`,
+              )
               .join("")}
           </tbody>
         </table>
-        ${visibleLineCount ? "" : `<div class="empty-state"><strong>No lines match this filter.</strong><p>Switch back to "All lines" to see the full queue.</p></div>`}
       </div>
     </section>
 
+    ${
+      selectedContext
+        ? `
     <aside class="request-detail-card">
-      <div>
-        <span class="log-type">Selected validation task</span>
-        <strong>${escapeHtml(selectedEstimate?.product_name || "Estimate")} - ${escapeHtml(selectedEstimate?.workstream || "Workstream")}</strong>
-        <small>${escapeHtml(selectedOwner?.name || "Owner")} - ${escapeHtml(selectedEstimate?.owner_email || selectedOwner?.email || "owner@example.com")}</small>
+      <div class="request-detail-head">
+        <div>
+          <span class="log-type">Selected product</span>
+          <strong>${escapeHtml(selectedContext.request.product_name)}</strong>
+          <small>${pluralize(selectedContext.estimates.length, "activity", "activities")} - ${formatNumber(selectedContext.currentMd)} MD - due ${escapeHtml(
+            formatShortDate(selectedContext.request.due_date),
+          )}</small>
+        </div>
+        <span class="status-pill ${statusClass(selectedContext.effectiveStatus)}">${escapeHtml(selectedContext.effectiveStatus)}</span>
       </div>
-      <div class="selected-request-summary">
-        <strong>${escapeHtml(selectedContext ? requestActionLabel(selectedContext) : "Select a request")}</strong>
-        <span>${escapeHtml(selectedContext ? requestGovernanceImpact(selectedContext) : "No request selected")}</span>
-      </div>
-      <div class="validation-readiness-impact ${selectedContext && requestNeedsOwnerAction(selectedContext) ? "attention" : "calm"}">
-        <span>Readiness impact</span>
-        <strong>${escapeHtml(selectedContext ? requestGovernanceImpact(selectedContext) : "No validation selected")}</strong>
-        <small>${escapeHtml(
-          selectedContext && requestNeedsOwnerAction(selectedContext)
-            ? `Completing this ${formatNumber(selectedEstimate?.initial_md || 0)} MD validation is required before the final sizing baseline can close.`
-            : "The owner decision is reflected in SRM/BAB readiness and the validated MD baseline.",
-        )}</small>
-      </div>
-      <div class="request-detail-grid">
-        <div>
-          <span>${escapeHtml(selectedContext?.effectiveStatus || "Pending")}</span>
-          <label>Effective status</label>
-        </div>
-        <div>
-          <span>${escapeHtml(selectedRequest ? `${formatShortDate(selectedRequest.due_date)} (${selectedContext?.dueIn ?? "-"}d)` : "-")}</span>
-          <label>Due date</label>
-        </div>
-        <div>
-          <span>${selectedEstimate?.initial_md ?? "-"}</span>
-          <label>Initial MD</label>
-        </div>
-        <div>
-          <span>${selectedEstimate ? dashboardMdForEstimate(selectedEstimate) : "-"}</span>
-          <label>Current MD</label>
-        </div>
-        <div>
-          <span>${selectedEstimate?.adjusted_md || "-"}</span>
-          <label>Adjusted MD</label>
-        </div>
-        <div>
-          <span>${selectedContext ? requestPriorityLabel(requestPriorityScore(selectedContext)) : "-"}</span>
-          <label>Priority</label>
-        </div>
-      </div>
-      <section class="notification-trigger-panel" aria-label="Resource owner notification trigger">
-        <div class="notification-trigger-copy">
-          <span class="log-type">Notify owner</span>
-          <strong>Send validation request</strong>
+
+      <div class="owner-contact-panel" aria-label="Product owner contact">
+        <div class="owner-contact-fields">
+          <label>
+            Owner name
+            <input class="matrix-input" type="text" data-owner-contact-field="owner_name" data-request-id="${escapeHtml(
+              selectedContext.request.id,
+            )}" value="${escapeHtml(selectedContext.owner.name)}" placeholder="Owner name" />
+          </label>
+          <label>
+            Owner email
+            <input class="matrix-input" type="email" data-owner-contact-field="owner_email" data-request-id="${escapeHtml(
+              selectedContext.request.id,
+            )}" value="${escapeHtml(selectedContext.owner.email)}" placeholder="owner@company.com" />
+          </label>
         </div>
         <div class="notification-trigger-actions">
-          <button type="button" class="primary-button" data-notification-trigger="Email" data-request-id="${escapeHtml(selectedRequest?.id || "")}" ${selectedRequest ? "" : "disabled"}>
+          <button type="button" class="primary-button" data-notification-trigger="Email" data-request-id="${escapeHtml(selectedContext.request.id)}">
             Send request (Email)
           </button>
-          <button type="button" class="secondary-button" data-notification-trigger="Teams" data-request-id="${escapeHtml(selectedRequest?.id || "")}" ${selectedRequest ? "" : "disabled"}>
-            Send request (Teams)
+          <button type="button" class="secondary-button" data-notification-trigger="Teams" data-request-id="${escapeHtml(selectedContext.request.id)}">
+            Schedule Teams meeting
           </button>
         </div>
         <div class="notification-channel-status" aria-label="Notification channel status">
-          <span><strong>Email</strong><small>${escapeHtml(emailNotificationState?.status || "Draft")} - ${escapeHtml(
-            formatNotificationTimestamp(emailNotificationState?.last_triggered_at),
-          )}</small></span>
-          <span><strong>Teams</strong><small>${escapeHtml(teamsNotificationState?.status || "Draft")} - ${escapeHtml(
-            formatNotificationTimestamp(teamsNotificationState?.last_triggered_at),
-          )}</small></span>
+          <span><strong>Email</strong><small>${escapeHtml(emailNotificationState?.trigger_count ? formatNotificationTimestamp(emailNotificationState.last_triggered_at) : "Not sent")}</small></span>
+          <span><strong>Teams</strong><small>${escapeHtml(teamsNotificationState?.trigger_count ? formatNotificationTimestamp(teamsNotificationState.last_triggered_at) : "Not sent")}</small></span>
         </div>
-      </section>
-      <div class="owner-action-panel" data-request-action-panel="${escapeHtml(selectedRequest?.id || "")}">
+      </div>
+
+      <div class="validation-breakdown" aria-label="Activity breakdown">
+        <div class="validation-breakdown-head">
+          <strong>Activity breakdown</strong>
+          <span>${formatNumber(selectedContext.totalMd)} MD initial</span>
+        </div>
+        <table class="validation-breakdown-table">
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Initial MD</th>
+              <th>Adjusted MD</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${selectedContext.estimates
+              .map(
+                (estimate) => `
+              <tr>
+                <td>${escapeHtml(estimate.workstream)}</td>
+                <td>${formatNumber(estimate.initial_md)}</td>
+                <td><input class="matrix-input md-input" type="number" min="0" data-estimate-adjust="${escapeHtml(estimate.id)}" value="${escapeHtml(
+                  estimate.adjusted_md || "",
+                )}" ${decisionLocked ? "disabled" : ""} /></td>
+              </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="owner-action-panel" data-request-action-panel="${escapeHtml(selectedContext.request.id)}">
         <div>
-          <strong class="fact-label-with-help">Resource owner action ${helpTooltip("resourceValidation", "Resource owner validation")}</strong>
-          <small>Approve, adjust, condition, reject, or request more information.</small>
+          <strong class="fact-label-with-help">Owner decision ${helpTooltip("resourceValidation", "Resource owner validation")}</strong>
+          <small>${escapeHtml(requestGovernanceImpact(selectedContext))} - the decision covers the whole ${escapeHtml(
+            selectedContext.request.product_name,
+          )} package.</small>
         </div>
-        <label>
-          Adjusted MD
-          <input
-            class="matrix-input md-input"
-            type="number"
-            min="0"
-            data-request-action-field="adjusted_md"
-            value="${escapeHtml(selectedEstimate?.adjusted_md || "")}"
-          />
-        </label>
         <label>
           Reason / conditions
           <textarea
             class="matrix-input owner-action-reason"
             data-request-action-field="reason"
             placeholder="Required for conditions, adjustment, rejection, or more information"
-          >${escapeHtml(selectedRequest?.adjustment_reason || "")}</textarea>
+          >${escapeHtml(selectedContext.request.adjustment_reason || "")}</textarea>
         </label>
         <label>
           Owner comments
@@ -1418,58 +1334,39 @@ function renderValidationRequests(opportunity) {
             class="matrix-input owner-action-comments"
             data-request-action-field="comments"
             placeholder="Optional owner comments for the validation trail"
-          >${escapeHtml(selectedRequest?.comments || "")}</textarea>
+          >${escapeHtml(selectedContext.request.comments || "")}</textarea>
         </label>
         <div class="request-action-row">
-          <button type="button" class="primary-button" data-owner-action="Approved" data-owner-advance="true" data-request-id="${escapeHtml(selectedRequest?.id || "")}">
+          <button type="button" class="primary-button" data-owner-action="Approved" data-owner-advance="true" data-request-id="${escapeHtml(
+            selectedContext.request.id,
+          )}">
             Approve &amp; next
           </button>
-          <button type="button" class="secondary-button" data-owner-action="Approved with Conditions" data-request-id="${escapeHtml(selectedRequest?.id || "")}">
+          <button type="button" class="secondary-button" data-owner-action="Approved with Conditions" data-request-id="${escapeHtml(
+            selectedContext.request.id,
+          )}">
             Approve with conditions
           </button>
-          <button type="button" class="secondary-button" data-owner-action="Needs Adjustment" data-request-id="${escapeHtml(selectedRequest?.id || "")}">
-            Adjust MD
+          <button type="button" class="secondary-button" data-owner-action="Needs Adjustment" data-request-id="${escapeHtml(
+            selectedContext.request.id,
+          )}">
+            Needs adjustment
           </button>
-          <button type="button" class="secondary-button" data-owner-action="More Information Requested" data-request-id="${escapeHtml(selectedRequest?.id || "")}">
+          <button type="button" class="secondary-button" data-owner-action="More Information Requested" data-request-id="${escapeHtml(
+            selectedContext.request.id,
+          )}">
             Request more information
           </button>
-          <button type="button" class="secondary-button danger-action" data-owner-action="Rejected" data-request-id="${escapeHtml(selectedRequest?.id || "")}">
+          <button type="button" class="secondary-button danger-action" data-owner-action="Rejected" data-request-id="${escapeHtml(
+            selectedContext.request.id,
+          )}">
             Reject
           </button>
         </div>
       </div>
-      <div class="validation-context-grid">
-        <div><span>Sizing drivers</span><p>${escapeHtml(selectedEstimate?.sizing_driver_summary || "Select a request to inspect sizing drivers.")}</p></div>
-        <div><span>Assumptions</span><p>${escapeHtml(selectedEstimate?.assumptions_used || "Sizing assumptions will appear here.")}</p></div>
-        ${selectedRequest?.comments ? `<div><span>Latest owner comment</span><p>${escapeHtml(selectedRequest.comments)}</p></div>` : ""}
-      </div>
-    </aside>
-
-    <details class="owner-workload-details">
-      <summary>
-        <strong>Owner workload view</strong>
-        <small>The same queue grouped by resource owner - ${pluralize(packageRows.length, "owner")}. Selecting an owner opens their most urgent line.</small>
-      </summary>
-      <div class="owner-package-grid">
-        ${packageRows
-          .map((item) => {
-            const status = item.overdue ? "Escalate" : item.exceptions ? "Exception" : item.pending ? "Requires action" : item.conditional ? "Conditional" : "Completed";
-            const tone = item.overdue || item.exceptions ? "critical" : item.pending || item.conditional ? "attention" : "ready";
-            const approvableIds = item.contexts
-              .filter((context) => requestNeedsOwnerAction(context) && !["Needs Adjustment", "Rejected"].includes(context.effectiveStatus))
-              .map((context) => context.request.id);
-            return `
-          <div class="owner-package ${tone}">
-            <button type="button" class="owner-package-open" data-request-id="${escapeHtml(item.primary.request.id)}">
-              <span class="owner-package-main"><strong>${escapeHtml(item.owner?.name || "Owner not assigned")}</strong><small>${pluralize(item.contexts.length, "sizing line")} - ${formatNumber(item.md)} MD - ${item.dueIn < 0 ? `${Math.abs(item.dueIn)}d overdue` : `due in ${item.dueIn}d`}</small></span>
-              <span class="status-pill ${statusClass(tone)}">${escapeHtml(status)}</span>
-            </button>
-            ${approvableIds.length ? `<button type="button" class="secondary-button owner-package-approve" data-bulk-approve="${escapeHtml(approvableIds.join(","))}">Approve ${approvableIds.length} pending</button>` : ""}
-          </div>`;
-          })
-          .join("")}
-      </div>
-    </details>
+    </aside>`
+        : ""
+    }
   `;
 }
 
@@ -1493,7 +1390,7 @@ function renderNotificationPreview() {
   const title = channel === "Email" ? notification.subject : notification.teams_title;
   const body = channel === "Email" ? notification.body : notification.teams_body;
   const activity = notification.activity || [];
-  const stateTone = channelState.status.startsWith("Triggered") ? "ready" : "pending";
+  const stateTone = channelState.trigger_count > 0 ? "ready" : "pending";
 
   elements.notificationPreview.innerHTML = `
     <div class="notification-preview-shell">
@@ -1533,7 +1430,7 @@ function renderNotificationPreview() {
                   (item) => `
               <div class="notification-activity-row">
                 <span class="notification-channel-mark">${escapeHtml(item.channel.slice(0, 1))}</span>
-                <span><strong>${escapeHtml(item.channel)} trigger generated</strong><small>${escapeHtml(item.recipient)} - ${escapeHtml(
+                <span><strong>${escapeHtml(item.status || `${item.channel} request sent`)}</strong><small>${escapeHtml(item.recipient)} - ${escapeHtml(
                   formatNotificationTimestamp(item.created_at),
                 )}</small></span>
                 <span class="status-pill ready">Recorded</span>
@@ -1547,47 +1444,6 @@ function renderNotificationPreview() {
   `;
 }
 
-function renderResourceOwnerRegistry(opportunity) {
-  if (!elements.resourceOwnerRegistry) return;
-  const products = new Set(productScopesFor(opportunity.id).map((scope) => scope.product_name));
-  const owners = mockDb.resourceOwners.filter(
-    (owner) => owner.product_scope === "Any" || products.has(owner.product_scope) || owner.region === opportunity.region,
-  );
-
-  elements.resourceOwnerRegistry.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Function</th>
-          <th>Product</th>
-          <th>Region</th>
-          <th>Workstream</th>
-          <th>Backup</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${owners
-          .map(
-            (owner) => `
-          <tr>
-            <th scope="row">${escapeHtml(owner.name)}</th>
-            <td>${escapeHtml(owner.email)}</td>
-            <td>${escapeHtml(owner.function)}</td>
-            <td>${escapeHtml(owner.product_scope)}</td>
-            <td>${escapeHtml(owner.region)}</td>
-            <td>${escapeHtml(owner.workstream)}</td>
-            <td>${escapeHtml(owner.backup_owner)}</td>
-          </tr>
-        `,
-          )
-          .join("")}
-      </tbody>
-    </table>
-  `;
-}
-
 function renderSizingEngine(opportunity) {
   renderAirportProfile(opportunity);
   renderClassificationRules();
@@ -1595,7 +1451,6 @@ function renderSizingEngine(opportunity) {
   renderSizingEstimates(opportunity);
   renderValidationRequests(opportunity);
   renderNotificationPreview();
-  renderResourceOwnerRegistry(opportunity);
 }
 
 function renderSrmCockpitBanner(opportunity, breakdown) {
@@ -2219,7 +2074,6 @@ export {
   renderSizingEstimates,
   renderValidationRequests,
   renderNotificationPreview,
-  renderResourceOwnerRegistry,
   renderSizingEngine,
   renderReadinessBreakdown,
   renderGovernanceChecklist,

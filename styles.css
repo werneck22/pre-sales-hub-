@@ -6609,6 +6609,119 @@ textarea:focus-visible {
   font-weight: 780;
 }
 
+.validation-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.validation-tabs button {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.validation-tabs button:hover {
+  border-color: var(--teal-dark);
+  color: var(--teal-dark);
+}
+
+.validation-tabs button.active {
+  border-color: var(--teal-dark);
+  color: #ffffff;
+  background: var(--teal-dark);
+}
+
+.queue-substat {
+  display: block;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 640;
+}
+
+.request-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.request-detail-head > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.owner-contact-panel {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+}
+
+.owner-contact-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 10px;
+}
+
+.owner-contact-fields label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 780;
+}
+
+.validation-breakdown {
+  display: grid;
+  gap: 6px;
+}
+
+.validation-breakdown-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.validation-breakdown-head span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.validation-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.validation-breakdown-table th,
+.validation-breakdown-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.validation-breakdown-table th {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.validation-breakdown-table .md-input {
+  width: 84px;
+}
+
 .owner-workload-details {
   overflow: hidden;
   border: 1px solid var(--line);

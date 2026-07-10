@@ -7,7 +7,7 @@ import {
   forumStatusField,
   isDocumented,
   pluralize,
-} from "./data.js?v=20260709-23";
+} from "./data.js?v=20260709-24";
 import {
   airportProfileFor,
   assumptionsFor,
@@ -17,25 +17,21 @@ import {
   risksFor,
   sizingEstimatesFor,
   validationsFor,
-} from "./state.js?v=20260709-23";
+} from "./state.js?v=20260709-24";
 import {
   finalMdForEstimate,
-  ownerName,
   requestActionLabel,
   requestGovernanceImpact,
   requestIsOverdue,
   requestNeedsOwnerAction,
   requestPriorityScore,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260709-23";
+} from "./sizing-engine.js?v=20260709-24";
 
 function sizingReadinessImpact(opportunity, forum) {
   const estimates = sizingEstimatesFor(opportunity.id);
-  const technicalWorkstreams = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services", "Implementation Engineer", "Airline Integration", "Insights Set up", "Agent Portal"];
   const contexts = validationRequestContexts([opportunity]);
-  const criticalContexts = contexts.filter(
-    (context) => technicalWorkstreams.includes(context.estimate.workstream) || context.estimate.risk_level === "High",
-  );
+  const criticalContexts = contexts.filter((context) => context.hasTechnical || context.hasHighRisk);
   const relevant = forum === "SRM" ? criticalContexts : contexts;
   const pendingStatuses = ["Not Started", "Pending Validation", "Needs Adjustment", "More Information Requested", "Overdue"];
   const rejectedCritical = criticalContexts.some((context) => context.effectiveStatus === "Rejected");
@@ -68,8 +64,11 @@ function hasAssumptionCategory(opportunity, category) {
 }
 
 function estimateValidationStatus(opportunity, estimate) {
-  const context = validationRequestContexts([opportunity]).find((item) => item.estimate.id === estimate.id);
-  return context?.effectiveStatus || estimate.status || "Not Started";
+  const context = validationRequestContexts([opportunity]).find((item) => item.request.product_name === estimate.product_name);
+  // Product-level overdue trumps the line status; otherwise the line's own
+  // status (set by the product decision or a per-line edit) is authoritative.
+  if (context && context.effectiveStatus === "Overdue") return "Overdue";
+  return estimate.status || context?.effectiveStatus || "Not Started";
 }
 
 function workstreamValidationEvidence(opportunity, workstream) {
@@ -322,11 +321,10 @@ function openBlockersFor(opportunity) {
   validationRequestContexts([opportunity])
     .filter(
       (context) =>
-        ["Rejected", "Overdue"].includes(context.effectiveStatus) && !["Rejected", "Overdue"].includes(context.estimate.status),
+        ["Rejected", "Overdue"].includes(context.effectiveStatus) &&
+        !context.estimates.some((estimate) => ["Rejected", "Overdue"].includes(estimate.status)),
     )
-    .forEach((context) =>
-      blockers.push(`Owner validation ${context.effectiveStatus.toLowerCase()}: ${context.estimate.product_name} ${context.estimate.workstream}`),
-    );
+    .forEach((context) => blockers.push(`Owner validation ${context.effectiveStatus.toLowerCase()}: ${context.request.product_name}`));
   return blockers;
 }
 
@@ -337,10 +335,7 @@ function productValidationReadiness(opportunity) {
   // without any resource owner actually validating anything.
   const estimates = sizingEstimatesFor(opportunity.id);
   const contexts = validationRequestContexts([opportunity]);
-  const estimateScores = estimates.map((estimate) => {
-    const context = contexts.find((item) => item.estimate.id === estimate.id);
-    return validationScore(context?.effectiveStatus || estimate.status);
-  });
+  const estimateScores = estimates.map((estimate) => validationScore(estimateValidationStatus(opportunity, estimate)));
   const score = estimateScores.length
     ? Math.round((estimateScores.reduce((sum, value) => sum + value, 0) / estimateScores.length) * 100)
     : 0;
@@ -524,10 +519,10 @@ function readinessGapsForOpportunity(opportunity) {
       opportunity,
       source: "Owner validation",
       severity,
-      label: `${context.estimate.product_name} ${context.estimate.workstream}: ${requestActionLabel(context)}`,
-      detail: `${context.owner?.name || ownerName(context.estimate.owner_id)} - ${requestGovernanceImpact(context)} - ${formatNumber(
-        context.estimate.initial_md,
-      )} MD - ${formatShortDate(context.request.due_date)}`,
+      label: `${context.request.product_name}: ${requestActionLabel(context)}`,
+      detail: `${context.owner.name} - ${requestGovernanceImpact(context)} - ${formatNumber(context.totalMd)} MD - ${formatShortDate(
+        context.request.due_date,
+      )}`,
       action: readinessGapAction("Owner validation"),
       priority,
     });

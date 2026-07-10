@@ -122,7 +122,7 @@ const HELP_TEXT = {
   confidence:
     "Confidence indicates how reliable the initial estimate is based on the available scope, assumptions, complexity, and risk inputs.",
   resourceValidation:
-    "Requests are routed by product, workstream, and region. Owner responses create the traceable evidence used by SRM and BAB readiness.",
+    "Each product in scope has one validation request sent to its owner. The owner's decision covers the product's full activity breakdown and feeds SRM and BAB readiness.",
   notificationPreview:
     "Preview and send the Email or Teams validation request for the selected resource owner.",
   srmReadiness:
@@ -145,9 +145,8 @@ const ROUTE_CONFIG = {
   scope: { area: "Opportunity", title: "Product Scope", previous: "intake", next: "sizing" },
   sizing: { area: "Opportunity", title: "Automated Sizing", previous: "scope", next: "validation" },
   validation: { area: "Validation", title: "Resource Validation", previous: "sizing", next: "governance" },
-  governance: { area: "Governance", title: "Readiness", previous: "validation", next: "stakeholders" },
-  stakeholders: { area: "Validation", title: "Stakeholder Matrix", previous: "governance", next: "risks" },
-  risks: { area: "Governance", title: "Risks & Assumptions", previous: "stakeholders", next: "decisions" },
+  governance: { area: "Governance", title: "Readiness", previous: "validation", next: "risks" },
+  risks: { area: "Governance", title: "Risks & Assumptions", previous: "governance", next: "decisions" },
   decisions: { area: "Governance", title: "Decision Log", previous: "risks", next: "businessCase" },
   businessCase: { area: "Governance", title: "Business Case Pack", previous: "decisions", next: "dashboard" },
 };
@@ -159,8 +158,8 @@ const TARGET_ROUTE_MAP = {
   "#sizing": "sizing",
   "#resource-validation": "validation",
   "#governance": "governance",
-  "#validation": "stakeholders",
-  "#stakeholders": "stakeholders",
+  "#validation": "validation",
+  "#stakeholders": "validation",
   "#risk-log": "risks",
   "#decisions": "decisions",
   "#business-case": "businessCase",

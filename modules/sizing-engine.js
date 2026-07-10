@@ -14,7 +14,7 @@ import {
   sizingDriverFactor,
   sizingRuleCode,
   slug,
-} from "./data.js?v=20260709-23";
+} from "./data.js?v=20260709-24";
 import {
   airportProfileFor,
   classifyAirport,
@@ -28,11 +28,11 @@ import {
   setSelectedValidationRequestId,
   showToast,
   sizingEstimatesFor,
-} from "./state.js?v=20260709-23";
+} from "./state.js?v=20260709-24";
 import {
   renderNotificationPreview,
   renderValidationRequests,
-} from "./render.js?v=20260709-23";
+} from "./render.js?v=20260709-24";
 
 function confidenceFor(opportunity, scope) {
   if (opportunity.complexity === "Very High" || scope.risk_level === "High") return "Medium";
@@ -55,27 +55,71 @@ function resolveResourceOwner(productName, workstream, region) {
   );
 }
 
-function ownerName(ownerId) {
-  return mockDb.resourceOwners.find((owner) => owner.id === ownerId)?.name || "Unassigned owner";
+const TECHNICAL_WORKSTREAMS = [
+  "Implementation",
+  "R&D",
+  "Integrations",
+  "Testing & Cutover",
+  "Field Services",
+  "Implementation Engineer",
+  "Airline Integration",
+  "Insights Set up",
+  "Agent Portal",
+];
+
+// Default owner contact for a product: the scope's own owner fields win;
+// the reference registry is only a fallback so a new product is never
+// contact-less.
+function defaultOwnerContact(scope, region) {
+  const fallback =
+    mockDb.resourceOwners.find(
+      (owner) => owner.active && owner.product_scope === scope.product_name && (owner.region === region || owner.region === "Global"),
+    ) || mockDb.resourceOwners.find((owner) => owner.active && owner.product_scope === scope.product_name);
+  const name = isDocumented(scope.owner) && !/^product owner$/i.test(scope.owner.trim()) ? scope.owner.trim() : fallback?.name || "Product owner";
+  const email = (scope.owner_email || "").trim() || fallback?.email || "";
+  return { name, email };
 }
 
-function ownerEmail(ownerId) {
-  return mockDb.resourceOwners.find((owner) => owner.id === ownerId)?.email || "owner@example.com";
+// Worst-first status across a product's sizing lines, used to derive the
+// product-level request status when lines are edited individually.
+const STATUS_SEVERITY = [
+  "Rejected",
+  "Overdue",
+  "Needs Adjustment",
+  "More Information Requested",
+  "Pending Validation",
+  "Not Started",
+  "Approved with Conditions",
+  "Approved",
+];
+
+function worstStatus(estimates) {
+  const statuses = estimates.map((estimate) => estimate.status || "Pending Validation");
+  return STATUS_SEVERITY.find((status) => statuses.includes(status)) || "Pending Validation";
 }
 
 function requestContextFor(request, opportunityOverride = null) {
-  const estimate = mockDb.sizingEstimates.find((item) => item.id === request.sizing_estimate_id);
-  if (!estimate) return null;
+  const estimates = mockDb.sizingEstimates.filter(
+    (item) => item.opportunity_id === request.opportunity_id && item.product_name === request.product_name,
+  );
+  if (!estimates.length) return null;
   const opportunity = opportunityOverride || mockDb.opportunities.find((item) => item.id === request.opportunity_id);
   if (!opportunity) return null;
-  const owner = mockDb.resourceOwners.find((item) => item.id === request.resource_owner_id);
+  const scope = mockDb.productScopes.find(
+    (item) => item.opportunity_id === request.opportunity_id && item.product_name === request.product_name,
+  );
   const dueIn = daysUntil(request.due_date);
   const effectiveStatus = effectiveRequestStatus(request, dueIn);
   return {
     opportunity,
     request,
-    estimate,
-    owner,
+    scope,
+    estimates,
+    totalMd: estimates.reduce((sum, estimate) => sum + Number(estimate.initial_md || 0), 0),
+    currentMd: estimates.reduce((sum, estimate) => sum + dashboardMdForEstimate(estimate), 0),
+    owner: { name: request.owner_name || "Product owner", email: request.owner_email || "" },
+    hasTechnical: estimates.some((estimate) => TECHNICAL_WORKSTREAMS.includes(estimate.workstream)),
+    hasHighRisk: estimates.some((estimate) => estimate.risk_level === "High"),
     dueIn,
     effectiveStatus,
   };
@@ -153,12 +197,10 @@ function requestPriorityScore(context) {
     Approved: 0,
   }[context.effectiveStatus] || 20;
   const dueScore = context.dueIn < 0 ? Math.min(30, Math.abs(context.dueIn) * 4) : context.dueIn <= 7 ? 12 : context.dueIn <= 14 ? 6 : 0;
-  const riskScore = context.estimate.confidence_level === "Medium" ? 6 : 0;
-  const workstreamScore = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services", "Implementation Engineer", "Airline Integration", "Insights Set up", "Agent Portal"].includes(context.estimate.workstream)
-    ? 8
-    : 3;
-  const mdScore = Math.min(12, Math.round(Number(context.estimate.initial_md || 0) / 10));
-  return statusScore + dueScore + riskScore + workstreamScore + mdScore;
+  const riskScore = context.hasHighRisk ? 6 : 0;
+  const technicalScore = context.hasTechnical ? 8 : 3;
+  const mdScore = Math.min(12, Math.round(Number(context.totalMd || 0) / 25));
+  return statusScore + dueScore + riskScore + technicalScore + mdScore;
 }
 
 function requestPriorityLabel(score) {
@@ -169,9 +211,8 @@ function requestPriorityLabel(score) {
 }
 
 function requestGovernanceImpact(context) {
-  const technicalWorkstreams = ["Implementation", "R&D", "Integrations", "Testing & Cutover", "Field Services", "Implementation Engineer", "Airline Integration", "Insights Set up", "Agent Portal"];
-  if (["Rejected", "Overdue"].includes(context.effectiveStatus) && technicalWorkstreams.includes(context.estimate.workstream)) return "Blocks SRM/BAB";
-  if (requestNeedsOwnerAction(context) && technicalWorkstreams.includes(context.estimate.workstream)) return "SRM dependency";
+  if (["Rejected", "Overdue"].includes(context.effectiveStatus) && context.hasTechnical) return "Blocks SRM/BAB";
+  if (requestNeedsOwnerAction(context) && context.hasTechnical) return "SRM dependency";
   if (requestNeedsOwnerAction(context)) return "BAB dependency";
   if (context.effectiveStatus === "Approved with Conditions") return "Conditional";
   return "Tracked";
@@ -181,8 +222,8 @@ function estimateId(opportunityId, productName, workstream) {
   return `se-${opportunityId}-${slug(productName)}-${slug(workstream)}`;
 }
 
-function requestId(estimateIdValue) {
-  return `vr-${estimateIdValue.replace(/^se-/, "")}`;
+function requestId(opportunityId, productName) {
+  return `vr-${opportunityId}-${slug(productName)}`;
 }
 
 function finalMdForEstimate(estimate) {
@@ -230,49 +271,49 @@ function estimateWhyText(estimate) {
   return `${estimate.product_name} ${estimate.workstream} was estimated at ${estimate.initial_md} MD because the airport is ${estimate.airport_category}, ${driverText}, opportunity complexity is ${estimate.complexity}, product risk is ${estimate.risk_level || "Medium"}, and mock rule ${appliedRule} was applied.${source}`;
 }
 
-function buildNotificationBody(opportunity, profile, estimate, owner) {
-  return `Hi ${owner.name},
+function buildNotificationBody(opportunity, profile, scope, estimates, ownerNameValue) {
+  const total = estimates.reduce((sum, estimate) => sum + Number(estimate.initial_md || 0), 0);
+  const lines = estimates.map((estimate) => `- ${estimate.workstream}: ${estimate.initial_md} MD`).join("\n");
+  const category = estimates[0]?.airport_category || profile.airport_category || "";
+  const drivers = estimates.find((estimate) => isDocumented(estimate.sizing_driver_summary))?.sizing_driver_summary || "No product-specific drivers configured";
+  return `Hi ${ownerNameValue},
 
-A new pre-sales sizing validation is required for the ${opportunity.name} opportunity.
+Your validation is required for the ${scope.product_name} sizing baseline of the ${opportunity.name} opportunity.
 
-Product: ${estimate.product_name}
-Workstream: ${estimate.workstream}
-Initial estimated effort: ${estimate.initial_md} MD
-Airport category: ${estimate.airport_category}
+Airport: ${profile.airport_name} (${category})
 Annual passengers: ${formatNumber(profile.annual_passengers)}
 Annual movements: ${formatNumber(profile.annual_movements)}
 Submission deadline: ${opportunity.submission_deadline}
 Implementation start: ${opportunity.implementation_start || "To be confirmed"}
 Target go-live: ${opportunity.go_live_date || "To be confirmed"}
-Assumptions: ${estimate.assumptions_used}
-Sizing drivers: ${estimate.sizing_driver_summary || "No product-specific drivers configured"}
 
-Please validate whether this sizing is acceptable, requires adjustment, or should be escalated.
+${scope.product_name} estimated effort:
+${lines}
+Total initial effort: ${total} MD
 
-Link to opportunity: [link]
+Sizing drivers: ${drivers}
+
+Please confirm whether this baseline is acceptable, requires adjustment, or needs escalation.
 
 Regards,
 Pre-Sales Readiness Hub`;
 }
 
-function buildTeamsNotificationBody(opportunity, profile, estimate, owner, dueDate) {
+function buildTeamsNotificationBody(opportunity, profile, scope, estimates, ownerNameValue, dueDate) {
+  const total = estimates.reduce((sum, estimate) => sum + Number(estimate.initial_md || 0), 0);
   return `Validation required
 
-${owner.name}, your review is required for an Airport IT pre-sales sizing estimate.
+${ownerNameValue}, your review is required for the ${scope.product_name} sizing baseline.
 
 Opportunity: ${opportunity.name}
-Airport: ${profile.airport_name} (${estimate.airport_category})
-Product: ${estimate.product_name}
-Workstream: ${estimate.workstream}
-Initial estimate: ${estimate.initial_md} MD
-Complexity: ${estimate.complexity}
+Airport: ${profile.airport_name}
+Product: ${scope.product_name} (${estimates.length} activities)
+Total initial estimate: ${total} MD
 Validation due: ${dueDate}
 Implementation start: ${opportunity.implementation_start || "To be confirmed"}
 Target go-live: ${opportunity.go_live_date || "To be confirmed"}
 
-Review the assumptions, approve the estimate, adjust the MD, or request more information.
-
-Open opportunity: [link]`;
+Review the activity breakdown, approve the baseline, adjust the MD, or request more information.`;
 }
 
 function notificationChannelState(notification, channel) {
@@ -298,31 +339,47 @@ function formatNotificationTimestamp(value) {
   }).format(date);
 }
 
-function triggerMockNotification(requestId, channel) {
-  if (!["Email", "Teams"].includes(channel)) {
-    return { ok: false, message: "Select Email or Teams before generating the notification.", tone: "warning" };
+// Builds the real hand-off link for a channel: Email opens the user's mail
+// client with the request pre-filled; Teams opens a pre-filled meeting invite
+// to the owner. A static page cannot send on the user's behalf, so the hub
+// prepares the message, opens the tool, and records the hand-off.
+function notificationTriggerHref(request, notification, channel) {
+  if (channel === "Email") {
+    return `mailto:${encodeURIComponent(notification.recipient)}?subject=${encodeURIComponent(notification.subject)}&body=${encodeURIComponent(
+      notification.body,
+    )}`;
   }
-  const request = mockDb.validationRequests.find((item) => item.id === requestId);
+  return `https://teams.microsoft.com/l/meeting/new?subject=${encodeURIComponent(notification.teams_title)}&attendees=${encodeURIComponent(
+    notification.recipient,
+  )}&content=${encodeURIComponent(notification.teams_body)}`;
+}
+
+function triggerNotification(requestIdValue, channel) {
+  if (!["Email", "Teams"].includes(channel)) {
+    return { ok: false, message: "Select Email or Teams before sending the request.", tone: "warning" };
+  }
+  const request = mockDb.validationRequests.find((item) => item.id === requestIdValue);
   const notification = request ? notificationForRequest(request.id) : null;
-  const estimate = request ? mockDb.sizingEstimates.find((item) => item.id === request.sizing_estimate_id) : null;
-  const owner = request ? mockDb.resourceOwners.find((item) => item.id === request.resource_owner_id) : null;
-  if (!request || !notification || !estimate || !owner) {
-    return { ok: false, message: "Select a validation request before generating a notification.", tone: "warning" };
+  if (!request || !notification) {
+    return { ok: false, message: "Select a validation request before sending.", tone: "warning" };
+  }
+  if (!isDocumented(notification.recipient)) {
+    return { ok: false, message: "Enter the owner's email address before sending the request.", tone: "attention" };
   }
 
   const timestamp = new Date().toISOString();
   const state = notificationChannelState(notification, channel);
-  state.status = "Triggered (simulation)";
+  state.status = channel === "Email" ? "Email drafted" : "Meeting invite opened";
   state.last_triggered_at = timestamp;
   state.trigger_count += 1;
-  notification.status = "Simulation generated";
+  notification.status = "Sent to owner";
   notification.sent_date = timestamp.slice(0, 10);
   request.sent_date = timestamp.slice(0, 10);
   notification.activity.unshift({
     id: `activity-${request.id}-${channel.toLowerCase()}-${Date.now()}`,
     channel,
     recipient: notification.recipient,
-    status: "Simulation generated",
+    status: channel === "Email" ? "Email opened in mail client" : "Teams meeting invite opened",
     created_at: timestamp,
   });
   notification.activity = notification.activity.slice(0, 8);
@@ -330,16 +387,29 @@ function triggerMockNotification(requestId, channel) {
 
   return {
     ok: true,
-    message: `${channel} validation request generated for ${owner.name}. No external message was sent.`,
+    href: notificationTriggerHref(request, notification, channel),
+    message:
+      channel === "Email"
+        ? `Email to ${notification.recipient} opened in your mail client.`
+        : `Teams meeting invite for ${notification.recipient} opened.`,
     tone: "success",
   };
 }
 
-function runMockNotificationTrigger(button) {
-  const result = triggerMockNotification(button.dataset.requestId, button.dataset.notificationTrigger);
+function runNotificationTrigger(button) {
+  const result = triggerNotification(button.dataset.requestId, button.dataset.notificationTrigger);
   if (result.ok) {
     renderValidationRequests(selectedOpportunity());
     renderNotificationPreview();
+    // Hand off to the user's mail client / Teams via a transient anchor so the
+    // page itself never navigates away.
+    const link = document.createElement("a");
+    link.href = result.href;
+    if (result.href.startsWith("https://")) link.target = "_blank";
+    link.rel = "noopener";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   }
   showToast(result.message, result.tone);
 }
@@ -353,17 +423,21 @@ function validationDueDate(opportunity) {
   return target < floor ? floor : target;
 }
 
-function upsertValidationWorkflow(opportunity, profile, estimate, owner) {
-  const requestKey = requestId(estimate.id);
+// One validation request per product in scope: the product owner receives a
+// single package covering every activity line, with an editable contact.
+function upsertValidationWorkflow(opportunity, profile, scope, estimates) {
+  const requestKey = requestId(opportunity.id, scope.product_name);
+  const contact = defaultOwnerContact(scope, opportunity.region);
   let request = mockDb.validationRequests.find((item) => item.id === requestKey);
   if (!request) {
     request = {
       id: requestKey,
       opportunity_id: opportunity.id,
-      sizing_estimate_id: estimate.id,
-      resource_owner_id: owner.id,
+      product_name: scope.product_name,
+      owner_name: contact.name,
+      owner_email: contact.email,
       request_type: "Sizing Validation",
-      status: estimate.status,
+      status: worstStatus(estimates),
       due_date: validationDueDate(opportunity),
       sent_date: "",
       response_date: "",
@@ -373,36 +447,38 @@ function upsertValidationWorkflow(opportunity, profile, estimate, owner) {
     };
     mockDb.validationRequests.push(request);
   } else {
-    request.resource_owner_id = owner.id;
-    request.status = estimate.status;
+    request.owner_name = request.owner_name || contact.name;
+    request.owner_email = request.owner_email || contact.email;
+    request.status = worstStatus(estimates);
   }
 
   let notification = notificationForRequest(request.id);
-  const subject = `Validation Required - ${profile.airport_name} - ${estimate.product_name} ${estimate.workstream} Sizing`;
-  const body = buildNotificationBody(opportunity, profile, estimate, owner);
-  const recipient = estimate.owner_email || owner.email;
+  const subject = `Validation Required - ${profile.airport_name} - ${scope.product_name} Sizing`;
+  const body = buildNotificationBody(opportunity, profile, scope, estimates, request.owner_name);
+  const teamsTitle = `Sizing validation - ${scope.product_name} - ${profile.airport_name}`;
+  const teamsBody = buildTeamsNotificationBody(opportunity, profile, scope, estimates, request.owner_name, request.due_date);
   if (!notification) {
     notification = {
       id: `notif-${request.id}`,
       validation_request_id: request.id,
-      recipient,
+      recipient: request.owner_email,
       subject,
       body,
-      teams_title: `Validation required - ${estimate.product_name} ${estimate.workstream}`,
-      teams_body: buildTeamsNotificationBody(opportunity, profile, estimate, owner, request.due_date),
+      teams_title: teamsTitle,
+      teams_body: teamsBody,
       status: "Draft",
-      created_date: "2026-06-17",
+      created_date: referenceToday(),
       sent_date: "",
       channel_states: {},
       activity: [],
     };
     mockDb.notifications.push(notification);
   } else {
-    notification.recipient = recipient;
+    notification.recipient = request.owner_email;
     notification.subject = subject;
     notification.body = body;
-    notification.teams_title = `Validation required - ${estimate.product_name} ${estimate.workstream}`;
-    notification.teams_body = buildTeamsNotificationBody(opportunity, profile, estimate, owner, request.due_date);
+    notification.teams_title = teamsTitle;
+    notification.teams_body = teamsBody;
   }
 
   notificationChannelState(notification, "Email");
@@ -422,9 +498,11 @@ function generateSizingForOpportunity(opportunityId, options = {}) {
   const category = classifyAirport(profile);
   const scopes = productScopesFor(opportunityId);
   const activeEstimateIds = [];
+  const activeProducts = [];
 
   scopes.forEach((scope) => {
     ensureScopeSizingInputs(scope, category);
+    const productEstimates = [];
     const workstreams = Object.keys(productWorkstreamBase[scope.product_name] || {});
     workstreams.forEach((workstream) => {
       const rule = mockDb.sizingRules.find(
@@ -515,15 +593,20 @@ function generateSizingForOpportunity(opportunityId, options = {}) {
 
       applyEstimateInitialMd(estimate);
 
-      upsertValidationWorkflow(opportunity, profile, estimate, owner);
+      productEstimates.push(estimate);
     });
+
+    if (productEstimates.length) {
+      activeProducts.push(scope.product_name);
+      upsertValidationWorkflow(opportunity, profile, scope, productEstimates);
+    }
   });
 
   mockDb.sizingEstimates = mockDb.sizingEstimates.filter(
     (item) => item.opportunity_id !== opportunityId || activeEstimateIds.includes(item.id),
   );
   mockDb.validationRequests = mockDb.validationRequests.filter(
-    (item) => item.opportunity_id !== opportunityId || activeEstimateIds.includes(item.sizing_estimate_id),
+    (item) => item.opportunity_id !== opportunityId || activeProducts.includes(item.product_name),
   );
   mockDb.notifications = mockDb.notifications.filter((item) =>
     mockDb.validationRequests.some((request) => request.id === item.validation_request_id),
@@ -558,7 +641,9 @@ function applySeedValidationState() {
     if (!estimate) return;
     estimate.status = "Overdue";
     estimate.final_validated_md = "";
-    const request = mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id);
+    const request = mockDb.validationRequests.find(
+      (item) => item.opportunity_id === update.opportunity && item.product_name === update.product,
+    );
     if (request) {
       request.status = "Overdue";
       request.due_date = update.dueDate;
@@ -612,7 +697,9 @@ function buildSizingCsv(opportunity) {
     "Validation due date",
   ];
   const rows = sizingEstimatesFor(opportunity.id).map((estimate) => {
-    const request = mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id);
+    const request = mockDb.validationRequests.find(
+      (item) => item.opportunity_id === estimate.opportunity_id && item.product_name === estimate.product_name,
+    );
     return [
       opportunity.name,
       opportunity.customer,
@@ -625,8 +712,8 @@ function buildSizingCsv(opportunity) {
       estimate.adjusted_md || "",
       finalMdForEstimate(estimate) || "",
       estimate.status,
-      ownerName(estimate.owner_id),
-      estimate.owner_email || ownerEmail(estimate.owner_id),
+      request?.owner_name || "",
+      request?.owner_email || estimate.owner_email || "",
       request?.due_date || "",
     ];
   });
@@ -648,9 +735,8 @@ function dashboardTotalsForOpportunity(opportunityId) {
 export {
   confidenceFor,
   resolveResourceOwner,
-  ownerName,
-  ownerEmail,
   requestContextFor,
+  worstStatus,
   validationRequestContexts,
   defaultValidationRequestId,
   nextActionableRequestId,
@@ -674,8 +760,8 @@ export {
   buildTeamsNotificationBody,
   notificationChannelState,
   formatNotificationTimestamp,
-  triggerMockNotification,
-  runMockNotificationTrigger,
+  triggerNotification,
+  runNotificationTrigger,
   upsertValidationWorkflow,
   generateSizingForOpportunity,
   initializeSizingEngine,
