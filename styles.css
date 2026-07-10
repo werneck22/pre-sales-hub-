@@ -1,38 +1,47 @@
 :root {
-  --bg: #eef1f6;
-  --bg-deep: #e2e7f2;
+  /* Amadeus brand tokens — see .claude/skills/amadeus/SKILL.md */
+  --bg: #eef2fb;
+  --bg-deep: #e2e9f7;
   --surface: #ffffff;
-  --surface-alt: #eef2fc;
-  --surface-subtle: #f6f8fc;
-  --ink: #10192e;
-  --muted: #57647c;
-  --line: #dde3f0;
-  --line-strong: #c3cce0;
-  --nav: #0f1b33;
-  --nav-2: #172a4d;
-  --nav-3: #0a1224;
-  --nav-ink: #eef2fb;
-  --teal: #2955d8;
-  --teal-dark: #1c3fae;
-  --teal-bright: #5b82ef;
-  --teal-soft: #93acf2;
-  --green: #1f7a47;
-  --amber: #9c5a12;
-  --red: #ad3a35;
-  --blue: #3a63c7;
-  --blue-line: #c9d9f7;
-  --status-neutral-bg: #eef1f6;
-  --status-neutral-border: #d7dfef;
-  --status-success-bg: #edf7f0;
-  --status-success-border: #bad9c4;
-  --status-warning-bg: #fff7e8;
-  --status-warning-border: #ead2a9;
-  --status-danger-bg: #fff1f0;
-  --status-danger-border: #e8bfbc;
-  --shadow: 0 1px 1px rgba(16, 25, 46, 0.04), 0 4px 12px rgba(16, 25, 46, 0.05),
-    0 12px 28px -14px rgba(20, 40, 90, 0.12);
-  --shadow-raised: 0 2px 4px rgba(16, 25, 46, 0.06), 0 18px 38px -16px rgba(20, 40, 90, 0.22);
-  --shadow-teal: 0 8px 22px -10px rgba(41, 85, 216, 0.4);
+  --surface-alt: #e9f0fc;
+  --surface-subtle: #f4f8ff;
+  --ink: #000835;
+  --muted: #55627e;
+  --line: #dee6ef;
+  --line-strong: #c5d0e6;
+  --nav: #000835;
+  --nav-2: #0a1748;
+  --nav-3: #00051f;
+  --nav-ink: #eaf0fd;
+  --teal: #003b8f;
+  --teal-dark: #002a66;
+  --teal-bright: #3a8bff;
+  --teal-soft: #c5d5f9;
+  --brand: #003b8f;
+  --brand-bright: #3a8bff;
+  --purple: #59008f;
+  --purple-bright: #b650ff;
+  --purple-soft: #be8dff;
+  --green: #1f7a52;
+  --green-dark: #023a00;
+  --amber: #7a5c12;
+  --red: #b3241f;
+  --blue: #3a8bff;
+  --blue-line: #c5d5f9;
+  --status-neutral-bg: #eef2fb;
+  --status-neutral-border: #dee6ef;
+  --status-success-bg: #e6f6e8;
+  --status-success-border: #bde3c3;
+  --status-warning-bg: #fff7d6;
+  --status-warning-border: #ecd9a0;
+  --status-warning-strong: #7a5c12;
+  --status-warning-soft: #fff7d6;
+  --status-danger-bg: #ffe7e6;
+  --status-danger-border: #f2c4c1;
+  --shadow: 0 1px 1px rgba(0, 8, 53, 0.04), 0 4px 12px rgba(0, 8, 53, 0.05),
+    0 12px 28px -14px rgba(0, 59, 143, 0.12);
+  --shadow-raised: 0 2px 4px rgba(0, 8, 53, 0.06), 0 18px 38px -16px rgba(0, 59, 143, 0.22);
+  --shadow-teal: 0 8px 22px -10px rgba(0, 59, 143, 0.4);
   --radius-sm: 7px;
   --radius-md: 11px;
   --radius-lg: 16px;
@@ -48,8 +57,10 @@
   --font-lg: 1rem;
   --font-xl: 1.25rem;
   --font-2xl: 1.6rem;
-  --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system,
+  --font-sans: "Inter Tight", ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Amadeus Neue", "Inter Tight", ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color-scheme: light;
   font-family: var(--font-sans);
 }
@@ -78,6 +89,21 @@ h5,
 h6,
 p {
   letter-spacing: 0;
+}
+
+/* Amadeus Neue (falls back to Inter Tight) for display-level type. */
+h1,
+h2,
+h3,
+h4,
+.brand-block h1,
+.record-name,
+#pageTitle,
+.detail-head h4,
+.dashboard-card span,
+.metric-value,
+.overall-readiness-card span {
+  font-family: var(--font-display);
 }
 
 button,
@@ -193,7 +219,7 @@ button {
 }
 
 .nav-link.active {
-  border-left-color: #72c6b7;
+  border-left-color: #3a8bff;
   background: rgba(255, 255, 255, 0.14);
 }
 
@@ -1464,7 +1490,7 @@ select {
   gap: 12px;
   align-items: center;
   padding: 12px;
-  border: 1px solid #c2d3f2;
+  border: 1px solid #c5d5f9;
   border-radius: 8px;
   background: #f6f9fd;
 }
@@ -1518,8 +1544,8 @@ select {
   gap: 12px 18px;
   align-items: center;
   padding: 12px 12px 10px;
-  border-top: 1px solid #c2d3f2;
-  border-bottom: 1px solid #c2d3f2;
+  border-top: 1px solid #c5d5f9;
+  border-bottom: 1px solid #c5d5f9;
   background: #f2f5fc;
 }
 
@@ -1776,7 +1802,7 @@ select {
 }
 
 .product-card.included {
-  border-color: #c2d3f2;
+  border-color: #c5d5f9;
   background: #f8fcfb;
 }
 
@@ -1786,7 +1812,7 @@ select {
 }
 
 .selected-request-summary {
-  border-color: #c9d9f7;
+  border-color: #c5d5f9;
   border-radius: var(--radius-sm);
   background: #f4f7fc;
 }
@@ -2029,7 +2055,7 @@ body[data-active-route="validation"] #sizing .sizing-layout {
   }
 
   .section-nav .nav-link.active {
-    border-bottom-color: #72c6b7;
+    border-bottom-color: #3a8bff;
   }
 }
 
@@ -4526,7 +4552,7 @@ tbody th {
 .executive-action-card:hover,
 .opportunity-card:hover,
 .opportunity-card.selected {
-  border-color: #a9cfc9;
+  border-color: #9fc0f0;
   background: #f2f5fc;
 }
 
@@ -4547,7 +4573,7 @@ tbody th {
 }
 
 .journey-panel.demo-mode {
-  border-color: #a9cfc9;
+  border-color: #9fc0f0;
   background: #fbfdfd;
   box-shadow: inset 3px 0 0 var(--teal);
 }
@@ -4570,11 +4596,11 @@ tbody th {
 }
 
 .presenter-notes {
-  border: 1px solid #c9d9f7;
+  border: 1px solid #c5d5f9;
 }
 
 .next-action-panel {
-  border-color: #c9d9f7;
+  border-color: #c5d5f9;
 }
 
 .stage-mini,
@@ -5265,7 +5291,7 @@ tbody th {
 }
 
 .owner-package:hover {
-  border-color: #a9cfc9;
+  border-color: #9fc0f0;
   background: #f2f5fc;
 }
 
@@ -5896,7 +5922,7 @@ tbody th {
 }
 
 .selected-request-summary {
-  border-color: #c9d9f7;
+  border-color: #c5d5f9;
   border-radius: var(--radius-sm);
   background: #f4f7fc;
 }
@@ -6619,7 +6645,7 @@ textarea:focus-visible {
 }
 
 .queue-line-row.selected td {
-  background: #eaf1fc;
+  background: #e9f0fc;
 }
 
 .queue-line-row.selected td:first-child {
@@ -6830,7 +6856,7 @@ textarea:focus-visible {
 
 .validation-line.selected {
   border-left-color: var(--teal-dark);
-  background: #eaf1fc;
+  background: #e9f0fc;
 }
 
 .vl-activity {
@@ -7372,7 +7398,7 @@ textarea:focus-visible {
   flex: 0 0 auto;
   padding: 4px 10px;
   border-radius: 999px;
-  background: var(--teal, #2955d8);
+  background: var(--teal, #003b8f);
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -7475,7 +7501,7 @@ textarea:focus-visible {
 }
 
 .scope-add-toggle:hover {
-  border-color: #c2d3f2;
+  border-color: #c5d5f9;
   background: #f8fcfb;
 }
 
@@ -7531,7 +7557,7 @@ textarea:focus-visible {
 .estimate-status-link {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--teal, #2955d8);
+  color: var(--teal, #003b8f);
   text-decoration: none;
 }
 
@@ -7560,7 +7586,7 @@ textarea:focus-visible {
   gap: 14px;
   padding: 16px 18px;
   border: 1px solid var(--line);
-  border-left: 4px solid #2955d8;
+  border-left: 4px solid #003b8f;
   border-radius: 10px;
   background: linear-gradient(180deg, rgba(41, 85, 216, 0.05), rgba(41, 85, 216, 0.01));
 }
@@ -7781,7 +7807,7 @@ textarea:focus-visible {
 
 .intake-airport-summary.loaded {
   border-style: solid;
-  border-color: #c2d3f2;
+  border-color: #c5d5f9;
   background: #f8fcfb;
   color: var(--ink);
   font-weight: 600;
@@ -7806,7 +7832,7 @@ textarea:focus-visible {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--brand, #2f5fd0);
+  color: var(--brand, #3a8bff);
   font-size: 0.72rem;
   font-weight: 700;
   text-decoration: none;
