@@ -10,16 +10,18 @@ import {
   defaultClassificationRules,
   isDocumented,
   makeGovernanceItems,
+  buildSizingOwners,
   makeValidation,
   productScope,
   risk,
-} from "./data.js?v=20260710-25";
+  sizingOwnerKey,
+} from "./data.js?v=20260710-26";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260710-25";
+} from "./readiness-rules.js?v=20260710-26";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260710-25";
+} from "./render.js?v=20260710-26";
 
 let mockDb = {
   opportunities: [
@@ -241,6 +243,7 @@ let mockDb = {
   sizingRules: buildDefaultSizingRules(),
   sizingEstimates: [],
   resourceOwners: buildResourceOwners(),
+  sizingOwners: buildSizingOwners(),
   validationRequests: [],
   notifications: [],
 };
@@ -270,6 +273,14 @@ function migrateMockDb(db) {
   db.classificationRules = defaultClassificationRules();
   db.sizingRules = buildDefaultSizingRules();
   db.resourceOwners = buildResourceOwners();
+  // Merge the global owner registry: keep any owner names/emails the user
+  // registered, add rows for new product+workstream scopes from this build.
+  const seededOwners = buildSizingOwners();
+  const existingOwners = new Map((Array.isArray(db.sizingOwners) ? db.sizingOwners : []).map((owner) => [owner.key, owner]));
+  db.sizingOwners = seededOwners.map((seed) => {
+    const saved = existingOwners.get(seed.key);
+    return saved ? { ...seed, owner_name: saved.owner_name || seed.owner_name, owner_email: saved.owner_email || seed.owner_email } : seed;
+  });
   [
     "opportunities",
     "productScopes",
@@ -306,13 +317,12 @@ function migrateMockDb(db) {
       (item) => !removedOpportunityIds.has(item.opportunity_id) && !removedOpportunityIds.has(item.opportunityId),
     );
   });
-  // Validation moved from one request per product/workstream line to one
-  // request per product. Old-format requests (keyed by sizing_estimate_id) and
-  // their notifications are dropped; the product-level workflow is regenerated
-  // from the persisted estimates on load, so owner decisions on the estimates
-  // are preserved.
-  if (db.validationRequests.some((request) => request.sizing_estimate_id)) {
-    db.validationRequests = db.validationRequests.filter((request) => !request.sizing_estimate_id);
+  // Validation is one request per activity line (product + workstream), keyed
+  // by sizing_estimate_id. Drop any product-level requests from the interim
+  // build (no sizing_estimate_id); the per-line workflow is regenerated from
+  // the persisted estimates on load, preserving owner decisions on the lines.
+  if (db.validationRequests.some((request) => !request.sizing_estimate_id)) {
+    db.validationRequests = db.validationRequests.filter((request) => request.sizing_estimate_id);
     db.notifications = db.notifications.filter((item) =>
       db.validationRequests.some((request) => request.id === item.validation_request_id),
     );
@@ -390,6 +400,9 @@ let selectedNotificationChannel = "Email";
 // Sub-tab on the Resource Validation screen: product owner validation vs the
 // internal function sign-off matrix (formerly the Stakeholders screen).
 let validationTab = "owners";
+// Owner registry tab: false = only products in the selected opportunity's
+// scope; true = the full catalogue.
+let registryShowAll = false;
 let activeRoute = "dashboard";
 const elements = {
   dashboard: document.querySelector("#dashboard"),
@@ -445,6 +458,8 @@ const elements = {
   notificationPreview: document.querySelector("#notificationPreview"),
   validationTabs: document.querySelector("#validationTabs"),
   validationOwnersPanel: document.querySelector("#validationOwnersPanel"),
+  ownerRegistryPanel: document.querySelector("#ownerRegistryPanel"),
+  ownerRegistryTable: document.querySelector("#ownerRegistryTable"),
   functionSignoffPanel: document.querySelector("#functionSignoffPanel"),
   governanceChecklist: document.querySelector("#governanceChecklist"),
   readinessBreakdown: document.querySelector("#readinessBreakdown"),
@@ -728,6 +743,7 @@ export {
   expandedEstimateProducts,
   selectedNotificationChannel,
   validationTab,
+  registryShowAll,
   activeRoute,
   elements,
   selectedOpportunity,
@@ -762,6 +778,7 @@ export {
   setEstimateExpansionOpportunityId,
   setSelectedNotificationChannel,
   setValidationTab,
+  setRegistryShowAll,
   setActiveRoute,
 };
 
@@ -793,7 +810,10 @@ function setSelectedNotificationChannel(value) {
   selectedNotificationChannel = value;
 }
 function setValidationTab(value) {
-  validationTab = value === "signoff" ? "signoff" : "owners";
+  validationTab = ["signoff", "registry"].includes(value) ? value : "owners";
+}
+function setRegistryShowAll(value) {
+  registryShowAll = Boolean(value);
 }
 function setActiveRoute(value) {
   activeRoute = value;

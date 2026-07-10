@@ -12,9 +12,10 @@ import {
   productWorkstreamBase,
   riskMultipliers,
   sizingDriverFactor,
+  sizingOwnerKey,
   sizingRuleCode,
   slug,
-} from "./data.js?v=20260710-25";
+} from "./data.js?v=20260710-26";
 import {
   airportProfileFor,
   classifyAirport,
@@ -28,31 +29,16 @@ import {
   setSelectedValidationRequestId,
   showToast,
   sizingEstimatesFor,
-} from "./state.js?v=20260710-25";
+} from "./state.js?v=20260710-26";
 import {
   renderNotificationPreview,
   renderValidationRequests,
-} from "./render.js?v=20260710-25";
+} from "./render.js?v=20260710-26";
 
 function confidenceFor(opportunity, scope) {
   if (opportunity.complexity === "Very High" || scope.risk_level === "High") return "Medium";
   if (opportunity.complexity === "High") return "Medium";
   return "High";
-}
-
-function resolveResourceOwner(productName, workstream, region) {
-  return (
-    mockDb.resourceOwners.find(
-      (owner) =>
-        owner.active &&
-        owner.product_scope === productName &&
-        owner.workstream === workstream &&
-        (owner.region === region || owner.region === "Global"),
-    ) ||
-    mockDb.resourceOwners.find((owner) => owner.active && owner.product_scope === "Any" && owner.workstream === workstream) ||
-    mockDb.resourceOwners.find((owner) => owner.active && owner.workstream === workstream) ||
-    mockDb.resourceOwners[0]
-  );
 }
 
 const TECHNICAL_WORKSTREAMS = [
@@ -67,59 +53,32 @@ const TECHNICAL_WORKSTREAMS = [
   "Agent Portal",
 ];
 
-// Default owner contact for a product: the scope's own owner fields win;
-// the reference registry is only a fallback so a new product is never
-// contact-less.
-function defaultOwnerContact(scope, region) {
-  const fallback =
-    mockDb.resourceOwners.find(
-      (owner) => owner.active && owner.product_scope === scope.product_name && (owner.region === region || owner.region === "Global"),
-    ) || mockDb.resourceOwners.find((owner) => owner.active && owner.product_scope === scope.product_name);
-  const name = isDocumented(scope.owner) && !/^product owner$/i.test(scope.owner.trim()) ? scope.owner.trim() : fallback?.name || "Product owner";
-  const email = (scope.owner_email || "").trim() || fallback?.email || "";
-  return { name, email };
-}
-
-// Worst-first status across a product's sizing lines, used to derive the
-// product-level request status when lines are edited individually.
-const STATUS_SEVERITY = [
-  "Rejected",
-  "Overdue",
-  "Needs Adjustment",
-  "More Information Requested",
-  "Pending Validation",
-  "Not Started",
-  "Approved with Conditions",
-  "Approved",
-];
-
-function worstStatus(estimates) {
-  const statuses = estimates.map((estimate) => estimate.status || "Pending Validation");
-  return STATUS_SEVERITY.find((status) => statuses.includes(status)) || "Pending Validation";
+// Owner contact for one activity scope, read from the global owner registry
+// (the reusable "cadastro"). Every product+workstream sizing line has its own
+// owner there; a missing row is a safe blank so nothing crashes.
+function registryOwner(productName, workstream) {
+  const entry = (mockDb.sizingOwners || []).find((owner) => owner.key === sizingOwnerKey(productName, workstream));
+  return { name: entry?.owner_name || `${workstream} owner`, email: entry?.owner_email || "" };
 }
 
 function requestContextFor(request, opportunityOverride = null) {
-  const estimates = mockDb.sizingEstimates.filter(
-    (item) => item.opportunity_id === request.opportunity_id && item.product_name === request.product_name,
+  const estimate = mockDb.sizingEstimates.find(
+    (item) => item.opportunity_id === request.opportunity_id && item.product_name === request.product_name && item.workstream === request.workstream,
   );
-  if (!estimates.length) return null;
+  if (!estimate) return null;
   const opportunity = opportunityOverride || mockDb.opportunities.find((item) => item.id === request.opportunity_id);
   if (!opportunity) return null;
-  const scope = mockDb.productScopes.find(
-    (item) => item.opportunity_id === request.opportunity_id && item.product_name === request.product_name,
-  );
   const dueIn = daysUntil(request.due_date);
   const effectiveStatus = effectiveRequestStatus(request, dueIn);
   return {
     opportunity,
     request,
-    scope,
-    estimates,
-    totalMd: estimates.reduce((sum, estimate) => sum + Number(estimate.initial_md || 0), 0),
-    currentMd: estimates.reduce((sum, estimate) => sum + dashboardMdForEstimate(estimate), 0),
-    owner: { name: request.owner_name || "Product owner", email: request.owner_email || "" },
-    hasTechnical: estimates.some((estimate) => TECHNICAL_WORKSTREAMS.includes(estimate.workstream)),
-    hasHighRisk: estimates.some((estimate) => estimate.risk_level === "High"),
+    estimate,
+    md: Number(estimate.initial_md || 0),
+    currentMd: dashboardMdForEstimate(estimate),
+    owner: { name: request.owner_name || "Owner not registered", email: request.owner_email || "" },
+    hasTechnical: TECHNICAL_WORKSTREAMS.includes(estimate.workstream),
+    hasHighRisk: estimate.risk_level === "High",
     dueIn,
     effectiveStatus,
   };
@@ -199,7 +158,7 @@ function requestPriorityScore(context) {
   const dueScore = context.dueIn < 0 ? Math.min(30, Math.abs(context.dueIn) * 4) : context.dueIn <= 7 ? 12 : context.dueIn <= 14 ? 6 : 0;
   const riskScore = context.hasHighRisk ? 6 : 0;
   const technicalScore = context.hasTechnical ? 8 : 3;
-  const mdScore = Math.min(12, Math.round(Number(context.totalMd || 0) / 25));
+  const mdScore = Math.min(12, Math.round(Number(context.md || 0) / 10));
   return statusScore + dueScore + riskScore + technicalScore + mdScore;
 }
 
@@ -222,8 +181,8 @@ function estimateId(opportunityId, productName, workstream) {
   return `se-${opportunityId}-${slug(productName)}-${slug(workstream)}`;
 }
 
-function requestId(opportunityId, productName) {
-  return `vr-${opportunityId}-${slug(productName)}`;
+function requestId(estimateIdValue) {
+  return `vr-${estimateIdValue.replace(/^se-/, "")}`;
 }
 
 function finalMdForEstimate(estimate) {
@@ -271,49 +230,43 @@ function estimateWhyText(estimate) {
   return `${estimate.product_name} ${estimate.workstream} was estimated at ${estimate.initial_md} MD because the airport is ${estimate.airport_category}, ${driverText}, opportunity complexity is ${estimate.complexity}, product risk is ${estimate.risk_level || "Medium"}, and mock rule ${appliedRule} was applied.${source}`;
 }
 
-function buildNotificationBody(opportunity, profile, scope, estimates, ownerNameValue) {
-  const total = estimates.reduce((sum, estimate) => sum + Number(estimate.initial_md || 0), 0);
-  const lines = estimates.map((estimate) => `- ${estimate.workstream}: ${estimate.initial_md} MD`).join("\n");
-  const category = estimates[0]?.airport_category || profile.airport_category || "";
-  const drivers = estimates.find((estimate) => isDocumented(estimate.sizing_driver_summary))?.sizing_driver_summary || "No product-specific drivers configured";
+function buildNotificationBody(opportunity, profile, estimate, ownerNameValue) {
   return `Hi ${ownerNameValue},
 
-Your validation is required for the ${scope.product_name} sizing baseline of the ${opportunity.name} opportunity.
+Your validation is required for one activity of the ${opportunity.name} opportunity.
 
-Airport: ${profile.airport_name} (${category})
+Product: ${estimate.product_name}
+Activity: ${estimate.workstream}
+Initial estimated effort: ${estimate.initial_md} MD
+Airport: ${profile.airport_name} (${estimate.airport_category})
 Annual passengers: ${formatNumber(profile.annual_passengers)}
 Annual movements: ${formatNumber(profile.annual_movements)}
 Submission deadline: ${opportunity.submission_deadline}
 Implementation start: ${opportunity.implementation_start || "To be confirmed"}
 Target go-live: ${opportunity.go_live_date || "To be confirmed"}
 
-${scope.product_name} estimated effort:
-${lines}
-Total initial effort: ${total} MD
+Sizing drivers: ${estimate.sizing_driver_summary || "No product-specific drivers configured"}
+Assumptions: ${estimate.assumptions_used}
 
-Sizing drivers: ${drivers}
-
-Please confirm whether this baseline is acceptable, requires adjustment, or needs escalation.
+Please confirm whether this estimate is acceptable, requires adjustment, or needs escalation.
 
 Regards,
 Pre-Sales Readiness Hub`;
 }
 
-function buildTeamsNotificationBody(opportunity, profile, scope, estimates, ownerNameValue, dueDate) {
-  const total = estimates.reduce((sum, estimate) => sum + Number(estimate.initial_md || 0), 0);
+function buildTeamsNotificationBody(opportunity, profile, estimate, ownerNameValue, dueDate) {
   return `Validation required
 
-${ownerNameValue}, your review is required for the ${scope.product_name} sizing baseline.
+${ownerNameValue}, your review is required for the ${estimate.product_name} - ${estimate.workstream} sizing estimate.
 
 Opportunity: ${opportunity.name}
-Airport: ${profile.airport_name}
-Product: ${scope.product_name} (${estimates.length} activities)
-Total initial estimate: ${total} MD
+Airport: ${profile.airport_name} (${estimate.airport_category})
+Initial estimate: ${estimate.initial_md} MD
 Validation due: ${dueDate}
 Implementation start: ${opportunity.implementation_start || "To be confirmed"}
 Target go-live: ${opportunity.go_live_date || "To be confirmed"}
 
-Review the activity breakdown, approve the baseline, adjust the MD, or request more information.`;
+Approve the estimate, adjust the MD, or request more information.`;
 }
 
 function notificationChannelState(notification, channel) {
@@ -423,21 +376,24 @@ function validationDueDate(opportunity) {
   return target < floor ? floor : target;
 }
 
-// One validation request per product in scope: the product owner receives a
-// single package covering every activity line, with an editable contact.
-function upsertValidationWorkflow(opportunity, profile, scope, estimates) {
-  const requestKey = requestId(opportunity.id, scope.product_name);
-  const contact = defaultOwnerContact(scope, opportunity.region);
+// One validation request per activity (product + workstream). The owner is a
+// snapshot of the global registry when the line is first created; editing it
+// later on the validation screen overrides it for this opportunity only.
+function upsertValidationWorkflow(opportunity, profile, estimate) {
+  const requestKey = requestId(estimate.id);
+  const owner = registryOwner(estimate.product_name, estimate.workstream);
   let request = mockDb.validationRequests.find((item) => item.id === requestKey);
   if (!request) {
     request = {
       id: requestKey,
       opportunity_id: opportunity.id,
-      product_name: scope.product_name,
-      owner_name: contact.name,
-      owner_email: contact.email,
+      product_name: estimate.product_name,
+      workstream: estimate.workstream,
+      sizing_estimate_id: estimate.id,
+      owner_name: owner.name,
+      owner_email: owner.email,
       request_type: "Sizing Validation",
-      status: worstStatus(estimates),
+      status: estimate.status,
       due_date: validationDueDate(opportunity),
       sent_date: "",
       response_date: "",
@@ -447,16 +403,18 @@ function upsertValidationWorkflow(opportunity, profile, scope, estimates) {
     };
     mockDb.validationRequests.push(request);
   } else {
-    request.owner_name = request.owner_name || contact.name;
-    request.owner_email = request.owner_email || contact.email;
-    request.status = worstStatus(estimates);
+    if (!isDocumented(request.owner_name)) request.owner_name = owner.name;
+    if (!isDocumented(request.owner_email)) request.owner_email = owner.email;
+    request.workstream = estimate.workstream;
+    request.sizing_estimate_id = estimate.id;
+    request.status = estimate.status;
   }
 
   let notification = notificationForRequest(request.id);
-  const subject = `Validation Required - ${profile.airport_name} - ${scope.product_name} Sizing`;
-  const body = buildNotificationBody(opportunity, profile, scope, estimates, request.owner_name);
-  const teamsTitle = `Sizing validation - ${scope.product_name} - ${profile.airport_name}`;
-  const teamsBody = buildTeamsNotificationBody(opportunity, profile, scope, estimates, request.owner_name, request.due_date);
+  const subject = `Validation Required - ${profile.airport_name} - ${estimate.product_name} ${estimate.workstream}`;
+  const body = buildNotificationBody(opportunity, profile, estimate, request.owner_name);
+  const teamsTitle = `Sizing validation - ${estimate.product_name} ${estimate.workstream} - ${profile.airport_name}`;
+  const teamsBody = buildTeamsNotificationBody(opportunity, profile, estimate, request.owner_name, request.due_date);
   if (!notification) {
     notification = {
       id: `notif-${request.id}`,
@@ -498,11 +456,9 @@ function generateSizingForOpportunity(opportunityId, options = {}) {
   const category = classifyAirport(profile);
   const scopes = productScopesFor(opportunityId);
   const activeEstimateIds = [];
-  const activeProducts = [];
 
   scopes.forEach((scope) => {
     ensureScopeSizingInputs(scope, category);
-    const productEstimates = [];
     const workstreams = Object.keys(productWorkstreamBase[scope.product_name] || {});
     workstreams.forEach((workstream) => {
       const rule = mockDb.sizingRules.find(
@@ -516,10 +472,8 @@ function generateSizingForOpportunity(opportunityId, options = {}) {
 
       const id = estimateId(opportunityId, scope.product_name, workstream);
       activeEstimateIds.push(id);
-      const owner = resolveResourceOwner(scope.product_name, workstream, opportunity.region);
       const driverFactor = sizingDriverFactor(scope, category);
       const driversUsed = driverSummary(scope, category);
-      const resolvedOwnerEmail = scope.owner_email || owner.email;
       const complexityMultiplier = complexityMultipliers[opportunity.complexity] || 1;
       const riskMultiplier = riskMultipliers[scope.risk_level] || 1;
       const mockAdjustmentFactor = Number((complexityMultiplier * riskMultiplier * driverFactor).toFixed(3));
@@ -565,8 +519,6 @@ function generateSizingForOpportunity(opportunityId, options = {}) {
           sizing_driver_factor: driverFactor,
           confidence_level: confidenceFor(opportunity, scope),
           status: "Pending Validation",
-          owner_id: owner.id,
-          owner_email: resolvedOwnerEmail,
         };
         mockDb.sizingEstimates = mockDb.sizingEstimates.filter((item) => item.id !== id);
         mockDb.sizingEstimates.push(estimate);
@@ -587,26 +539,19 @@ function generateSizingForOpportunity(opportunityId, options = {}) {
         estimate.sizing_driver_summary = driversUsed;
         estimate.sizing_driver_factor = driverFactor;
         estimate.confidence_level = confidenceFor(opportunity, scope);
-        estimate.owner_id = owner.id;
-        estimate.owner_email = estimate.owner_email || resolvedOwnerEmail;
       }
 
       applyEstimateInitialMd(estimate);
 
-      productEstimates.push(estimate);
+      upsertValidationWorkflow(opportunity, profile, estimate);
     });
-
-    if (productEstimates.length) {
-      activeProducts.push(scope.product_name);
-      upsertValidationWorkflow(opportunity, profile, scope, productEstimates);
-    }
   });
 
   mockDb.sizingEstimates = mockDb.sizingEstimates.filter(
     (item) => item.opportunity_id !== opportunityId || activeEstimateIds.includes(item.id),
   );
   mockDb.validationRequests = mockDb.validationRequests.filter(
-    (item) => item.opportunity_id !== opportunityId || activeProducts.includes(item.product_name),
+    (item) => item.opportunity_id !== opportunityId || activeEstimateIds.includes(item.sizing_estimate_id),
   );
   mockDb.notifications = mockDb.notifications.filter((item) =>
     mockDb.validationRequests.some((request) => request.id === item.validation_request_id),
@@ -641,9 +586,7 @@ function applySeedValidationState() {
     if (!estimate) return;
     estimate.status = "Overdue";
     estimate.final_validated_md = "";
-    const request = mockDb.validationRequests.find(
-      (item) => item.opportunity_id === update.opportunity && item.product_name === update.product,
-    );
+    const request = mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id);
     if (request) {
       request.status = "Overdue";
       request.due_date = update.dueDate;
@@ -697,9 +640,7 @@ function buildSizingCsv(opportunity) {
     "Validation due date",
   ];
   const rows = sizingEstimatesFor(opportunity.id).map((estimate) => {
-    const request = mockDb.validationRequests.find(
-      (item) => item.opportunity_id === estimate.opportunity_id && item.product_name === estimate.product_name,
-    );
+    const request = mockDb.validationRequests.find((item) => item.sizing_estimate_id === estimate.id);
     return [
       opportunity.name,
       opportunity.customer,
@@ -713,7 +654,7 @@ function buildSizingCsv(opportunity) {
       finalMdForEstimate(estimate) || "",
       estimate.status,
       request?.owner_name || "",
-      request?.owner_email || estimate.owner_email || "",
+      request?.owner_email || "",
       request?.due_date || "",
     ];
   });
@@ -734,9 +675,8 @@ function dashboardTotalsForOpportunity(opportunityId) {
 
 export {
   confidenceFor,
-  resolveResourceOwner,
+  registryOwner,
   requestContextFor,
-  worstStatus,
   validationRequestContexts,
   defaultValidationRequestId,
   nextActionableRequestId,
