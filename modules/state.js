@@ -14,13 +14,13 @@ import {
   makeValidation,
   productScope,
   risk,
-} from "./data.js?v=20260711-1";
+} from "./data.js?v=20260711-2";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-1";
+} from "./readiness-rules.js?v=20260711-2";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260711-1";
+} from "./render.js?v=20260711-2";
 
 let mockDb = {
   opportunities: [
@@ -434,12 +434,7 @@ const elements = {
   toastRegion: document.querySelector("#toastRegion"),
   executiveNextActions: document.querySelector("#executiveNextActions"),
   executiveAttentionList: document.querySelector("#executiveAttentionList"),
-  pendingValidationList: document.querySelector("#pendingValidationList"),
-  overdueValidationList: document.querySelector("#overdueValidationList"),
-  deadlineList: document.querySelector("#deadlineList"),
-  functionBottlenecks: document.querySelector("#functionBottlenecks"),
   topReadinessGaps: document.querySelector("#topReadinessGaps"),
-  forumReadinessBoard: document.querySelector("#forumReadinessBoard"),
   dashboardEmptyState: document.querySelector("#dashboardEmptyState"),
   opportunityList: document.querySelector("#opportunityList"),
   intakeForm: document.querySelector("#intakeForm"),
@@ -484,16 +479,15 @@ const elements = {
   readinessBadge: document.querySelector("#readinessBadge"),
   forumBadge: document.querySelector("#forumBadge"),
   metricPipeline: document.querySelector("#metricPipeline"),
+  metricPipelineValue: document.querySelector("#metricPipelineValue"),
+  metricAtRisk: document.querySelector("#metricAtRisk"),
   metricBlockers: document.querySelector("#metricBlockers"),
   metricReadiness: document.querySelector("#metricReadiness"),
-  metricGovernance: document.querySelector("#metricGovernance"),
   metricPendingSizing: document.querySelector("#metricPendingSizing"),
   metricOverdueValidations: document.querySelector("#metricOverdueValidations"),
   metricInitialMd: document.querySelector("#metricInitialMd"),
   metricValidatedMd: document.querySelector("#metricValidatedMd"),
   metricMdDelta: document.querySelector("#metricMdDelta"),
-  metricSrmSizingBlock: document.querySelector("#metricSrmSizingBlock"),
-  metricBabSizingBlock: document.querySelector("#metricBabSizingBlock"),
   bcmCount: document.querySelector("#bcmCount"),
   srmCount: document.querySelector("#srmCount"),
   babCount: document.querySelector("#babCount"),

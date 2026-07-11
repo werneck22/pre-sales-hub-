@@ -9,7 +9,6 @@ import {
   benchmarkSignal,
   benchmarksForCategory,
   currentForumStatus,
-  daysUntil,
   driverDetailsForScope,
   driversForProduct,
   ensureScopeSizingInputs,
@@ -27,7 +26,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260711-1";
+} from "./data.js?v=20260711-2";
 import {
   activeRoute,
   airportProfileFor,
@@ -60,7 +59,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260711-1";
+} from "./state.js?v=20260711-2";
 import {
   dashboardTotalsForOpportunity,
   defaultValidationRequestId,
@@ -69,19 +68,16 @@ import {
   formatFactor,
   formatNotificationTimestamp,
   notificationChannelState,
-  requestActionLabel,
   requestContextFor,
   requestGovernanceImpact,
   requestIsOverdue,
   requestNeedsOwnerAction,
-  requestPriorityLabel,
   requestPriorityScore,
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260711-1";
+} from "./sizing-engine.js?v=20260711-2";
 import {
-  forumReadinessDetail,
   forumReadinessLabel,
   forumReady,
   hasBlocker,
@@ -91,7 +87,7 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260711-1";
+} from "./readiness-rules.js?v=20260711-2";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -118,21 +114,11 @@ function hydrateHelpTooltips(root = document) {
 function renderExecutiveDashboard() {
   const visible = filteredOpportunities();
   const blockers = visible.filter(hasBlocker);
-  const ready = visible.filter(forumReady);
-  const readyForumStatuses = ["Ready", "Ready with Conditions"];
+  const atRisk = visible.filter((opportunity) => !forumReady(opportunity));
+  const pipelineValue = visible.reduce((sum, opportunity) => sum + Number(opportunity.estimated_value || 0), 0);
   const requestContexts = validationRequestContexts(visible);
   const pendingRequests = requestContexts.filter(requestNeedsOwnerAction);
   const overdueRequests = requestContexts.filter(requestIsOverdue);
-  const notReadyForSrm = visible.filter(
-    (opportunity) =>
-      !readyForumStatuses.includes(forumReadinessDetail(opportunity, "SRM").status) ||
-      !readyForumStatuses.includes(sizingReadinessImpact(opportunity, "SRM")),
-  );
-  const notReadyForBab = visible.filter(
-    (opportunity) =>
-      !readyForumStatuses.includes(forumReadinessDetail(opportunity, "BAB").status) ||
-      !readyForumStatuses.includes(sizingReadinessImpact(opportunity, "BAB")),
-  );
   const totals = visible.reduce(
     (summary, opportunity) => {
       const opportunityTotals = dashboardTotalsForOpportunity(opportunity.id);
@@ -147,9 +133,20 @@ function renderExecutiveDashboard() {
     : 0;
 
   if (elements.metricPipeline) elements.metricPipeline.textContent = visible.length;
+  if (elements.metricPipelineValue) {
+    const compactValue =
+      pipelineValue >= 1e9
+        ? `$${(pipelineValue / 1e9).toFixed(1)}B`
+        : pipelineValue >= 1e6
+          ? `$${(pipelineValue / 1e6).toFixed(1)}M`
+          : pipelineValue >= 1e3
+            ? `$${Math.round(pipelineValue / 1e3)}K`
+            : formatCurrency(pipelineValue);
+    elements.metricPipelineValue.textContent = compactValue;
+  }
+  if (elements.metricAtRisk) elements.metricAtRisk.textContent = atRisk.length;
   if (elements.metricBlockers) elements.metricBlockers.textContent = `${pluralize(blockers.length, "blocker")}`;
   if (elements.metricReadiness) elements.metricReadiness.textContent = `${averageReadiness}%`;
-  if (elements.metricGovernance) elements.metricGovernance.textContent = `${ready.length} current forum ready`;
   if (elements.metricPendingSizing) elements.metricPendingSizing.textContent = pendingRequests.length;
   if (elements.metricOverdueValidations) elements.metricOverdueValidations.textContent = overdueRequests.length;
   if (elements.metricInitialMd) elements.metricInitialMd.textContent = formatNumber(totals.initial);
@@ -158,8 +155,6 @@ function renderExecutiveDashboard() {
     const delta = totals.validated - totals.initial;
     elements.metricMdDelta.textContent = `${delta > 0 ? "+" : ""}${formatNumber(delta)}`;
   }
-  if (elements.metricSrmSizingBlock) elements.metricSrmSizingBlock.textContent = notReadyForSrm.length;
-  if (elements.metricBabSizingBlock) elements.metricBabSizingBlock.textContent = notReadyForBab.length;
   if (elements.bcmCount) elements.bcmCount.textContent = visible.filter((opportunity) => opportunity.current_governance_stage === "BCM").length;
   if (elements.srmCount) elements.srmCount.textContent = visible.filter((opportunity) => opportunity.current_governance_stage === "SRM").length;
   if (elements.babCount) elements.babCount.textContent = visible.filter((opportunity) => opportunity.current_governance_stage === "BAB").length;
@@ -175,164 +170,9 @@ function renderExecutiveDashboard() {
   }
 
   const emptyDashboard = (message) => `<div class="empty-state dashboard-empty-row">${escapeHtml(message)}</div>`;
-  const requestRow = (context) => {
-    const dueLabel = context.dueIn < 0 ? `${Math.abs(context.dueIn)}d overdue` : `Due in ${context.dueIn}d`;
-    const priority = requestPriorityLabel(requestPriorityScore(context));
-    return `
-      <button type="button" class="dashboard-row validation-row priority-${statusClass(priority)}" data-id="${escapeHtml(context.opportunity.id)}" data-request-id="${escapeHtml(
-        context.request.id,
-      )}">
-        <span class="dashboard-row-main">
-          <strong>${escapeHtml(context.opportunity.name)}</strong>
-          <small>${escapeHtml(context.request.product_name)} - ${escapeHtml(context.owner.name)} - ${escapeHtml(requestActionLabel(context))}</small>
-        </span>
-        <span class="dashboard-row-meta">
-          <span class="status-pill ${statusClass(context.effectiveStatus)}">${escapeHtml(context.effectiveStatus)}</span>
-          <span class="row-metric">${escapeHtml(priority)} - ${escapeHtml(requestGovernanceImpact(context))}</span>
-          <small class="row-date">${escapeHtml(formatShortDate(context.request.due_date))} - ${escapeHtml(dueLabel)}</small>
-        </span>
-      </button>`;
-  };
-
-  if (elements.pendingValidationList) {
-    // Overdue and pending share one list (overdue ranks highest by priority),
-    // so the dashboard shows a single owner-validation queue instead of two.
-    const ownerValidations = [
-      ...overdueRequests,
-      ...pendingRequests.filter((context) => context.effectiveStatus !== "Overdue"),
-    ]
-      .sort((a, b) => requestPriorityScore(b) - requestPriorityScore(a) || a.dueIn - b.dueIn)
-      .slice(0, 7);
-    elements.pendingValidationList.innerHTML =
-      ownerValidations.map(requestRow).join("") || emptyDashboard("No owner validations pending.");
-  }
-
-  if (elements.deadlineList) {
-    elements.deadlineList.innerHTML = visible
-      .slice()
-      .sort((a, b) => daysUntil(a.submission_deadline) - daysUntil(b.submission_deadline))
-      .slice(0, 5)
-      .map((opportunity) => {
-        const score = readiness(opportunity);
-        const deadlineIn = daysUntil(opportunity.submission_deadline);
-        return `
-          <button type="button" class="dashboard-row deadline-row" data-id="${escapeHtml(opportunity.id)}">
-            <span class="dashboard-row-main">
-              <strong>${escapeHtml(opportunity.customer)}</strong>
-              <small>${escapeHtml(opportunity.name)} - ${score}% ready</small>
-            </span>
-            <span class="row-date">${escapeHtml(formatShortDate(opportunity.submission_deadline))}</span>
-            <span class="row-metric">${deadlineIn}d</span>
-          </button>`;
-      })
-      .join("") || emptyDashboard("No upcoming submission deadlines.");
-  }
-
-  if (elements.functionBottlenecks) {
-    const bottlenecks = new Map();
-    const addBottleneck = (name, options = {}) => {
-      if (!name) return;
-      const row =
-        bottlenecks.get(name) || {
-          name,
-          count: 0,
-          overdue: 0,
-          rejected: 0,
-          needsAdjustment: 0,
-          pending: 0,
-          conditional: 0,
-          blocked: 0,
-          md: 0,
-          score: 0,
-          opportunities: new Set(),
-        };
-      row.count += 1;
-      row.md += Number(options.md || 0);
-      row.score += Number(options.score || 1);
-      if (options.overdue) row.overdue += 1;
-      if (options.rejected) row.rejected += 1;
-      if (options.needsAdjustment) row.needsAdjustment += 1;
-      if (options.pending) row.pending += 1;
-      if (options.conditional) row.conditional += 1;
-      if (options.blocked) row.blocked += 1;
-      if (options.opportunityId) row.opportunities.add(options.opportunityId);
-      bottlenecks.set(name, row);
-    };
-
-    requestContexts
-      .filter((context) => requestNeedsOwnerAction(context) || ["Rejected", "Approved with Conditions"].includes(context.effectiveStatus))
-      .forEach((context) =>
-        addBottleneck(context.request.product_name, {
-          overdue: requestIsOverdue(context),
-          rejected: context.effectiveStatus === "Rejected",
-          needsAdjustment: context.effectiveStatus === "Needs Adjustment",
-          pending: requestNeedsOwnerAction(context),
-          conditional: context.effectiveStatus === "Approved with Conditions",
-          md: context.md,
-          score: Math.max(1, Math.round(requestPriorityScore(context) / 15)),
-          opportunityId: context.opportunity.id,
-        }),
-      );
-    visible.forEach((opportunity) => {
-      validationsFor(opportunity.id)
-        .filter((validation) => validation.required && validation.status !== "Validated")
-        .forEach((validation) =>
-          addBottleneck(validation.function, {
-            blocked: validation.status === "Blocked",
-            score: validation.status === "Blocked" ? 8 : 3,
-            opportunityId: opportunity.id,
-          }),
-        );
-    });
-
-    const rows = Array.from(bottlenecks.values())
-      .map((row) => ({ ...row, opportunityCount: row.opportunities.size }))
-      .sort((a, b) => b.score - a.score || b.overdue - a.overdue || b.md - a.md)
-      .slice(0, 7);
-    const maxScore = Math.max(1, ...rows.map((row) => row.score));
-    elements.functionBottlenecks.innerHTML = rows.length
-      ? rows
-          .map(
-            (row, index) => {
-              const critical = row.overdue || row.rejected || row.blocked;
-              const attention = !critical && (row.needsAdjustment || row.pending || row.conditional);
-              const label = critical
-                ? "Escalate"
-                : row.needsAdjustment
-                  ? "Adjustment"
-                  : row.pending
-                    ? "Owner action"
-                    : row.conditional
-                      ? "Condition"
-                      : "Review";
-              const detail = [
-                row.overdue ? `${row.overdue} overdue` : "",
-                row.rejected ? `${row.rejected} rejected` : "",
-                row.needsAdjustment ? `${row.needsAdjustment} adjustment` : "",
-                row.blocked ? `${row.blocked} blocked` : "",
-                row.pending ? `${row.pending} pending` : "",
-                row.conditional ? `${row.conditional} conditional` : "",
-              ]
-                .filter(Boolean)
-                .join(" / ");
-              return `
-        <div class="bottleneck-row ${critical ? "critical" : attention ? "attention" : ""}">
-          <span class="bottleneck-rank" aria-hidden="true">${index + 1}</span>
-          <span class="bottleneck-copy">
-            <strong>${escapeHtml(row.name)}</strong>
-            <small>${pluralize(row.count, "action")} across ${pluralize(row.opportunityCount, "opportunity", "opportunities")}${row.md ? ` - ${formatNumber(row.md)} MD exposed` : ""}${detail ? ` - ${escapeHtml(detail)}` : ""}</small>
-          </span>
-          <span class="status-pill ${critical ? "critical" : attention ? "attention" : "pending"}">${escapeHtml(label)}</span>
-          <div class="bottleneck-bar" aria-label="Relative operational pressure"><span style="width: ${(row.score / maxScore) * 100}%"></span></div>
-        </div>`;
-            },
-          )
-          .join("")
-      : emptyDashboard("No function bottlenecks in the current filter.");
-  }
 
   if (elements.topReadinessGaps) {
-    const topGaps = portfolioReadinessGaps(visible, 7, { perOpportunity: true });
+    const topGaps = portfolioReadinessGaps(visible, 5, { perOpportunity: true });
     elements.topReadinessGaps.innerHTML = topGaps.length
       ? topGaps
           .map(
@@ -349,32 +189,6 @@ function renderExecutiveDashboard() {
           )
           .join("")
       : emptyDashboard("No material readiness gaps in the current filter.");
-  }
-
-  if (elements.forumReadinessBoard) {
-    elements.forumReadinessBoard.innerHTML = GOVERNANCE_FORUMS.map((forum) => {
-      const details = visible.map((opportunity) => forumReadinessDetail(opportunity, forum));
-      const average = details.length ? Math.round(details.reduce((sum, detail) => sum + detail.score, 0) / details.length) : 0;
-      const readyCount = details.filter((detail) => detail.status === "Ready").length;
-      const conditionalCount = details.filter((detail) => detail.status === "Ready with Conditions").length;
-      const partialCount = details.filter((detail) => detail.status === "Partially Ready").length;
-      const notReadyCount = details.filter((detail) => detail.status === "Not Ready").length;
-
-      return `
-        <div class="forum-readiness-card">
-          <div class="forum-card-head">
-            <strong>${escapeHtml(forum)}</strong>
-            <span>${average}%</span>
-          </div>
-          <span class="progress-track" aria-hidden="true"><span style="width: ${average}%"></span></span>
-          <div class="forum-status-grid">
-            <span><b>${readyCount}</b> Ready</span>
-            <span><b>${conditionalCount}</b> Conditional</span>
-            <span><b>${partialCount}</b> Partial</span>
-            <span><b>${notReadyCount}</b> Not ready</span>
-          </div>
-        </div>`;
-    }).join("");
   }
 
   if (elements.blockerList) {

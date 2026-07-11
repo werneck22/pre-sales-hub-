@@ -10,7 +10,7 @@ import {
   productScope,
   referenceToday,
   stakeholderTemplates,
-} from "./data.js?v=20260711-1";
+} from "./data.js?v=20260711-2";
 import {
   airportProfileFor,
   classifyAirport,
@@ -29,7 +29,7 @@ import {
   showToast,
   sizingEstimatesFor,
   validationRequestsFor,
-} from "./state.js?v=20260711-1";
+} from "./state.js?v=20260711-2";
 import {
   applyEstimateInitialMd,
   buildNotificationBody,
@@ -37,18 +37,18 @@ import {
   defaultValidationRequestId,
   finalMdForEstimate,
   generateSizingForOpportunity,
-} from "./sizing-engine.js?v=20260711-1";
+} from "./sizing-engine.js?v=20260711-2";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-1";
+} from "./readiness-rules.js?v=20260711-2";
 import {
   airportByCode,
-} from "./airport-directory.js?v=20260711-1";
+} from "./airport-directory.js?v=20260711-2";
 import {
   renderAll,
   renderIntakeNarrativeSummary,
   renderRecordHeader,
-} from "./render.js?v=20260711-1";
+} from "./render.js?v=20260711-2";
 
 function syncIntakeFromForm() {
   const opportunity = selectedOpportunity();

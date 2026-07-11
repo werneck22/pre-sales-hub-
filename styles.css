@@ -583,7 +583,7 @@ textarea:focus-visible {
 
 .dashboard-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -940,7 +940,7 @@ textarea:focus-visible {
 
 @media (max-width: 1380px) {
   .dashboard-card-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
