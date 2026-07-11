@@ -7,7 +7,7 @@ import {
   forumStatusField,
   isDocumented,
   pluralize,
-} from "./data.js?v=20260711-1";
+} from "./data.js?v=20260711-2";
 import {
   airportProfileFor,
   assumptionsFor,
@@ -17,7 +17,7 @@ import {
   risksFor,
   sizingEstimatesFor,
   validationsFor,
-} from "./state.js?v=20260711-1";
+} from "./state.js?v=20260711-2";
 import {
   effectiveRequestStatus,
   finalMdForEstimate,
@@ -27,7 +27,7 @@ import {
   requestNeedsOwnerAction,
   requestPriorityScore,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260711-1";
+} from "./sizing-engine.js?v=20260711-2";
 
 function sizingReadinessImpact(opportunity, forum) {
   const estimates = sizingEstimatesFor(opportunity.id);

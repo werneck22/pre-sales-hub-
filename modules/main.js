@@ -5,7 +5,7 @@ import {
   productScope,
   risk,
   slug,
-} from "./data.js?v=20260711-1";
+} from "./data.js?v=20260711-2";
 import {
   activeRoute,
   airportProfileFor,
@@ -38,7 +38,7 @@ import {
   toggleValidationProduct,
   sizingEstimatesFor,
   sortByReadiness,
-} from "./state.js?v=20260711-1";
+} from "./state.js?v=20260711-2";
 import {
   buildSizingCsv,
   defaultValidationRequestId,
@@ -46,10 +46,10 @@ import {
   initializeSizingEngine,
   nextActionableRequestId,
   runNotificationTrigger,
-} from "./sizing-engine.js?v=20260711-1";
+} from "./sizing-engine.js?v=20260711-2";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-1";
+} from "./readiness-rules.js?v=20260711-2";
 import {
   airportProfileComplete,
   buildBusinessCaseText,
@@ -57,15 +57,15 @@ import {
   renderNotificationPreview,
   renderSizingEstimates,
   renderValidationRequests,
-} from "./render.js?v=20260711-1";
+} from "./render.js?v=20260711-2";
 import {
   lookupAirportData,
-} from "./airport-lookup.js?v=20260711-1";
+} from "./airport-lookup.js?v=20260711-2";
 import {
   handleSearchResultClick,
   hideSearchResults,
   renderSearchResults,
-} from "./airport-search.js?v=20260711-1";
+} from "./airport-search.js?v=20260711-2";
 import {
   addProductScope,
   applyAirportCodeToProfile,
@@ -81,7 +81,7 @@ import {
   updateEstimateManualOverride,
   updateEstimateValidation,
   updateScopeDriverValue,
-} from "./actions.js?v=20260711-1";
+} from "./actions.js?v=20260711-2";
 
 elements.opportunityList.addEventListener("click", (event) => {
   const card = event.target.closest("[data-id]");

@@ -16,7 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260711-1" />
+    <link rel="stylesheet" href="./styles.css?v=20260711-2" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
@@ -47,7 +47,7 @@
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v30</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v31</span></p>
       </aside>
 
       <main class="main-content">
@@ -115,34 +115,24 @@
 
             <div class="dashboard-card-grid" aria-label="Portfolio health metrics">
               <div class="dashboard-card">
-                <span id="metricPipeline">0</span>
-                <label>Active Opportunities</label>
-                <small>Filtered portfolio count</small>
+                <span id="metricReadiness">0%</span>
+                <label>Portfolio readiness</label>
+                <small><b id="metricPipeline">0</b> active opportunities</small>
               </div>
               <div class="dashboard-card">
-                <span id="metricReadiness">0%</span>
-                <label>Average Readiness Score</label>
-                <small>BCM, SRM, BAB and validation weighted</small>
+                <span id="metricPipelineValue">$0</span>
+                <label>Pipeline value</label>
+                <small>Total estimated across portfolio</small>
               </div>
               <div class="dashboard-card attention">
-                <span id="metricPendingSizing">0</span>
-                <label>Pending Validations</label>
-                <small>Owner action required</small>
+                <span id="metricAtRisk">0</span>
+                <label>At risk</label>
+                <small>Not ready for their current gate</small>
               </div>
               <div class="dashboard-card critical">
-                <span id="metricOverdueValidations">0</span>
-                <label>Overdue Validations</label>
-                <small>Past validation due date</small>
-              </div>
-              <div class="dashboard-card attention">
-                <span id="metricSrmSizingBlock">0</span>
-                <label>Not Ready for SRM</label>
-                <small>Governance or sizing gaps</small>
-              </div>
-              <div class="dashboard-card attention">
-                <span id="metricBabSizingBlock">0</span>
-                <label>Not Ready for BAB</label>
-                <small>Business case or approval gaps</small>
+                <span id="metricPendingSizing">0</span>
+                <label>Owner actions</label>
+                <small><b id="metricOverdueValidations">0</b> overdue</small>
               </div>
             </div>
 
@@ -168,46 +158,6 @@
                   <span id="metricBlockers" class="section-count">0 blockers</span>
                 </div>
                 <div id="topReadinessGaps" class="dashboard-list"></div>
-              </section>
-
-              <section class="dashboard-section" aria-labelledby="pendingValidationsHeading">
-                <div class="dashboard-section-title">
-                  <div>
-                    <p class="eyebrow">Owner workflow</p>
-                    <h4 id="pendingValidationsHeading">Owner Validations</h4>
-                  </div>
-                </div>
-                <div id="pendingValidationList" class="dashboard-list compact"></div>
-              </section>
-
-              <section class="dashboard-section" aria-labelledby="deadlinesHeading">
-                <div class="dashboard-section-title">
-                  <div>
-                    <p class="eyebrow">Bid calendar</p>
-                    <h4 id="deadlinesHeading">Upcoming Submission Deadlines</h4>
-                  </div>
-                </div>
-                <div id="deadlineList" class="dashboard-list compact"></div>
-              </section>
-
-              <section class="dashboard-section" aria-labelledby="bottlenecksHeading">
-                <div class="dashboard-section-title">
-                  <div>
-                    <p class="eyebrow">Operational bottlenecks</p>
-                    <h4 id="bottlenecksHeading">Blockers by Function</h4>
-                  </div>
-                </div>
-                <div id="functionBottlenecks" class="bottleneck-list"></div>
-              </section>
-
-              <section class="dashboard-section dashboard-section-wide" aria-labelledby="forumReadinessHeading">
-                <div class="dashboard-section-title">
-                  <div>
-                    <h4 id="forumReadinessHeading">Readiness by Governance Forum</h4>
-                  </div>
-                  <span id="metricGovernance" class="section-count">0 ready</span>
-                </div>
-                <div id="forumReadinessBoard" class="forum-readiness-board"></div>
               </section>
             </div>
           </article>
@@ -698,6 +648,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260711-1"></script>
+    <script type="module" src="./modules/main.js?v=20260711-2"></script>
   </body>
 </html>
