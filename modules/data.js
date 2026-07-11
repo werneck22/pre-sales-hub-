@@ -48,9 +48,6 @@ const PRODUCT_FAMILY_MAP = {
   "Integrations & APIs": "AMS - Amadeus Management Solutions",
   "Support & Field Services": "Support",
 };
-// The AMS (Amadeus Management Solutions) suite. Integrations/APIs is scoped
-// against AODB (see PRODUCT_LINKS) rather than being a suite product itself.
-const AMS_SUITE_PRODUCTS = new Set(["AODB", "FRMS", "DDS"]);
 const PRODUCT_LINKS = { "Integrations & APIs": "AODB" };
 function productFamily(name) {
   if (String(name).startsWith("Seamless GT11 eGate")) return "Seamless - Hardware";
@@ -60,12 +57,9 @@ function productFamily(name) {
 
 const GOVERNANCE_FORUMS = ["BCM", "SRM", "BAB"];
 const VALIDATION_STATUSES = ["Pending", "In review", "Validated", "Blocked"];
-const GOVERNANCE_STATUSES = ["Not started", "In progress", "Ready", "Conditionally approved", "Approved", "Blocked"];
-const SIZING_STATUSES = ["Not started", "Draft", "Sized", "Validated"];
 const SCOPE_STATUSES = ["In scope", "Optional", "Deferred"];
 const RISK_LEVELS = ["Low", "Medium", "High"];
 const AIRPORT_CATEGORIES = ["Small", "Medium", "Large", "Extra Large"];
-const COMPLEXITY_LEVELS = ["Low", "Medium", "High", "Very High"];
 const VALIDATION_REQUEST_STATUSES = [
   "Not Started",
   "Pending Validation",
@@ -1169,18 +1163,14 @@ export {
   PRODUCT_NAMES,
   GOVERNANCE_FORUMS,
   VALIDATION_STATUSES,
-  GOVERNANCE_STATUSES,
-  SIZING_STATUSES,
   SCOPE_STATUSES,
   RISK_LEVELS,
   AIRPORT_CATEGORIES,
-  COMPLEXITY_LEVELS,
   VALIDATION_REQUEST_STATUSES,
   WORKSTREAMS,
   PRODUCT_FAMILY_ORDER,
   productFamily,
   PRODUCTS_AWAITING_SIZING,
-  AMS_SUITE_PRODUCTS,
   PRODUCT_LINKS,
   computeDriverValue,
   referenceToday,

@@ -7,7 +7,7 @@ import {
   forumStatusField,
   isDocumented,
   pluralize,
-} from "./data.js?v=20260710-29";
+} from "./data.js?v=20260711-1";
 import {
   airportProfileFor,
   assumptionsFor,
@@ -17,7 +17,7 @@ import {
   risksFor,
   sizingEstimatesFor,
   validationsFor,
-} from "./state.js?v=20260710-29";
+} from "./state.js?v=20260711-1";
 import {
   effectiveRequestStatus,
   finalMdForEstimate,
@@ -27,7 +27,7 @@ import {
   requestNeedsOwnerAction,
   requestPriorityScore,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260710-29";
+} from "./sizing-engine.js?v=20260711-1";
 
 function sizingReadinessImpact(opportunity, forum) {
   const estimates = sizingEstimatesFor(opportunity.id);
@@ -50,18 +50,6 @@ function sizingReadinessImpact(opportunity, forum) {
   if (forum === "BAB" && pendingFinalSizing) return "Pending Validation";
   if (conditional) return "Ready with Conditions";
   return "Ready";
-}
-
-function functionValidation(opportunity, functionName) {
-  return validationsFor(opportunity.id).find((item) => item.function === functionName);
-}
-
-function hasRiskCategory(opportunity, category) {
-  return risksFor(opportunity.id).some((item) => item.category === category);
-}
-
-function hasAssumptionCategory(opportunity, category) {
-  return assumptionsFor(opportunity.id).some((item) => item.category === category);
 }
 
 function estimateValidationStatus(opportunity, estimate) {
@@ -224,14 +212,6 @@ function readinessRuleResults(opportunity, forum) {
 
 function allReadinessRules(opportunity) {
   return GOVERNANCE_FORUMS.flatMap((forum) => readinessRuleResults(opportunity, forum));
-}
-
-function checklistTotal(opportunity) {
-  return allReadinessRules(opportunity).length;
-}
-
-function checklistComplete(opportunity) {
-  return allReadinessRules(opportunity).filter((item) => item.complete).length;
 }
 
 function validationScore(status) {
@@ -598,17 +578,12 @@ function forumReady(opportunity) {
 
 export {
   sizingReadinessImpact,
-  functionValidation,
-  hasRiskCategory,
-  hasAssumptionCategory,
   estimateValidationStatus,
   workstreamValidationEvidence,
   deliveryEffortEvidence,
   ruleResult,
   readinessRuleResults,
   allReadinessRules,
-  checklistTotal,
-  checklistComplete,
   validationScore,
   forumReadinessDetail,
   openBlockersFor,
