@@ -26,7 +26,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260711-2";
+} from "./data.js?v=20260711-3";
 import {
   activeRoute,
   airportProfileFor,
@@ -59,7 +59,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260711-2";
+} from "./state.js?v=20260711-3";
 import {
   dashboardTotalsForOpportunity,
   defaultValidationRequestId,
@@ -76,7 +76,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260711-2";
+} from "./sizing-engine.js?v=20260711-3";
 import {
   forumReadinessLabel,
   forumReady,
@@ -87,7 +87,7 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260711-2";
+} from "./readiness-rules.js?v=20260711-3";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
