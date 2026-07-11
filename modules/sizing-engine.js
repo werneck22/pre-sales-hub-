@@ -15,25 +15,24 @@ import {
   sizingOwnerKey,
   sizingRuleCode,
   slug,
-} from "./data.js?v=20260710-29";
+} from "./data.js?v=20260711-1";
 import {
   airportProfileFor,
   classifyAirport,
   mockDb,
   notificationForRequest,
   productScopesFor,
-  selectedNotificationChannel,
   selectedOpportunity,
   selectedValidationRequestId,
   setSelectedNotificationChannel,
   setSelectedValidationRequestId,
   showToast,
   sizingEstimatesFor,
-} from "./state.js?v=20260710-29";
+} from "./state.js?v=20260711-1";
 import {
   renderNotificationPreview,
   renderValidationRequests,
-} from "./render.js?v=20260710-29";
+} from "./render.js?v=20260711-1";
 
 function confidenceFor(opportunity, scope) {
   if (opportunity.complexity === "Very High" || scope.risk_level === "High") return "Medium";

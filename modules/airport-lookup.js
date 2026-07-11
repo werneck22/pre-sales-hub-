@@ -4,13 +4,13 @@ import {
   elements,
   selectedId,
   showToast,
-} from "./state.js?v=20260710-29";
+} from "./state.js?v=20260711-1";
 import {
   renderAll,
-} from "./render.js?v=20260710-29";
+} from "./render.js?v=20260711-1";
 import {
   applyAirportCodeToProfile,
-} from "./actions.js?v=20260710-29";
+} from "./actions.js?v=20260711-1";
 
 // Public SPARQL endpoint, CORS-enabled, no key required. Wikidata stores
 // annual passenger traffic as "patronage" (P3872) statements with a
@@ -67,33 +67,6 @@ async function fetchWikidataAirport(code) {
   } finally {
     clearTimeout(timer);
   }
-}
-
-function trafficProvenanceText(profile) {
-  const location = [profile.airport_city, profile.airport_state, profile.airport_country].filter(Boolean).join(", ");
-  const locationPrefix = location ? `${location} · ` : "";
-  if (profile.traffic_source === "Reference directory") {
-    const year = profile.traffic_source_year ? ` (${profile.traffic_source_year})` : "";
-    const edited = Number(profile.annual_passengers) !== Number(profile.traffic_fetched_passengers || 0);
-    if (edited) {
-      return `${locationPrefix}passengers manually edited after the reference directory${year} suggested ${Number(
-        profile.traffic_fetched_passengers || 0,
-      ).toLocaleString("en-US")}.`;
-    }
-    return `${locationPrefix}traffic from the reference directory${year} · approximate figures - confirm against official statistics before governance use.`;
-  }
-  if (profile.traffic_source !== "Wikidata") {
-    return `${locationPrefix}Manual entry. Enter an IATA/ICAO code to look up traffic.`;
-  }
-  const year = profile.traffic_source_year ? ` (${profile.traffic_source_year})` : "";
-  const retrieved = profile.traffic_retrieved_at ? ` · retrieved ${profile.traffic_retrieved_at}` : "";
-  const edited = Number(profile.annual_passengers) !== Number(profile.traffic_fetched_passengers || 0);
-  if (edited) {
-    return `Passengers manually edited after Wikidata${year} lookup suggested ${Number(
-      profile.traffic_fetched_passengers || 0,
-    ).toLocaleString("en-US")}${retrieved}.`;
-  }
-  return `Passengers from Wikidata${year}${retrieved} · unverified suggestion - confirm against official statistics. Movements remain manual.`;
 }
 
 async function lookupAirportData() {
@@ -165,6 +138,5 @@ export {
   sparqlQueryForCode,
   parseWikidataResult,
   fetchWikidataAirport,
-  trafficProvenanceText,
   lookupAirportData,
 };

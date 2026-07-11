@@ -14,14 +14,13 @@ import {
   makeValidation,
   productScope,
   risk,
-  sizingOwnerKey,
-} from "./data.js?v=20260710-29";
+} from "./data.js?v=20260711-1";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260710-29";
+} from "./readiness-rules.js?v=20260711-1";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260710-29";
+} from "./render.js?v=20260711-1";
 
 let mockDb = {
   opportunities: [
@@ -660,10 +659,6 @@ function notificationForRequest(requestId) {
   return mockDb.notifications.find((item) => item.validation_request_id === requestId);
 }
 
-function governanceItemsFor(opportunityId = selectedId, forum) {
-  const items = byOpportunity(mockDb.governanceItems, opportunityId);
-  return forum ? items.filter((item) => item.forum === forum) : items;
-}
 function categoryIndex(category) {
   return AIRPORT_CATEGORIES.indexOf(category);
 }
@@ -771,7 +766,6 @@ export {
   sizingEstimatesFor,
   validationRequestsFor,
   notificationForRequest,
-  governanceItemsFor,
   categoryIndex,
   categoryForMetric,
   classifyAirport,
