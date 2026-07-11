@@ -137,10 +137,21 @@ button {
 }
 
 .brand-block {
-  display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
-  gap: 10px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.brand-logo {
+  display: block;
+  width: 132px;
+  max-width: 78%;
+  height: auto;
+}
+
+.brand-product {
+  color: var(--nav-ink);
 }
 
 .brand-mark {
