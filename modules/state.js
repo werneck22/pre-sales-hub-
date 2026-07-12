@@ -14,13 +14,13 @@ import {
   makeValidation,
   productScope,
   risk,
-} from "./data.js?v=20260711-3";
+} from "./data.js?v=20260711-4";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-3";
+} from "./readiness-rules.js?v=20260711-4";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260711-3";
+} from "./render.js?v=20260711-4";
 
 let mockDb = {
   opportunities: [
@@ -409,14 +409,10 @@ const validationOpenProducts = new Set();
 let validationLineFilter = "all";
 let activeRoute = "dashboard";
 const elements = {
-  dashboard: document.querySelector("#dashboard"),
   workspaceGrid: document.querySelector(".workspace-grid"),
   recordHeader: document.querySelector("[data-opportunity-context]"),
-  pageEyebrow: document.querySelector("#pageEyebrow"),
   pageTitle: document.querySelector("#pageTitle"),
   routeContextBar: document.querySelector("#routeContextBar"),
-  routeArea: document.querySelector("#routeArea"),
-  routeBreadcrumb: document.querySelector("#routeBreadcrumb"),
   routeWorkflowNav: document.querySelector("#routeWorkflowNav"),
   routeRecommendation: document.querySelector("#routeRecommendation"),
   routeRecommendationText: document.querySelector("#routeRecommendationText"),
@@ -432,8 +428,6 @@ const elements = {
   exportSizingCsvBtn: document.querySelector("#exportSizingCsvBtn"),
   printBusinessCaseBtn: document.querySelector("#printBusinessCaseBtn"),
   toastRegion: document.querySelector("#toastRegion"),
-  executiveNextActions: document.querySelector("#executiveNextActions"),
-  executiveAttentionList: document.querySelector("#executiveAttentionList"),
   topReadinessGaps: document.querySelector("#topReadinessGaps"),
   dashboardEmptyState: document.querySelector("#dashboardEmptyState"),
   opportunityList: document.querySelector("#opportunityList"),
@@ -444,7 +438,6 @@ const elements = {
   productScope: document.querySelector("#productScope"),
   airportProfileForm: document.querySelector("#airportProfileForm"),
   airportLookupBtn: document.querySelector("#airportLookupBtn"),
-  airportLookupStatus: document.querySelector("#airportLookupStatus"),
   categoryBadge: document.querySelector("#categoryBadge"),
   classificationRules: document.querySelector("#classificationRules"),
   runSizingBtn: document.querySelector("#runSizingBtn"),
@@ -488,10 +481,6 @@ const elements = {
   metricInitialMd: document.querySelector("#metricInitialMd"),
   metricValidatedMd: document.querySelector("#metricValidatedMd"),
   metricMdDelta: document.querySelector("#metricMdDelta"),
-  bcmCount: document.querySelector("#bcmCount"),
-  srmCount: document.querySelector("#srmCount"),
-  babCount: document.querySelector("#babCount"),
-  blockerList: document.querySelector("#blockerList"),
 };
 function selectedOpportunity() {
   return mockDb.opportunities.find((opportunity) => opportunity.id === selectedId) || mockDb.opportunities[0];
@@ -537,10 +526,7 @@ function updateRouteChrome(route) {
   const isDashboard = route === "dashboard";
   const opportunity = selectedOpportunity();
 
-  if (elements.pageEyebrow) elements.pageEyebrow.textContent = config.area;
   if (elements.pageTitle) elements.pageTitle.textContent = config.title;
-  if (elements.routeArea) elements.routeArea.textContent = isDashboard ? "Portfolio" : opportunity.name;
-  if (elements.routeBreadcrumb) elements.routeBreadcrumb.textContent = config.title;
   if (elements.routeContextBar) elements.routeContextBar.hidden = isDashboard;
   if (elements.routeWorkflowNav) elements.routeWorkflowNav.hidden = isDashboard;
   if (elements.routeRecommendation) elements.routeRecommendation.hidden = isDashboard;

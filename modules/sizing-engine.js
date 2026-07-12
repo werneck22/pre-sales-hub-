@@ -15,7 +15,7 @@ import {
   sizingOwnerKey,
   sizingRuleCode,
   slug,
-} from "./data.js?v=20260711-3";
+} from "./data.js?v=20260711-4";
 import {
   airportProfileFor,
   classifyAirport,
@@ -28,11 +28,11 @@ import {
   setSelectedValidationRequestId,
   showToast,
   sizingEstimatesFor,
-} from "./state.js?v=20260711-3";
+} from "./state.js?v=20260711-4";
 import {
   renderNotificationPreview,
   renderValidationRequests,
-} from "./render.js?v=20260711-3";
+} from "./render.js?v=20260711-4";
 
 function confidenceFor(opportunity, scope) {
   if (opportunity.complexity === "Very High" || scope.risk_level === "High") return "Medium";
@@ -159,13 +159,6 @@ function requestPriorityScore(context) {
   const technicalScore = context.hasTechnical ? 8 : 3;
   const mdScore = Math.min(12, Math.round(Number(context.md || 0) / 10));
   return statusScore + dueScore + riskScore + technicalScore + mdScore;
-}
-
-function requestPriorityLabel(score) {
-  if (score >= 95) return "Critical";
-  if (score >= 70) return "High";
-  if (score >= 45) return "Medium";
-  return "Low";
 }
 
 function requestGovernanceImpact(context) {
@@ -685,7 +678,6 @@ export {
   requestIsOverdue,
   requestActionLabel,
   requestPriorityScore,
-  requestPriorityLabel,
   requestGovernanceImpact,
   estimateId,
   requestId,

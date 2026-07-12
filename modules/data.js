@@ -955,14 +955,6 @@ function computeDriverValue(driver, inputs = {}) {
   return 0;
 }
 
-function defaultSizingInputs(productName, airportCategory = "Medium") {
-  return Object.fromEntries(
-    driversForProduct(productName)
-      .filter((driver) => !driver.computed)
-      .map((driver) => [driver.key, driverDefault(driver, airportCategory)]),
-  );
-}
-
 function ensureScopeSizingInputs(scope, airportCategory = "Medium") {
   if (!scope) return;
   if (!scope.owner_email) scope.owner_email = defaultOwnerEmail(scope.owner);
@@ -1207,7 +1199,6 @@ export {
   sizingRuleDescription,
   driversForProduct,
   driverDefault,
-  defaultSizingInputs,
   ensureScopeSizingInputs,
   driverDetailsForScope,
   sizingDriverFactor,

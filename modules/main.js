@@ -5,7 +5,7 @@ import {
   productScope,
   risk,
   slug,
-} from "./data.js?v=20260711-3";
+} from "./data.js?v=20260711-4";
 import {
   activeRoute,
   airportProfileFor,
@@ -38,7 +38,7 @@ import {
   toggleValidationProduct,
   sizingEstimatesFor,
   sortByReadiness,
-} from "./state.js?v=20260711-3";
+} from "./state.js?v=20260711-4";
 import {
   buildSizingCsv,
   defaultValidationRequestId,
@@ -46,10 +46,10 @@ import {
   initializeSizingEngine,
   nextActionableRequestId,
   runNotificationTrigger,
-} from "./sizing-engine.js?v=20260711-3";
+} from "./sizing-engine.js?v=20260711-4";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-3";
+} from "./readiness-rules.js?v=20260711-4";
 import {
   airportProfileComplete,
   buildBusinessCaseText,
@@ -57,15 +57,15 @@ import {
   renderNotificationPreview,
   renderSizingEstimates,
   renderValidationRequests,
-} from "./render.js?v=20260711-3";
+} from "./render.js?v=20260711-4";
 import {
   lookupAirportData,
-} from "./airport-lookup.js?v=20260711-3";
+} from "./airport-lookup.js?v=20260711-4";
 import {
   handleSearchResultClick,
   hideSearchResults,
   renderSearchResults,
-} from "./airport-search.js?v=20260711-3";
+} from "./airport-search.js?v=20260711-4";
 import {
   addProductScope,
   applyAirportCodeToProfile,
@@ -81,7 +81,7 @@ import {
   updateEstimateManualOverride,
   updateEstimateValidation,
   updateScopeDriverValue,
-} from "./actions.js?v=20260711-3";
+} from "./actions.js?v=20260711-4";
 
 elements.opportunityList.addEventListener("click", (event) => {
   const card = event.target.closest("[data-id]");
@@ -93,19 +93,6 @@ elements.opportunityList.addEventListener("click", (event) => {
   renderAll();
   navigateToRoute("intake");
 });
-
-if (elements.blockerList) {
-  elements.blockerList.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-id]");
-    if (!button) return;
-    setSelectedId(button.dataset.id);
-    setEstimateProductFilter("all");
-    setEstimateStatusFilter("all");
-    setSelectedValidationRequestId(defaultValidationRequestId(selectedId));
-    renderAll();
-    navigateToRoute("intake");
-  });
-}
 
 if (elements.topReadinessGaps) {
   elements.topReadinessGaps.addEventListener("click", (event) => {
@@ -120,38 +107,12 @@ if (elements.topReadinessGaps) {
   });
 }
 
-if (elements.dashboard) {
-  elements.dashboard.addEventListener("click", (event) => {
-    const row = event.target.closest(".dashboard-row[data-id], .executive-action-card[data-id]");
-    if (!row) return;
-    setSelectedId(row.dataset.id);
-    setEstimateProductFilter("all");
-    setEstimateStatusFilter("all");
-    setSelectedValidationRequestId(row.dataset.requestId || defaultValidationRequestId(selectedId));
-    renderAll();
-    navigateToRoute(row.dataset.requestId ? "validation" : "intake");
-  });
-}
-
 document.addEventListener("click", (event) => {
   const button = event.target.closest("[data-action]");
   if (!button) return;
   event.preventDefault();
   executeJourneyAction(button.dataset.action, button.dataset.target);
 });
-
-if (elements.executiveNextActions) {
-  elements.executiveNextActions.addEventListener("click", (event) => {
-    const card = event.target.closest("[data-id]");
-    if (!card) return;
-    setSelectedId(card.dataset.id);
-    setEstimateProductFilter("all");
-    setEstimateStatusFilter("all");
-    setSelectedValidationRequestId(defaultValidationRequestId(selectedId));
-    renderAll();
-    navigateToRoute("intake");
-  });
-}
 
 elements.searchInput.addEventListener("input", () => {
   renderSearchResults(elements.searchInput.value);

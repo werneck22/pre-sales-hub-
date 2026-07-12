@@ -7,7 +7,7 @@ import {
   forumStatusField,
   isDocumented,
   pluralize,
-} from "./data.js?v=20260711-3";
+} from "./data.js?v=20260711-4";
 import {
   airportProfileFor,
   assumptionsFor,
@@ -17,7 +17,7 @@ import {
   risksFor,
   sizingEstimatesFor,
   validationsFor,
-} from "./state.js?v=20260711-3";
+} from "./state.js?v=20260711-4";
 import {
   effectiveRequestStatus,
   finalMdForEstimate,
@@ -27,7 +27,7 @@ import {
   requestNeedsOwnerAction,
   requestPriorityScore,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260711-3";
+} from "./sizing-engine.js?v=20260711-4";
 
 function sizingReadinessImpact(opportunity, forum) {
   const estimates = sizingEstimatesFor(opportunity.id);
@@ -210,8 +210,39 @@ function readinessRuleResults(opportunity, forum) {
   return rules[forum] || [];
 }
 
-function allReadinessRules(opportunity) {
-  return GOVERNANCE_FORUMS.flatMap((forum) => readinessRuleResults(opportunity, forum));
+// Checklist items are phrased as done-states ("X documented"); a gap list must
+// state the problem instead, or a "Critical" pill next to "X completed" reads
+// as a contradiction. Display mapping only - rule matching keeps the original.
+const GAP_LABELS = {
+  "Intake completeness": "Intake incomplete",
+  "Sales owner assigned": "Sales owner not assigned",
+  "Pre-sales owner assigned": "Pre-sales owner not assigned",
+  "Submission deadline known": "Submission deadline missing",
+  "Product scope defined": "Product scope not defined",
+  "Strategic rationale documented": "Strategic rationale missing",
+  "Bid/no-bid recommendation documented": "Bid/no-bid recommendation missing",
+  "Airport category calculated": "Airport category not calculated",
+  "Product scope completed": "Product scope incomplete",
+  "Initial sizing generated": "Initial sizing not generated",
+  "Technical assumptions documented": "Technical assumptions missing",
+  "Product owners identified": "Product owners not identified",
+  "Implementation validations completed or conditionally approved": "Implementation validations outstanding",
+  "R&D validations completed or conditionally approved": "R&D validations outstanding",
+  "Integration risks documented": "Integration risks not documented",
+  "Critical blockers resolved": "Critical blockers unresolved",
+  "SRM ready or ready with conditions": "SRM not ready",
+  "Final validated MD available": "Final validated MD missing",
+  "Business case input complete": "Business case input incomplete",
+  "Pricing readiness status captured": "Pricing readiness not captured",
+  "Key risks and mitigations documented": "Key risks and mitigations missing",
+  "Delivery effort validated": "Delivery effort not validated",
+  "Executive decision requested": "Executive decision not requested",
+  "Exceptions documented": "Exceptions not documented",
+  "Decision log updated": "Decision log not updated",
+};
+
+function gapLabel(ruleLabel) {
+  return GAP_LABELS[ruleLabel] || ruleLabel;
 }
 
 function validationScore(status) {
@@ -264,7 +295,7 @@ function forumReadinessDetail(opportunity, forum) {
   }
 
   const recommendedActions = [
-    ...uniqueBlockers.map((blocker) => `Resolve blocker: ${blocker}.`),
+    ...uniqueBlockers.map((blocker) => `Resolve blocker: ${gapLabel(blocker)}.`),
     ...missingItems.map((item) => item.action),
     ...uniqueConditions.map((condition) => `Confirm and record condition: ${condition}.`),
   ].filter((action, index, actions) => action && actions.indexOf(action) === index);
@@ -464,7 +495,7 @@ function readinessGapsForOpportunity(opportunity) {
         opportunity,
         source: forum,
         severity: "Critical",
-        label: blocker,
+        label: gapLabel(blocker),
         detail: `${detail.status} - ${detail.complete}/${detail.total} checklist items complete`,
         action: rule?.action || readinessGapAction(forum, blocker),
         priority: 95 - detail.score,
@@ -479,7 +510,7 @@ function readinessGapsForOpportunity(opportunity) {
         opportunity,
         source: forum,
         severity,
-        label,
+        label: gapLabel(label),
         detail: `${detail.complete}/${detail.total} ${forum} checklist items complete`,
         action: rule?.action || readinessGapAction(forum, label),
         priority: 55 + currentStageWeight + (100 - detail.checklistPercent) / 4,
@@ -583,7 +614,7 @@ export {
   deliveryEffortEvidence,
   ruleResult,
   readinessRuleResults,
-  allReadinessRules,
+  gapLabel,
   validationScore,
   forumReadinessDetail,
   openBlockersFor,

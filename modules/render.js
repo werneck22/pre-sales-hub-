@@ -26,7 +26,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260711-3";
+} from "./data.js?v=20260711-4";
 import {
   activeRoute,
   airportProfileFor,
@@ -59,7 +59,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260711-3";
+} from "./state.js?v=20260711-4";
 import {
   dashboardTotalsForOpportunity,
   defaultValidationRequestId,
@@ -76,10 +76,11 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260711-3";
+} from "./sizing-engine.js?v=20260711-4";
 import {
   forumReadinessLabel,
   forumReady,
+  gapLabel,
   hasBlocker,
   portfolioReadinessGaps,
   readiness,
@@ -87,7 +88,7 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260711-3";
+} from "./readiness-rules.js?v=20260711-4";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -155,9 +156,6 @@ function renderExecutiveDashboard() {
     const delta = totals.validated - totals.initial;
     elements.metricMdDelta.textContent = `${delta > 0 ? "+" : ""}${formatNumber(delta)}`;
   }
-  if (elements.bcmCount) elements.bcmCount.textContent = visible.filter((opportunity) => opportunity.current_governance_stage === "BCM").length;
-  if (elements.srmCount) elements.srmCount.textContent = visible.filter((opportunity) => opportunity.current_governance_stage === "SRM").length;
-  if (elements.babCount) elements.babCount.textContent = visible.filter((opportunity) => opportunity.current_governance_stage === "BAB").length;
 
   if (elements.dashboardEmptyState) {
     elements.dashboardEmptyState.innerHTML = visible.length
@@ -191,21 +189,6 @@ function renderExecutiveDashboard() {
       : emptyDashboard("No material readiness gaps in the current filter.");
   }
 
-  if (elements.blockerList) {
-    elements.blockerList.innerHTML = blockers.length
-      ? blockers
-          .slice(0, 4)
-          .map((opportunity) => {
-            const blocker =
-              risksFor(opportunity.id).find((item) => item.severity === "High" && item.status !== "Closed") ||
-              validationsFor(opportunity.id).find((item) => item.status === "Blocked");
-            return `<li><button type="button" data-id="${escapeHtml(opportunity.id)}"><strong>${escapeHtml(
-              opportunity.customer,
-            )}</strong><span>${escapeHtml(blocker?.description || blocker?.comments || "Validation blocked")}</span></button></li>`;
-          })
-          .join("")
-      : '<li class="empty-state">No critical blockers in the current filter.</li>';
-  }
 }
 
 function renderOpportunityList() {
@@ -1344,7 +1327,7 @@ function renderSizingEngine(opportunity) {
 function renderSrmCockpitBanner(opportunity, breakdown) {
   const srm = breakdown.forumDetails.SRM;
   const sizingImpact = sizingReadinessImpact(opportunity, "SRM");
-  const blockers = [...new Set([...srm.blockers, ...srm.missing])].slice(0, 4);
+  const blockers = [...new Set([...srm.blockers, ...srm.missing])].slice(0, 4).map(gapLabel);
   const ready = ["Ready", "Ready with Conditions"].includes(srm.status);
   return `
     <section class="srm-cockpit ${statusClass(srm.status)}" aria-label="SRM readiness cockpit">
