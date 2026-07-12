@@ -16,13 +16,13 @@
       href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260711-4" />
+    <link rel="stylesheet" href="./styles.css?v=20260711-5" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
       <aside class="sidebar" aria-label="Hub navigation">
         <div class="brand-block">
-          <img class="brand-logo" src="assets/amadeus-logo.png?v=20260711-4" alt="Amadeus" width="132" height="19" />
+          <img class="brand-logo" src="assets/amadeus-logo.png?v=20260711-5" alt="Amadeus" width="132" height="19" />
           <h1 class="brand-product">AirPort Hub</h1>
         </div>
 
@@ -44,7 +44,7 @@
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v33</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v34</span></p>
       </aside>
 
       <main class="main-content">
@@ -100,7 +100,7 @@
           <article class="summary-panel executive-panel">
             <div class="section-heading dashboard-heading">
               <div>
-                <h3>Portfolio readiness cockpit</h3>
+                <h3>Portfolio overview</h3>
               </div>
               <select id="stageFilter" aria-label="Filter by governance stage">
                 <option value="all">All stages</option>
@@ -119,7 +119,7 @@
               <div class="dashboard-card">
                 <span id="metricPipelineValue">$0</span>
                 <label>Pipeline value</label>
-                <small>Total estimated across portfolio</small>
+                <small>Estimated deal value</small>
               </div>
               <div class="dashboard-card attention">
                 <span id="metricAtRisk">0</span>
@@ -148,9 +148,7 @@
               <section class="dashboard-section dashboard-section-wide" aria-labelledby="topReadinessGapsHeading">
                 <div class="dashboard-section-title">
                   <div>
-                    <p class="eyebrow">Leadership focus</p>
-                    <h4 id="topReadinessGapsHeading">What Needs Attention</h4>
-                    <p class="section-help">Most urgent gap per opportunity.</p>
+                    <h4 id="topReadinessGapsHeading">Needs attention</h4>
                   </div>
                   <span id="metricBlockers" class="section-count">0 blockers</span>
                 </div>
@@ -162,8 +160,7 @@
           <article class="opportunity-panel executive-opportunity-panel">
             <div class="section-heading compact">
               <div>
-                <p class="eyebrow">Opportunity list</p>
-                <h3>Pipeline readiness</h3>
+                <h3>Pipeline</h3>
               </div>
               <button id="sortReadinessBtn" class="secondary-button" type="button">Sort by readiness</button>
             </div>
@@ -535,7 +532,6 @@
                     <h3>BCM, SRM, and BAB checklist</h3>
                     <button type="button" class="help-tooltip" data-help-key="srmReadiness" data-help-label="Governance readiness"><span aria-hidden="true">i</span></button>
                   </div>
-                  <p class="section-help">Why the opportunity is or is not ready.</p>
                 </div>
                 <span id="checklistScore" class="meta-chip">0 of 0 complete</span>
               </div>
@@ -645,6 +641,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260711-4"></script>
+    <script type="module" src="./modules/main.js?v=20260711-5"></script>
   </body>
 </html>

@@ -26,7 +26,6 @@ package.
   - `actions.js` — form sync and mutation handlers; opportunity creation.
   - `airport-directory.js` — bundled airport reference data + search.
   - `airport-search.js` — header search dropdown → create opportunity from an airport.
-  - `airport-lookup.js` — per-code Wikidata traffic lookup.
   - `main.js` — event wiring and bootstrap (entry point).
 
 ## Non-negotiable rules

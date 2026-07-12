@@ -10,7 +10,7 @@ import {
   productScope,
   referenceToday,
   stakeholderTemplates,
-} from "./data.js?v=20260711-4";
+} from "./data.js?v=20260711-5";
 import {
   airportProfileFor,
   classifyAirport,
@@ -29,7 +29,7 @@ import {
   showToast,
   sizingEstimatesFor,
   validationRequestsFor,
-} from "./state.js?v=20260711-4";
+} from "./state.js?v=20260711-5";
 import {
   applyEstimateInitialMd,
   buildNotificationBody,
@@ -37,18 +37,18 @@ import {
   defaultValidationRequestId,
   finalMdForEstimate,
   generateSizingForOpportunity,
-} from "./sizing-engine.js?v=20260711-4";
+} from "./sizing-engine.js?v=20260711-5";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-4";
+} from "./readiness-rules.js?v=20260711-5";
 import {
   airportByCode,
-} from "./airport-directory.js?v=20260711-4";
+} from "./airport-directory.js?v=20260711-5";
 import {
   renderAll,
   renderIntakeNarrativeSummary,
   renderRecordHeader,
-} from "./render.js?v=20260711-4";
+} from "./render.js?v=20260711-5";
 
 function syncIntakeFromForm() {
   const opportunity = selectedOpportunity();
@@ -146,7 +146,7 @@ function createOpportunity() {
   const id = `opp-${Date.now()}`;
   const opportunity = newOpportunityRecord(id);
   const profile = airportProfile(id, opportunity.customer, 0, 0, opportunity.region);
-  registerOpportunity(opportunity, profile, "New mock opportunity created. Start by entering the airport profile.");
+  registerOpportunity(opportunity, profile, "Opportunity created. Start with the airport profile.");
 }
 
 // Creates an opportunity targeting a specific airport from the reference
