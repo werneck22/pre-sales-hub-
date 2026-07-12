@@ -108,11 +108,11 @@ const HELP_TEXT = {
   productScope:
     "Product scope defines which sizing rules, workstreams, resource owners, and validations are included in the opportunity baseline.",
   automatedSizing:
-    "Initial MDs are generated from configurable mock rules based on airport category, product scope, complexity, risk, and product drivers. Validation is required before governance use.",
+    "Initial MDs are generated from preliminary rules based on airport category, product scope, complexity, risk, and product drivers. Owner validation is required before governance use.",
   mdEstimates:
     "MD means man-day. Initial MD is the generated baseline, adjusted MD records an owner change, and final MD is available after approval.",
   complexity:
-    "Complexity adjusts the mock sizing baseline for solution and delivery difficulty. Use the level that best reflects the known opportunity conditions.",
+    "Complexity adjusts the preliminary sizing baseline for solution and delivery difficulty. Use the level that best reflects the known opportunity conditions.",
   confidence:
     "Confidence indicates how reliable the initial estimate is based on the available scope, assumptions, complexity, and risk inputs.",
   resourceValidation:
@@ -127,8 +127,6 @@ const HELP_TEXT = {
     "The decision log preserves forum outcomes, owners, conditions, and next steps as governance evidence.",
   manualOverrides:
     "Manual overrides require justification to preserve traceability. The original rule calculation remains visible for comparison.",
-  airportLookup:
-    "Looks up annual passenger traffic on Wikidata by IATA (3-letter) or ICAO (4-letter) airport code. The result is an unverified suggestion with its source and reference year recorded; movements still require manual entry and figures should be confirmed against official statistics before governance use.",
   businessCasePack:
     "The business case pack consolidates the validated sizing baseline, scope, assumptions, open risks, approval conditions, and decisions into one read-only summary, with a historical benchmark comparison for similar airports.",
 };

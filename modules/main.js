@@ -5,7 +5,7 @@ import {
   productScope,
   risk,
   slug,
-} from "./data.js?v=20260711-4";
+} from "./data.js?v=20260711-5";
 import {
   activeRoute,
   airportProfileFor,
@@ -38,7 +38,7 @@ import {
   toggleValidationProduct,
   sizingEstimatesFor,
   sortByReadiness,
-} from "./state.js?v=20260711-4";
+} from "./state.js?v=20260711-5";
 import {
   buildSizingCsv,
   defaultValidationRequestId,
@@ -46,10 +46,10 @@ import {
   initializeSizingEngine,
   nextActionableRequestId,
   runNotificationTrigger,
-} from "./sizing-engine.js?v=20260711-4";
+} from "./sizing-engine.js?v=20260711-5";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-4";
+} from "./readiness-rules.js?v=20260711-5";
 import {
   airportProfileComplete,
   buildBusinessCaseText,
@@ -57,15 +57,12 @@ import {
   renderNotificationPreview,
   renderSizingEstimates,
   renderValidationRequests,
-} from "./render.js?v=20260711-4";
-import {
-  lookupAirportData,
-} from "./airport-lookup.js?v=20260711-4";
+} from "./render.js?v=20260711-5";
 import {
   handleSearchResultClick,
   hideSearchResults,
   renderSearchResults,
-} from "./airport-search.js?v=20260711-4";
+} from "./airport-search.js?v=20260711-5";
 import {
   addProductScope,
   applyAirportCodeToProfile,
@@ -81,7 +78,7 @@ import {
   updateEstimateManualOverride,
   updateEstimateValidation,
   updateScopeDriverValue,
-} from "./actions.js?v=20260711-4";
+} from "./actions.js?v=20260711-5";
 
 elements.opportunityList.addEventListener("click", (event) => {
   const card = event.target.closest("[data-id]");
@@ -170,7 +167,6 @@ elements.generateSizingBtn?.addEventListener("click", () => {
   runSizingForSelected();
   if (productScopesFor(selectedId).length) navigateToRoute("sizing");
 });
-elements.airportLookupBtn?.addEventListener("click", lookupAirportData);
 if (elements.estimateProductFilter) {
   elements.estimateProductFilter.addEventListener("change", () => {
     setEstimateProductFilter(elements.estimateProductFilter.value);
@@ -205,7 +201,7 @@ elements.intakeForm.addEventListener("submit", (event) => {
   event.preventDefault();
   syncIntakeFromForm();
   renderAll();
-  showToast("Mock intake saved. Readiness and next actions refreshed.");
+  showToast("Intake saved.");
 });
 
 elements.productScope.addEventListener("input", (event) => {
@@ -231,7 +227,7 @@ elements.productScope.addEventListener("change", (event) => {
   if (productName) {
     if (event.target.checked && !findProductScope(selectedId, productName)) {
       addProductScope(selectedId, productName);
-      showToast(`${productName} added to scope. Sizing placeholders are ready.`);
+      showToast(`${productName} added to scope.`);
     }
     if (!event.target.checked) {
       mockDb.productScopes = mockDb.productScopes.filter((item) => !(item.opportunity_id === selectedId && item.product_name === productName));

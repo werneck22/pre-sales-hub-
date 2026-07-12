@@ -26,7 +26,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260711-4";
+} from "./data.js?v=20260711-5";
 import {
   activeRoute,
   airportProfileFor,
@@ -59,7 +59,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260711-4";
+} from "./state.js?v=20260711-5";
 import {
   dashboardTotalsForOpportunity,
   defaultValidationRequestId,
@@ -76,7 +76,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260711-4";
+} from "./sizing-engine.js?v=20260711-5";
 import {
   forumReadinessLabel,
   forumReady,
@@ -88,7 +88,7 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260711-4";
+} from "./readiness-rules.js?v=20260711-5";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -162,7 +162,7 @@ function renderExecutiveDashboard() {
       ? ""
       : `<div class="empty-state guided-empty">
           <strong>No opportunities match the current filters.</strong>
-          <p>Clear the filter or create a new opportunity to walk through intake, sizing, validation, and readiness.</p>
+          <p>Clear the filter or create a new opportunity.</p>
           <button type="button" class="primary-button" data-action="create-opportunity">Create opportunity</button>
         </div>`;
   }
@@ -871,7 +871,7 @@ function renderSizingEstimates(opportunity) {
                   <div class="rule-breakdown-grid">
                     <div><span>Rule ID</span><strong>${escapeHtml(appliedRule)}</strong></div>
                     <div><span>Rule description</span><strong>${escapeHtml(
-                      estimate.rule_description || rule.description || "Mock configurable sizing rule.",
+                      estimate.rule_description || rule.description || "Preliminary sizing rule - pending calibration.",
                     )}</strong></div>
                     <div><span>Base MD</span><strong>${formatNumber(estimate.base_md || rule.base_md || rule.default_md || 0)}</strong></div>
                     <div><span>Complexity multiplier</span><strong>${escapeHtml(formatFactor(estimate.complexity_multiplier))}</strong></div>
@@ -1749,7 +1749,7 @@ function buildBusinessCaseText(opportunity) {
   lines.push(`Key assumptions (${assumptions.length}):`);
   assumptions.forEach((assumption) => lines.push(`  - ${assumption.description}`));
   lines.push("");
-  lines.push("Mock pack - not for external distribution. Salesforce remains the system of record.");
+  lines.push("Draft pack - not for external distribution. Salesforce remains the system of record.");
   return lines.join("\n");
 }
 
