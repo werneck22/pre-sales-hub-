@@ -26,7 +26,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260711-5";
+} from "./data.js?v=20260711-6";
 import {
   activeRoute,
   airportProfileFor,
@@ -59,7 +59,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260711-5";
+} from "./state.js?v=20260711-6";
 import {
   dashboardTotalsForOpportunity,
   defaultValidationRequestId,
@@ -76,7 +76,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260711-5";
+} from "./sizing-engine.js?v=20260711-6";
 import {
   forumReadinessLabel,
   forumReady,
@@ -88,7 +88,7 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260711-5";
+} from "./readiness-rules.js?v=20260711-6";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -670,8 +670,8 @@ function renderSizingSummary(opportunity) {
       <span>${totals.validated}</span>
       <label>Validated MD</label>
     </div>
-    <div class="metric compact-metric ${totals.delta ? "alert" : ""}">
-      <span>${totals.delta}</span>
+    <div class="metric compact-metric ${totals.validated && totals.delta ? "alert" : ""}">
+      <span>${totals.validated ? totals.delta : "-"}</span>
       <label>MD delta</label>
     </div>
     <div class="metric compact-metric alert">

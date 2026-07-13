@@ -14,13 +14,13 @@ import {
   makeValidation,
   productScope,
   risk,
-} from "./data.js?v=20260711-5";
+} from "./data.js?v=20260711-6";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-5";
+} from "./readiness-rules.js?v=20260711-6";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260711-5";
+} from "./render.js?v=20260711-6";
 
 let mockDb = {
   opportunities: [
