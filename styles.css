@@ -2736,15 +2736,10 @@ button:disabled {
   align-items: start;
 }
 
-.sizing-main,
-.sizing-side {
+.sizing-main {
   display: grid;
   gap: 14px;
   min-width: 0;
-}
-
-.sizing-side {
-  grid-template-columns: minmax(260px, 0.45fr) minmax(0, 1fr);
 }
 
 .subsection-heading {
@@ -4764,7 +4759,6 @@ tbody th {
 .sizing-summary,
 .process-flow,
 .sizing-layout,
-.sizing-side,
 .workspace-side,
 .validation-command-bar,
 .validation-workflow-board,
@@ -5223,10 +5217,6 @@ tbody th {
 .reference-registry .matrix-wrap {
   border-width: 1px 0 0;
   border-radius: 0;
-}
-
-.sizing-side {
-  grid-template-columns: 1fr;
 }
 
 @media (max-width: 900px) {

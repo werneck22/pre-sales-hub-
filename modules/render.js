@@ -26,7 +26,7 @@ import {
   sizingRuleCode,
   statusClass,
   statusOptions,
-} from "./data.js?v=20260711-6";
+} from "./data.js?v=20260711-7";
 import {
   activeRoute,
   airportProfileFor,
@@ -59,7 +59,7 @@ import {
   validationRequestsFor,
   validationTab,
   validationsFor,
-} from "./state.js?v=20260711-6";
+} from "./state.js?v=20260711-7";
 import {
   dashboardTotalsForOpportunity,
   defaultValidationRequestId,
@@ -76,7 +76,7 @@ import {
   sizingRuleForEstimate,
   totalsForOpportunity,
   validationRequestContexts,
-} from "./sizing-engine.js?v=20260711-6";
+} from "./sizing-engine.js?v=20260711-7";
 import {
   forumReadinessLabel,
   forumReady,
@@ -88,7 +88,7 @@ import {
   readinessGapsForOpportunity,
   readinessRuleResults,
   sizingReadinessImpact,
-} from "./readiness-rules.js?v=20260711-6";
+} from "./readiness-rules.js?v=20260711-7";
 
 function helpTooltip(key, label) {
   return `<button type="button" class="help-tooltip" data-help-key="${escapeHtml(key)}" data-help-label="${escapeHtml(
@@ -622,36 +622,6 @@ function renderAirportProfile(opportunity) {
         ${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(String(value))}</dd></div>`).join("")}
       </dl>`;
   }
-}
-
-function renderClassificationRules() {
-  if (!elements.classificationRules) return;
-  elements.classificationRules.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Annual passengers</th>
-          <th>Annual movements</th>
-          <th>Active</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${mockDb.classificationRules
-          .map(
-            (rule) => `
-          <tr>
-            <th scope="row">${escapeHtml(rule.category)}</th>
-            <td>${formatNumber(rule.passenger_min)} - ${rule.passenger_max === Infinity ? "+" : formatNumber(rule.passenger_max)}</td>
-            <td>${formatNumber(rule.movement_min)} - ${rule.movement_max === Infinity ? "+" : formatNumber(rule.movement_max)}</td>
-            <td>${rule.active ? "Yes" : "No"}</td>
-          </tr>
-        `,
-          )
-          .join("")}
-      </tbody>
-    </table>
-  `;
 }
 
 function renderSizingSummary(opportunity) {
@@ -1317,7 +1287,6 @@ function renderNotificationPreview() {
 
 function renderSizingEngine(opportunity) {
   renderAirportProfile(opportunity);
-  renderClassificationRules();
   renderSizingSummary(opportunity);
   renderSizingEstimates(opportunity);
   renderValidationRequests(opportunity);
@@ -1938,7 +1907,6 @@ export {
   renderScopeDriverControls,
   renderProductScope,
   renderAirportProfile,
-  renderClassificationRules,
   renderSizingSummary,
   filteredSizingEstimates,
   renderEstimateFilters,
