@@ -14,13 +14,13 @@ import {
   makeValidation,
   productScope,
   risk,
-} from "./data.js?v=20260711-6";
+} from "./data.js?v=20260711-7";
 import {
   readiness,
-} from "./readiness-rules.js?v=20260711-6";
+} from "./readiness-rules.js?v=20260711-7";
 import {
   recommendedNextAction,
-} from "./render.js?v=20260711-6";
+} from "./render.js?v=20260711-7";
 
 let mockDb = {
   opportunities: [
@@ -438,7 +438,6 @@ const elements = {
   productScope: document.querySelector("#productScope"),
   airportProfileForm: document.querySelector("#airportProfileForm"),
   categoryBadge: document.querySelector("#categoryBadge"),
-  classificationRules: document.querySelector("#classificationRules"),
   runSizingBtn: document.querySelector("#runSizingBtn"),
   sizingSummary: document.querySelector("#sizingSummary"),
   estimateProductFilter: document.querySelector("#estimateProductFilter"),
