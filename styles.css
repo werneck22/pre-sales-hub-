@@ -3959,7 +3959,20 @@ tbody th {
 }
 
 .inline-form.stacked {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.inline-form.stacked label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.inline-form.stacked .span-2,
+.inline-form.stacked button {
+  grid-column: 1 / -1;
 }
 
 .log-subheading {
@@ -4736,6 +4749,7 @@ tbody th {
 .visual-row,
 .executive-action-strip,
 .dashboard-section-grid,
+.inline-form.stacked,
 .form-grid,
 .narrative-summary,
 .narrative-cards,

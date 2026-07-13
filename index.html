@@ -16,13 +16,13 @@
       href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260711-5" />
+    <link rel="stylesheet" href="./styles.css?v=20260711-6" />
   </head>
   <body data-active-route="dashboard">
     <div class="app-shell">
       <aside class="sidebar" aria-label="Hub navigation">
         <div class="brand-block">
-          <img class="brand-logo" src="assets/amadeus-logo.png?v=20260711-5" alt="Amadeus" width="132" height="19" />
+          <img class="brand-logo" src="assets/amadeus-logo.png?v=20260711-6" alt="Amadeus" width="132" height="19" />
           <h1 class="brand-product">AirPort Hub</h1>
         </div>
 
@@ -44,7 +44,7 @@
 
         <button id="resetDataBtn" class="sidebar-reset" type="button">Reset demo data</button>
 
-        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v34</span></p>
+        <p class="sidebar-footer"><strong>Amadeus</strong> Airport IT · It's how travel works better. <span class="build-tag">Build v35</span></p>
       </aside>
 
       <main class="main-content">
@@ -137,7 +137,7 @@
               <span class="dashboard-strip-label">Sizing effort (MD)</span>
               <span class="dashboard-strip-stat"><b id="metricInitialMd">0</b> initial</span>
               <span class="dashboard-strip-divider" aria-hidden="true"></span>
-              <span class="dashboard-strip-stat"><b id="metricValidatedMd">0</b> validated</span>
+              <span class="dashboard-strip-stat"><b id="metricValidatedMd">0</b> current</span>
               <span class="dashboard-strip-divider" aria-hidden="true"></span>
               <span class="dashboard-strip-stat delta"><b id="metricMdDelta">0</b> delta</span>
             </div>
@@ -568,46 +568,76 @@
                                   </div>
               </div>
               <form id="riskForm" class="inline-form stacked">
-                <select name="category" aria-label="Risk category">
-                  <option>Technical</option>
-                  <option>Delivery</option>
-                  <option>Commercial</option>
-                  <option>Governance</option>
-                  <option>Exclusion</option>
-                </select>
-                <input name="description" type="text" placeholder="Risk description" />
-                <select name="severity" aria-label="Severity">
-                  <option>High</option>
-                  <option>Medium</option>
-                  <option>Low</option>
-                </select>
-                <input name="mitigation" type="text" placeholder="Mitigation" />
-                <input name="owner" type="text" placeholder="Owner" />
-                <select name="status" aria-label="Risk status">
-                  <option>Open</option>
-                  <option>Mitigating</option>
-                  <option>Closed</option>
-                </select>
+                <label class="span-2">
+                  Description
+                  <input name="description" type="text" />
+                </label>
+                <label>
+                  Category
+                  <select name="category">
+                    <option>Technical</option>
+                    <option>Delivery</option>
+                    <option>Commercial</option>
+                    <option>Governance</option>
+                    <option>Exclusion</option>
+                  </select>
+                </label>
+                <label>
+                  Severity
+                  <select name="severity">
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select>
+                </label>
+                <label>
+                  Mitigation
+                  <input name="mitigation" type="text" />
+                </label>
+                <label>
+                  Owner
+                  <input name="owner" type="text" />
+                </label>
+                <label>
+                  Status
+                  <select name="status">
+                    <option>Open</option>
+                    <option>Mitigating</option>
+                    <option>Closed</option>
+                  </select>
+                </label>
                 <button class="secondary-button" type="submit">Add risk</button>
               </form>
               <div id="riskList" class="log-list"></div>
 
               <h4 class="log-subheading">Assumptions</h4>
               <form id="assumptionForm" class="inline-form stacked">
-                <input name="description" type="text" placeholder="Assumption description" />
-                <select name="category" aria-label="Assumption category">
-                  <option>Technical</option>
-                  <option>Delivery</option>
-                  <option>Integration</option>
-                  <option>Commercial</option>
-                  <option>Customer dependency</option>
-                </select>
-                <select name="impact" aria-label="Impact">
-                  <option>High</option>
-                  <option>Medium</option>
-                  <option>Low</option>
-                </select>
-                <input name="owner" type="text" placeholder="Owner" />
+                <label class="span-2">
+                  Description
+                  <input name="description" type="text" />
+                </label>
+                <label>
+                  Category
+                  <select name="category">
+                    <option>Technical</option>
+                    <option>Delivery</option>
+                    <option>Integration</option>
+                    <option>Commercial</option>
+                    <option>Customer dependency</option>
+                  </select>
+                </label>
+                <label>
+                  Impact
+                  <select name="impact">
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select>
+                </label>
+                <label class="span-2">
+                  Owner
+                  <input name="owner" type="text" />
+                </label>
                 <button class="secondary-button" type="submit">Add assumption</button>
               </form>
               <div id="assumptionList" class="log-list"></div>
@@ -623,15 +653,30 @@
                                   </div>
               </div>
               <form id="decisionForm" class="inline-form stacked">
-                <select name="forum" aria-label="Forum">
-                  <option>BCM</option>
-                  <option>SRM</option>
-                  <option>BAB</option>
-                </select>
-                <input name="decision_owner" type="text" placeholder="Decision owner" />
-                <input name="decision" type="text" placeholder="Decision" />
-                <input name="conditions" type="text" placeholder="Conditions" />
-                <input name="next_steps" type="text" placeholder="Next steps" />
+                <label>
+                  Forum
+                  <select name="forum">
+                    <option>BCM</option>
+                    <option>SRM</option>
+                    <option>BAB</option>
+                  </select>
+                </label>
+                <label>
+                  Decision owner
+                  <input name="decision_owner" type="text" />
+                </label>
+                <label class="span-2">
+                  Decision
+                  <input name="decision" type="text" />
+                </label>
+                <label>
+                  Conditions
+                  <input name="conditions" type="text" />
+                </label>
+                <label>
+                  Next steps
+                  <input name="next_steps" type="text" />
+                </label>
                 <button class="primary-button" type="submit">Log decision</button>
               </form>
               <div id="decisionList" class="log-list"></div>
@@ -641,6 +686,6 @@
       </main>
     </div>
 
-    <script type="module" src="./modules/main.js?v=20260711-5"></script>
+    <script type="module" src="./modules/main.js?v=20260711-6"></script>
   </body>
 </html>
