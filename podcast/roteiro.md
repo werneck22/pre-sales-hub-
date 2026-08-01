@@ -7,7 +7,7 @@ Convenções: `## N — Título` abre um episódio. `[pausa]` vira silêncio na 
 
 ## 1 — O dilema
 
-Bem-vindo. Nos próximos vinte e cinco minutos você vai dominar o caso ING Bank of Canada — não para recontá-lo, mas para decidir sobre ele. Porque é isso que uma discussão de caso cobra: uma posição, defendida com números.
+Bem-vindo. Nos próximos trinta minutos você vai dominar o caso ING Bank of Canada — não para recontá-lo, mas para decidir sobre ele. Porque é isso que uma discussão de caso cobra: uma posição, defendida com números.
 
 [pausa]
 
@@ -156,3 +156,75 @@ Quinta, no fechamento, quando pedirem o principal takeaway: “Vantagem sustent�
 E se vier o cold call, sua resposta de trinta segundos: “O dilema imediato é marketing; o real é provar que discount funciona em banco. Eu apostaria nos quinze milhões ou mais: o CAC exige, a janela competitiva fechava com o mbanx, e o modelo só remunera o capital em escala. Subinvestir é o único cenário sem vitória possível.”
 
 Boa aula. Você não vai à discussão para participar. Vai para elevá-la.
+
+## 8 — Extra: Uruguai e Estados Unidos
+
+Episódio extra, e ele muda de assunto: sai o Canadá de 1997, entra a expansão do BTG Pactual. Um aviso antes de começar, e ele importa. O que eu trago de fato aqui é informação pública, de imprensa e comunicado. A leitura estratégica é minha. E a validação é sua, porque você tem o lado de dentro e eu não. Trate este episódio como um roteiro de perguntas, não como um laudo.
+
+[pausa]
+
+Primeiro os fatos, curtos.
+
+Uruguai. Em julho de 2025 o BTG anuncia a compra da operação do HSBC no país. A aprovação do banco central uruguaio sai, e em julho de 2026 as agências reabrem com a marca nova. Preço: cento e setenta e cinco milhões de dólares pela operação, duzentos e onze milhões considerando os instrumentos de capital adicionais. O que veio junto: cerca de duzentos e sessenta funcionários, aproximadamente cinquenta mil clientes, mais de um vírgula oito bilhão de dólares em ativos sob gestão e uma carteira de crédito de um vírgula um bilhão. Era o quinto maior banco privado do Uruguai. E o escopo declarado é amplo: varejo, crédito para empresas de todos os portes, banco de investimento e wealth management.
+
+Estados Unidos. Acordo anunciado em junho de 2024 para comprar cem por cento do M.Y. Safra Bank, concluído em janeiro de 2026, com aval do Federal Reserve. Vira BTG Pactual Bank, sediado em Nova York. E o que a licença destrava é bem específico: captar depósito e conceder crédito diretamente no mercado americano — coisa que o banco não podia fazer em mais de quinze anos de presença por lá. Na ponta do cliente, é digital: conta em dólar, transferências, cartão internacional, carteira digital no celular.
+
+[pausa]
+
+Agora a leitura. E ela começa pelo que os dois casos têm em comum, que é mais do que parece.
+
+O ING varreu os países da OCDE com três critérios explícitos: oligopólio, preços altos, produtos homogêneos. Três, escritos. E a escolha do Canadá tinha função dupla: mercado em si e laboratório para os Estados Unidos. Então a primeira pergunta que eu levaria para a mesa é essa. Qual é a tese de peneira? Porque expansão sem critério declarado não é estratégia, é coleção de bandeiras no mapa. E o Uruguai também tem função dupla óbvia: é um mercado pequeno e é um hub — ambiente fiscal favorável que atrai cliente de alta renda da América Latina inteira. Isso é escolha de peneira. Vale dizer em voz alta qual é.
+
+[pausa]
+
+Segundo ponto, e é o contraste mais rico deste episódio: comprar contra construir.
+
+O ING Direct foi greenfield puro. Sem template, doze meses, legado zero — e a Pergunta Três passa a aula inteira defendendo por que valeu a pena: sistema desenhado para um único propósito, gente contratada por atitude, autonomia para corrigir em voo. O BTG fez o oposto nas duas frentes. Comprou.
+
+E comprar é uma troca, não um atalho de graça. O que se ganha é exatamente o que faltou ao Kuhlmann: tempo, licença, base de clientes e depósito no primeiro dia. O que se paga é justamente aquilo que o caso valoriza — você herda sistema, processo, contrato e cultura do dono anterior. Kuhlmann sofreu doze meses para ter legado zero. Quem compra pula os doze meses e recebe o legado junto.
+
+[pausa]
+
+E aqui vai a distinção que separa quem leu os dois casos de quem só passou o olho: as duas compras do BTG não são a mesma tese.
+
+Nos Estados Unidos, o ativo parece ser a licença. Um banco pequeno em Nova York vale pelo que ele destrava — captar depósito e emprestar sob supervisão do Fed. É compra de permissão.
+
+No Uruguai é compra de negócio: cinquenta mil clientes, quase dois bilhões sob gestão, agências, carteira de crédito, duzentas e sessenta pessoas. Mesmo rótulo de expansão internacional, duas economias completamente diferentes. Se você fizer só essa distinção em voz alta, já elevou a conversa.
+
+[pausa]
+
+Terceiro: passivo primeiro. Lembra da sequência do ING? Capta barato com um produto de poupança e depois adiciona crédito, para subir o rendimento e antecipar o ponto de equilíbrio. A licença americana é literalmente isso: captar depósito e emprestar. Então a pergunta boa não é se o BTG virou banco de varejo nos Estados Unidos. É o que ele está buscando: spread ou funding? Porque dinheiro de cliente que hoje dorme em custodiante de terceiro vira, com licença própria, depósito na casa. Isso é matéria-prima barata — exatamente o papel que o ISA tinha para o ING.
+
+[pausa]
+
+Quarto, e este é o desconforto produtivo. O caso é explícito: bancos estrangeiros tentaram o varejo canadense — Citibank, Bank of America, BNP — todos com pouco ou nenhum sucesso. Se você levar esse paralelo para a mesa, a pergunta é inevitável: por que agora seria diferente?
+
+Eu defenderia três respostas, e nenhuma delas é otimismo. Um: não é varejo de massa, é cliente de alta renda — a economia é de saldo por cliente, não de número de clientes. Dois: comprou base e licença, em vez de construir do zero contra incumbente entrincheirado. E três, a mais forte: o ING foi conquistar o cliente local do concorrente. O BTG está seguindo o próprio cliente para onde ele já queria estar. Isso tem outro nome e outra aritmética. Uma coisa é conquistar mercado, outra é acompanhar cliente. O custo de aquisição de alguém que já é seu cliente em outro país não é cento e oitenta dólares — é uma fração disso. É essa a vantagem estrutural da tese regional, e é ela que responde a pergunta.
+
+[pausa]
+
+Quinto, o incômodo que eu levaria mesmo assim, porque tem resposta boa. A lição central do ING é a disciplina da recusa: não à conta corrente, não ao cheque, não ao caixa eletrônico. Dez a vinte produtos onde mora oitenta por cento do lucro. O escopo declarado no Uruguai é o oposto disso: varejo, empresas de todos os portes, banco de investimento e wealth. Serviço completo.
+
+Então a pergunta é: o que a gente vai recusar no Uruguai? Porque a aritmética não perdoa. E faça a conta comigo, direcional: duzentas e sessenta pessoas para cinquenta mil clientes dá um funcionário para cada cento e noventa clientes. Isso é proporção de gestão de patrimônio, não de varejo de massa — banco de varejo de verdade opera com milhares de clientes por funcionário. Ou seja: a estrutura que veio junto já diz para onde o negócio precisa ir, e ela aponta para ticket alto. É o Episódio Quatro aplicado. Saldo por cliente é a variável escondida — no Canadá de 97 e no Uruguai de hoje.
+
+[pausa]
+
+Sexto e último: separação contra integração. O ING provou que unidade disruptiva morre quando é integrada. Pull e push não convivem, e a disciplina de não integrar era a estratégia. Mas expansão de plataforma quer exatamente o contrário — e o discurso público no Uruguai é de integração à plataforma internacional. E faz sentido, porque ali a sinergia é de produto e de cliente, não de disrupção.
+
+A lição, então, não é isole sempre. É saber qual dos dois jogos você está jogando. Isolar é para quando a nova unidade ameaça o modelo da matriz. Integrar é para quando ela estende o alcance da matriz. Confundir os dois custa caro nas duas direções.
+
+[pausa]
+
+Fecho com cinco aprendizados, em fila rápida.
+
+Um: declare a tese de peneira. O ING tinha três critérios escritos; toda expansão devia ter os seus.
+
+Dois: comprar e construir compram coisas diferentes. Velocidade e licença de um lado; custo estrutural e foco do outro. Ninguém leva os dois.
+
+Três: distinga compra de permissão de compra de negócio. Mesmo rótulo, contas diferentes.
+
+Quatro: a métrica não é país no mapa nem cliente na base. É receita por cliente contra alavanca de custo.
+
+Cinco: pergunte sempre o que será recusado. Num banco, o que você recusa é o que financia o que você oferece.
+
+E o meta-aprendizado, que vale mais que os cinco: o caso do ING não serve para dizer que o BTG deveria ter feito diferente. Serve para dar vocabulário — peneira, greenfield, passivo primeiro, saldo por cliente, disciplina de recusa. Chegar numa discussão de expansão com esse vocabulário é o que separa opinião de análise.

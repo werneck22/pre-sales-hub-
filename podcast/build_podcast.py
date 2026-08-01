@@ -74,6 +74,8 @@ SUMMARIES = {
        "disciplina de produtos e sete transposições para hoje.",
     7: "Tática de sala: cinco intervenções planejadas, como reformular o dilema de "
        "marketing e a resposta de trinta segundos para o cold call.",
+    8: "Extra: o caso aplicado à expansão do BTG Pactual no Uruguai e nos Estados "
+       "Unidos — comprar contra construir, licença contra negócio, e o que recusar.",
 }
 
 

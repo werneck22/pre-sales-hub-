@@ -8,8 +8,8 @@ roteiro nunca sai do disco.
 |---|---|
 | Voz | Piper / VITS ONNX, `pt_BR-faber-medium` (modelo local, MIT) |
 | Áudio | MP3 mono 80 kbps, normalizado a −16 LUFS (padrão de podcast) |
-| Duração | ~25 min em 7 episódios |
-| Saída | `audio/ep1..ep7.mp3`, `index.html` (player), `feed.xml` (RSS) |
+| Duração | ~32 min em 7 episódios + 1 extra |
+| Saída | `audio/ep1..ep8.mp3`, `index.html` (player), `feed.xml` (RSS) |
 
 ## Rodar
 
@@ -44,6 +44,14 @@ narração reconstrói (a conta de ROE do episódio 4) ou cita casos externos ao
 Ivey (Egg, ING Direct USA, INSEAD), o próprio texto avisa. Manter esse aviso é
 parte do conteúdo: numa discussão de caso, apresentar inferência como fato é o
 erro que custa caro.
+
+O episódio 8 é extra e sai do caso: aplica o mesmo vocabulário à expansão do
+BTG Pactual no Uruguai (HSBC Uruguai, anunciada em jul/2025, operação iniciada
+em jul/2026) e nos Estados Unidos (M.Y. Safra Bank, concluída em jan/2026).
+Os fatos vêm de imprensa e comunicados públicos; a leitura estratégica é
+interpretação, e a narração diz isso na primeira frase. Quem tem o lado de
+dentro valida — nenhum dado interno entrou aqui, nem deve entrar: o
+repositório é público.
 
 ## Editar o conteúdo
 
