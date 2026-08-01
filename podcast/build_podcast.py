@@ -16,11 +16,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import re
 import shutil
 import subprocess
 import sys
 import wave
+from array import array
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -35,6 +37,7 @@ DEFAULT_VOICE = "pt_BR-faber-medium"
 # Silêncios (segundos). O roteiro pede "respiro de 1-2s" em [pausa].
 # Preferimos alongar as pausas a esticar os fonemas: o Piper fica robótico acima
 # de length-scale ~1.2, mas respiros entre frases soam naturais e baixam o ritmo.
+# SIL_SENTENCE é só o piso — quem decide a pausa entre frases é prosody().
 SIL_LEAD_IN = 0.5
 SIL_AFTER_TITLE = 0.9
 SIL_SENTENCE = 0.3
@@ -193,20 +196,98 @@ def write_wav(path: Path, sample_rate: int, pcm: bytes) -> None:
         out.writeframes(pcm)
 
 
-def synthesize(voice, ep: Episode, lexicon, syn_config) -> tuple[int, bytes]:
+# Um locutor nunca lê duas frases no mesmo andamento. O Piper, sim — e é isso
+# que denuncia a síntese. Estas funções devolvem o ritmo por frase.
+
+SENTENCE_SPLIT = re.compile(r"(?<=[.!?])[\"')\]]*\s+")
+
+
+def split_sentences(text: str) -> list[str]:
+    return [s.strip() for s in SENTENCE_SPLIT.split(text) if s.strip()]
+
+
+def prosody(sentence: str, base_length: float, base_noise_w: float, rng) -> tuple[float, float, float, float]:
+    """(length_scale, noise_w, ganho, pausa depois) para uma frase.
+
+    Frase curta é frase de efeito: mais lenta e um pouco mais forte. Frase longa
+    acelera e recua, como quem já está embalado. Pergunta pede suspensão. Sobre
+    tudo isso vai um jitter pequeno — a variação que o ouvido lê como "alguém
+    falando", e não como um sintetizador.
+    """
+    words = len(sentence.split())
+    length = base_length
+    gain_db = rng.uniform(-0.7, 0.7)
+    if words <= 6:
+        length += 0.09          # "Constantes." "Só." — pesa a pausa dramática
+        gain_db += 1.1
+    elif words <= 12:
+        length += 0.03
+        gain_db += 0.4
+    elif words >= 28:
+        length -= 0.045         # períodos longos correm
+        gain_db -= 0.6
+
+    if sentence.endswith("?"):
+        length += 0.03
+    length += rng.uniform(-0.045, 0.045)
+
+    noise_w = max(0.6, base_noise_w + rng.uniform(-0.06, 0.06))
+
+    if sentence.endswith("?"):
+        pause = 0.46
+    elif sentence.endswith("!"):
+        pause = 0.42
+    elif sentence.endswith("..."):
+        pause = 0.60           # reticências no roteiro são suspense, não fim de frase
+    elif sentence.endswith(":"):
+        pause = 0.20
+    elif words <= 6:
+        pause = 0.44           # deixa a frase curta assentar
+    else:
+        pause = SIL_SENTENCE
+    return length, noise_w, gain_db, pause + rng.uniform(-0.05, 0.05)
+
+
+def apply_gain(pcm: bytes, gain_db: float) -> bytes:
+    if abs(gain_db) < 0.05:
+        return pcm
+    factor = 10 ** (gain_db / 20)
+    samples = array("h")
+    samples.frombytes(pcm)
+    samples = array("h", (max(-32768, min(32767, int(s * factor))) for s in samples))
+    return samples.tobytes()
+
+
+def synthesize(voice, ep: Episode, lexicon, base_config) -> tuple[int, bytes]:
+    from piper import SynthesisConfig
+
     sample_rate = voice.config.sample_rate
     chunks = [silence(sample_rate, SIL_LEAD_IN)]
     spoken = [b for b in ep.blocks if b[0] == "text"]
     done = 0
+    # semente fixa por episódio: o jitter varia entre frases, mas o build é reproduzível
+    rng = random.Random(f"{ep.number}:{ep.title}")
+
     for kind, value in ep.blocks:
         if kind == "pause":
             chunks.append(silence(sample_rate, value))
             continue
-        text = for_tts(value, lexicon)
-        for i, audio in enumerate(voice.synthesize(text, syn_config=syn_config)):
-            if i:  # o Piper devolve um chunk por frase — respiro entre elas
-                chunks.append(silence(sample_rate, SIL_SENTENCE))
-            chunks.append(audio.audio_int16_bytes)
+        sentences = split_sentences(for_tts(value, lexicon))
+        for i, sentence in enumerate(sentences):
+            length, noise_w, gain_db, pause = prosody(sentence, base_config.length_scale,
+                                                      base_config.noise_w_scale, rng)
+            config = SynthesisConfig(
+                length_scale=length,
+                noise_scale=base_config.noise_scale,
+                noise_w_scale=noise_w,
+                # normalize_audio nivelaria TODA frase no pico máximo: é o que faz a
+                # narração soar plana. Sem ele, o modelo varia sozinho de 0,45 a 0,73.
+                normalize_audio=False,
+            )
+            if i:
+                chunks.append(silence(sample_rate, pause))
+            for audio in voice.synthesize(sentence, syn_config=config):
+                chunks.append(apply_gain(audio.audio_int16_bytes, gain_db))
         done += 1
         print(f"    bloco {done}/{len(spoken)}", end="\r", flush=True)
     chunks.append(silence(sample_rate, SIL_TAIL))
@@ -214,14 +295,67 @@ def synthesize(voice, ep: Episode, lexicon, syn_config) -> tuple[int, bytes]:
     return sample_rate, b"".join(chunks)
 
 
-def encode_mp3(wav_path: Path, mp3_path: Path, cover: Path | None, tags: dict) -> None:
+# Cadeia de locução: tira o retumbo grave, dá corpo e presença e comprime de
+# leve — só o suficiente para a voz soar próxima do microfone, sem achatar a
+# variação entre frases que a prosódia acabou de criar.
+VOICE_CHAIN = (
+    "highpass=f=75,"
+    "equalizer=f=200:t=q:w=1.2:g=1.4,"
+    "equalizer=f=3000:t=q:w=1.4:g=1.8,"
+    "acompressor=threshold=-12dB:ratio=1.8:attack=12:release=250:makeup=1,"
+    "afade=t=in:st=0:d=0.25"
+)
+
+LOUDNESS_TARGET = "I=-16:TP=-1.5:LRA=11"
+
+# Ruído de sala. Silêncio digital absoluto é o que mais entrega uma gravação
+# sintética: nenhuma sala é perfeitamente muda. ~-50 dBFS, filtrado, imperceptível
+# como som e decisivo como textura.
+ROOM_TONE = "anoisesrc=color=pink:amplitude=0.008,highpass=f=120,lowpass=f=5000"
+
+
+def measure_loudness(wav_path: Path) -> str:
+    """Primeira passagem do loudnorm: mede para depois aplicar ganho linear.
+
+    Em passagem única o loudnorm age como compressor e derruba a faixa dinâmica —
+    exatamente o que a prosódia por frase acabou de construir. Medindo antes, a
+    segunda passagem só desloca o nível.
+    """
+    proc = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-nostats", "-i", str(wav_path),
+         "-af", f"{VOICE_CHAIN},loudnorm={LOUDNESS_TARGET}:print_format=json",
+         "-f", "null", "-"],
+        capture_output=True, text=True, check=True)
+    raw = proc.stderr[proc.stderr.rindex("{"):proc.stderr.rindex("}") + 1]
+    m = json.loads(raw)
+    return (f"loudnorm={LOUDNESS_TARGET}:linear=true"
+            f":measured_I={m['input_i']}:measured_TP={m['input_tp']}"
+            f":measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}")
+
+
+def encode_mp3(wav_path: Path, mp3_path: Path, cover: Path | None, tags: dict,
+               room_tone: bool = True, bitrate: str = "80k") -> None:
+    chain = f"{VOICE_CHAIN},{measure_loudness(wav_path)}"
+
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav_path)]
+    if room_tone:
+        cmd += ["-f", "lavfi", "-i", ROOM_TONE]
+    cover_index = 2 if room_tone else 1
     if cover and cover.exists():
-        cmd += ["-i", str(cover), "-map", "0:a", "-map", "1:v", "-disposition:v", "attached_pic",
-                "-c:v", "copy", "-metadata:s:v", "title=Album cover",
-                "-metadata:s:v", "comment=Cover (front)"]
-    cmd += ["-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "44100", "-ac", "1",
-            "-c:a", "libmp3lame", "-b:a", "64k", "-id3v2_version", "3"]
+        cmd += ["-i", str(cover)]
+
+    if room_tone:
+        graph = f"[0:a]{chain}[sp];[1:a]aformat=channel_layouts=mono[rt];" \
+                f"[sp][rt]amix=inputs=2:duration=first:normalize=0[out]"
+    else:
+        graph = f"[0:a]{chain}[out]"
+    cmd += ["-filter_complex", graph, "-map", "[out]"]
+
+    if cover and cover.exists():
+        cmd += [f"-map", f"{cover_index}:v", "-disposition:v", "attached_pic", "-c:v", "copy",
+                "-metadata:s:v", "title=Album cover", "-metadata:s:v", "comment=Cover (front)"]
+
+    cmd += ["-ar", "44100", "-ac", "1", "-c:a", "libmp3lame", "-b:a", bitrate, "-id3v2_version", "3"]
     for key, value in tags.items():
         cmd += ["-metadata", f"{key}={value}"]
     cmd.append(str(mp3_path))
@@ -303,12 +437,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--voice", default=DEFAULT_VOICE)
     parser.add_argument("--episode", type=int, action="append", help="renderiza só estes episódios")
-    parser.add_argument("--length-scale", type=float, default=1.2, help="1.0 = ritmo natural; >1 = mais lento")
-    parser.add_argument("--noise-scale", type=float, default=0.667)
-    parser.add_argument("--noise-w", type=float, default=0.8)
+    parser.add_argument("--length-scale", type=float, default=1.14,
+                        help="ritmo base; a prosódia por frase varia em torno dele")
+    parser.add_argument("--noise-scale", type=float, default=0.68)
+    parser.add_argument("--noise-w", type=float, default=0.88,
+                        help="variação de duração dos fonemas — quanto maior, menos metronômico")
     parser.add_argument("--base-url", default="https://werneck22.github.io/pre-sales-hub-/podcast",
                         help="URL pública usada no feed RSS")
-    parser.add_argument("--sample", action="store_true", help="gera 40s de amostra de cada voz instalada")
+    parser.add_argument("--sample", action="store_true", help="gera uma amostra de cada voz instalada")
+    parser.add_argument("--no-room-tone", dest="room_tone", action="store_false",
+                        help="desliga o ruído de sala (volta ao silêncio digital)")
+    parser.add_argument("--bitrate", default="80k")
     parser.add_argument("--keep-wav", action="store_true")
     args = parser.parse_args()
 
@@ -329,15 +468,17 @@ def main() -> None:
     WORK_DIR.mkdir(parents=True, exist_ok=True)
 
     if args.sample:
-        text = for_tts(episodes[0].blocks[2][1], lexicon)[:420]
+        # mesmo trecho, mesma cadeia de tratamento — só a voz muda
+        demo = Episode(1, "Amostra", blocks=episodes[0].blocks[:8])
         for onnx in sorted(VOICES_DIR.glob("*.onnx")):
             name = onnx.stem
             print(f"amostra: {name}")
             voice = PiperVoice.load(onnx)
-            pcm = b"".join(c.audio_int16_bytes for c in voice.synthesize(text, syn_config=syn_config))
+            sample_rate, pcm = synthesize(voice, demo, lexicon, syn_config)
             wav = WORK_DIR / f"sample-{name}.wav"
-            write_wav(wav, voice.config.sample_rate, pcm)
-            encode_mp3(wav, AUDIO_DIR / f"sample-{name}.mp3", None, {"title": f"Amostra {name}"})
+            write_wav(wav, sample_rate, pcm)
+            encode_mp3(wav, AUDIO_DIR / f"sample-{name}.mp3", None,
+                       {"title": f"Amostra — {name}"}, room_tone=args.room_tone, bitrate=args.bitrate)
         return
 
     print(f"voz: {args.voice}  |  length-scale: {args.length_scale}")
@@ -376,7 +517,7 @@ def main() -> None:
             "date": str(built_at.year),
             "genre": "Podcast",
             "comment": ep.summary(180),
-        })
+        }, room_tone=args.room_tone, bitrate=args.bitrate)
         if not args.keep_wav:
             wav_path.unlink()
         seconds = duration_seconds(mp3_path)

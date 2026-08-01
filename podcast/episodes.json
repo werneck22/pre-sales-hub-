@@ -4,8 +4,8 @@
     "subtitle": "Curso em áudio para a discussão de caso",
     "description": "Seis episódios para dominar o caso ING Bank of Canada — não para recontá-lo, mas para decidir sobre ele: o dilema de marketing, a escolha do Canadá, a estratégia do não, a aritmética que fecha o ROE, as cinco perguntas da semana e a tática de sala.",
     "voice": "pt_BR-faber-medium",
-    "built_at": "2026-08-01T13:33:26+00:00",
-    "total_duration_hhmmss": "00:20:55"
+    "built_at": "2026-08-01T13:50:11+00:00",
+    "total_duration_hhmmss": "00:20:19"
   },
   "episodes": [
     {
@@ -15,9 +15,9 @@
       "file": "ep1.mp3",
       "summary": "O orçamento de marketing que não fecha com a própria meta — e o dilema maior embaixo dele: ninguém no mundo tinha provado que banco de desconto funciona.",
       "words": 330,
-      "duration_seconds": 124.7,
-      "duration_hhmmss": "00:02:05",
-      "bytes": 1246038,
+      "duration_seconds": 123.0,
+      "duration_hhmmss": "00:02:03",
+      "bytes": 1478582,
       "transcript": [
         "Bem-vindo. Nos próximos vinte minutos você vai dominar o caso ING Bank of Canada — não para recontá-lo, mas para decidir sobre ele. Porque é isso que uma discussão de caso cobra: uma posição, defendida com números.",
         "Começo pelo fim, que é onde o caso realmente começa. Início de 1997, Toronto. Arkadi Kuhlmann, presidente do ING Bank of Canada, olha o plano de lançamento e se faz uma pergunta que ele mesmo formula assim: “Devemos apostar tudo e gastar dez a vinte milhões de dólares no primeiro ano? Isso pode ser um enorme sucesso… ou um grande fracasso.”",
@@ -33,9 +33,9 @@
       "file": "ep2.mp3",
       "summary": "Os três critérios de peneira que elegeram o Canadá, o oligopólio dos cinco grandes e a razão de oito para um entre agência e internet.",
       "words": 402,
-      "duration_seconds": 173.4,
-      "duration_hhmmss": "00:02:53",
-      "bytes": 1635554,
+      "duration_seconds": 169.8,
+      "duration_hhmmss": "00:02:50",
+      "bytes": 1946674,
       "transcript": [
         "O ING é um gigante holandês nascido em 1991 da fusão da maior seguradora do país com o terceiro maior banco. No fim de 1996, tinha quase quinhentos bilhões de guilders em ativos — uma vez e meia o Royal Bank, o maior banco do Canadá. Detalhe estratégico: setenta e cinco por cento da receita vinha de seguros. Banco direto, para o ING, era diversificação e aposta de futuro.",
         "O gatilho veio de casa: na Holanda, um banco direto de um concorrente havia atraído sete milhões de clientes. A matriz então varreu os países da OCDE com três critérios de peneira. Preste atenção neles, porque são a tese do caso inteiro: primeiro, oligopólio bancário de varejo. Segundo, preços altos com serviço caro. Terceiro, produtos homogêneos, todos iguais. Traduzindo: procuravam um mercado gordo, preguiçoso e sem diferenciação — o habitat perfeito para um discounter.",
@@ -52,9 +52,9 @@
       "file": "ep3.mp3",
       "summary": "Posicionamento, dois produtos, juros dez vezes maiores e a lista de recusas: sem conta corrente, sem cheque, sem caixa eletrônico.",
       "words": 513,
-      "duration_seconds": 208.4,
-      "duration_hhmmss": "00:03:28",
-      "bytes": 1915585,
+      "duration_seconds": 203.4,
+      "duration_hhmmss": "00:03:23",
+      "bytes": 2282607,
       "transcript": [
         "A estratégia do ING Direct se define menos pelo que oferece e mais pelo que recusa. Vou percorrer os blocos.",
         "Alvo: canadenses de trinta a cinquenta e quatro anos, ensino superior, renda familiar acima de cinquenta mil, com pelo menos dois mil e quinhentos em poupança livre. Começa por Ontário — um milhão e meio de pessoas nesse perfil, mais da metade em Toronto — e nacionaliza em dezoito meses. E um detalhe fino: o cliente-alvo já trabalha com vários bancos e escolhe produto a produto. O ING não pede o divórcio do banco principal; pede um caso.",
@@ -73,9 +73,9 @@
       "file": "ep4.mp3",
       "summary": "A conta que decide a discussão: spread menor que o do incumbente, saldo médio por cliente e custos travados até quinhentas mil contas.",
       "words": 594,
-      "duration_seconds": 229.4,
-      "duration_hhmmss": "00:03:49",
-      "bytes": 2083003,
+      "duration_seconds": 223.4,
+      "duration_hhmmss": "00:03:43",
+      "bytes": 2481947,
       "transcript": [
         "Este episódio é o mais importante. Pegue papel ou abra a calculadora mental, porque quem domina esta conta controla a discussão.",
         "O banco canadense médio ganha um spread de duzentos e cinquenta pontos-base — dois e meio por cento entre o que capta e o que aplica. O ING inverte a lógica: aplica a uns seis por cento em títulos e paga quatro na poupança. Spread de duzentos pontos. Tirando dezesseis pontos do seguro de depósito, sobram uns cento e oitenta.",
@@ -97,9 +97,9 @@
       "file": "ep5.mp3",
       "summary": "Capital regulatório, a tensão com a matriz, foco e isolamento na TI, a disciplina de produtos e sete transposições para hoje.",
       "words": 910,
-      "duration_seconds": 356.1,
-      "duration_hhmmss": "00:05:56",
-      "bytes": 3096745,
+      "duration_seconds": 343.5,
+      "duration_hhmmss": "00:05:43",
+      "bytes": 3682778,
       "transcript": [
         "Agora, as cinco perguntas guias — que, atenção, misturam este caso com os casos do ING Direct americano e do INSEAD. Onde eu sair do documento, eu aviso.",
         "Pergunta um: como justificar oitenta mil dólares de capital para cada milhão em depósitos? Isso é simplesmente o capital regulatório de oito por cento. A resposta tem quatro camadas. Um: custo estrutural, não incremental — cinquenta por cento de cost-income contra sessenta e cinco, canal oito vezes mais barato, custos travados até quinhentas mil contas. Dois: simplicidade de balanço — sem conta corrente, sem cheque, sem crédito no início, menos fraude, menos processo, menos capital operacional. Três: a alavanca que acabamos de calcular — o capital é remunerado pelo volume, como num atacarejo, não pela margem unitária. Quatro: a sequência passivo-primeiro — capta barato hoje para, amanhã, financiar ativos de crédito que rendem mais que títulos e antecipam o breakeven. Frase de síntese para a aula: “o capital compra três coisas — plataforma de custo fixo, marca e funding barato; a remuneração está na escala, não no spread”.",
@@ -116,9 +116,9 @@
       "file": "ep6.mp3",
       "summary": "Tática de sala: quatro intervenções planejadas, como reformular o dilema de marketing e a resposta de trinta segundos para o cold call.",
       "words": 424,
-      "duration_seconds": 162.9,
-      "duration_hhmmss": "00:02:43",
-      "bytes": 1551355,
+      "duration_seconds": 156.0,
+      "duration_hhmmss": "00:02:36",
+      "bytes": 1807722,
       "transcript": [
         "Último episódio: tática de sala, no formato Think-Pair-Share com oitenta minutos de plenária.",
         "Regra de ouro do briefing da casa: mover a conversa adiante. Nada de recontar o caso, nada de repetir o colega, nada de “na minha área a gente faz assim” como assunto — experiência entra como evidência, não como biografia.",

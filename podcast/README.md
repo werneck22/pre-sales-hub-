@@ -7,7 +7,7 @@ roteiro nunca sai do disco.
 | | |
 |---|---|
 | Voz | Piper / VITS ONNX, `pt_BR-faber-medium` (modelo local, MIT) |
-| Áudio | MP3 mono 64 kbps, normalizado a −16 LUFS (padrão de podcast) |
+| Áudio | MP3 mono 80 kbps, normalizado a −16 LUFS (padrão de podcast) |
 | Duração | ~20 min em 6 episódios |
 | Saída | `audio/ep1..ep6.mp3`, `index.html` (player), `feed.xml` (RSS) |
 
@@ -74,3 +74,32 @@ Ajustes de ritmo ficam em `build_podcast.py`: preferimos alongar as pausas
 (`SIL_SENTENCE`, `SIL_PARAGRAPH`, `SIL_MARKED_PAUSE`) a esticar os fonemas — o
 Piper fica robótico com `--length-scale` acima de ~1,2, mas respiros entre
 frases soam naturais e derrubam o ritmo para uns 155 palavras por minuto.
+
+## O que torna a narração menos sintética
+
+O que denuncia um TTS não é o timbre — é a regularidade. Seis medidas, em ordem
+de impacto:
+
+1. **Prosódia por frase** (`prosody()`). Cada frase recebe seu próprio andamento:
+   frase curta é frase de efeito e sai mais lenta e mais forte; período longo
+   corre e recua; pergunta ganha suspensão. Por cima vai um jitter de ±4 % com
+   semente fixa — varia entre frases, mas o build continua reproduzível.
+2. **Sem normalização por frase.** O Piper nivela cada frase no pico máximo, o
+   que faz toda a narração sair no mesmo volume. Com `normalize_audio=False` os
+   picos voltam a variar sozinhos (0,45 a 0,73), como em alguém falando.
+3. **Pausas guiadas pela pontuação.** `?` pede 0,46 s, `...` pede 0,60 s (no
+   roteiro reticências são suspense, não fim de frase), `:` pede 0,20 s.
+4. **Ruído de sala** (`ROOM_TONE`). Silêncio digital absoluto é a maior denúncia
+   de gravação sintética — nenhuma sala é muda. Rosa filtrado a ~−60 dBFS:
+   imperceptível como som, decisivo como textura. Desligue com `--no-room-tone`.
+5. **Cadeia de locução** (`VOICE_CHAIN`): corta abaixo de 75 Hz, +1,4 dB de corpo
+   em 200 Hz, +1,8 dB de presença em 3 kHz e compressão leve (1,8:1) para a voz
+   soar próxima do microfone.
+6. **Normalização linear em duas passagens.** Em passagem única o `loudnorm` age
+   como compressor e achata justamente a variação criada nos itens 1 e 2 —
+   `measure_loudness()` mede antes para a segunda passagem só deslocar o nível.
+
+O teto, daqui em diante, é o modelo: a faixa dinâmica do WAV recém-sintetizado
+já é de 3,4 LU, e a cadeia de tratamento preserva isso inteiro. Ganho adicional
+vem de trocar a voz (`--sample` gera o mesmo trecho em todas as instaladas), não
+de mais processamento.
