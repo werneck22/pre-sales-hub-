@@ -68,9 +68,11 @@ SUMMARIES = {
        "sem conta corrente, sem cheque, sem caixa eletrônico.",
     4: "A conta que decide a discussão: spread menor que o do incumbente, saldo médio "
        "por cliente e custos travados até quinhentas mil contas.",
-    5: "Capital regulatório, a tensão com a matriz, foco e isolamento na TI, a "
+    5: "O mbanx e os outros entrantes de 1996-97, e a lista de riscos do próprio "
+       "Kuhlmann — incluindo a fricção de resgate num banco sem caixa eletrônico.",
+    6: "Capital regulatório, a tensão com a matriz, foco e isolamento na TI, a "
        "disciplina de produtos e sete transposições para hoje.",
-    6: "Tática de sala: quatro intervenções planejadas, como reformular o dilema de "
+    7: "Tática de sala: cinco intervenções planejadas, como reformular o dilema de "
        "marketing e a resposta de trinta segundos para o cold call.",
 }
 

@@ -8,8 +8,8 @@ roteiro nunca sai do disco.
 |---|---|
 | Voz | Piper / VITS ONNX, `pt_BR-faber-medium` (modelo local, MIT) |
 | Áudio | MP3 mono 80 kbps, normalizado a −16 LUFS (padrão de podcast) |
-| Duração | ~20 min em 6 episódios |
-| Saída | `audio/ep1..ep6.mp3`, `index.html` (player), `feed.xml` (RSS) |
+| Duração | ~25 min em 7 episódios |
+| Saída | `audio/ep1..ep7.mp3`, `index.html` (player), `feed.xml` (RSS) |
 
 ## Rodar
 
@@ -34,6 +34,16 @@ build_podcast.py --sample                     # 40 s de amostra de cada voz inst
 
 Vozes disponíveis em `./fetch_voices.sh all`: `faber` (padrão, masculina,
 locutor), `cadu`, `jeff`, `edresson`.
+
+## Fidelidade ao caso
+
+O roteiro foi conferido linha a linha contra o dossiê de preparação (fonte
+primária: Ivey 9A99A010). O dossiê **não** está neste repositório e não deve
+ser commitado — é material de terceiros. Os números narrados vêm dele; onde a
+narração reconstrói (a conta de ROE do episódio 4) ou cita casos externos ao
+Ivey (Egg, ING Direct USA, INSEAD), o próprio texto avisa. Manter esse aviso é
+parte do conteúdo: numa discussão de caso, apresentar inferência como fato é o
+erro que custa caro.
 
 ## Editar o conteúdo
 

@@ -7,11 +7,11 @@ Convenções: `## N — Título` abre um episódio. `[pausa]` vira silêncio na 
 
 ## 1 — O dilema
 
-Bem-vindo. Nos próximos vinte minutos você vai dominar o caso ING Bank of Canada — não para recontá-lo, mas para decidir sobre ele. Porque é isso que uma discussão de caso cobra: uma posição, defendida com números.
+Bem-vindo. Nos próximos vinte e cinco minutos você vai dominar o caso ING Bank of Canada — não para recontá-lo, mas para decidir sobre ele. Porque é isso que uma discussão de caso cobra: uma posição, defendida com números.
 
 [pausa]
 
-Começo pelo fim, que é onde o caso realmente começa. Início de 1997, Toronto. Arkadi Kuhlmann, presidente do ING Bank of Canada, olha o plano de lançamento e se faz uma pergunta que ele mesmo formula assim: “Devemos apostar tudo e gastar dez a vinte milhões de dólares no primeiro ano? Isso pode ser um enorme sucesso… ou um grande fracasso.”
+Começo pelo fim, que é onde o caso realmente começa. Maio de 1997, Toronto. Arkadi Kuhlmann, CEO do ING Bank of Canada, olha o plano de lançamento e se faz uma pergunta que ele mesmo formula assim: “Devemos apostar tudo e gastar dez a vinte milhões de dólares no primeiro ano? Isso pode ser um enorme sucesso… ou um grande fracasso.”
 
 Guarde essa frase. Ela é o dilema de superfície: o orçamento de marketing. O plano oficial previa seis milhões e duzentos mil. Mas os estudos do próprio ING diziam que adquirir um cliente custaria cerca de cento e oitenta dólares no primeiro ano. Faça a conta comigo: cento e oitenta dólares vezes a meta de oitenta e cinco mil clientes… dá mais de quinze milhões. O orçamento oficial não fecha com a própria meta. Esse é o primeiro número que você leva para a aula.
 
@@ -31,13 +31,13 @@ O gatilho veio de casa: na Holanda, um banco direto de um concorrente havia atra
 
 [pausa]
 
-Sobraram três finalistas. Alemanha: enorme, atraente, mas grande demais para a primeira aposta — risco excessivo. Austrália: o ING já estava lá, mas o mercado era pequeno e isolado. Canadá: o meio-termo ideal. Mercado de tamanho médio, o ING já tinha presença com seguros — inclusive uma operação de venda direta, a Belair — e, cereja do bolo, o Canadá poderia ser laboratório para depois atacar os Estados Unidos.
+Sobraram três finalistas. Alemanha: enorme, atraente, mas grande demais para a primeira aposta — risco excessivo. Austrália: mercado pequeno e isolado demais. Canadá: o meio-termo ideal. Mercado de tamanho médio, o ING já tinha presença com seguros — inclusive uma operação de venda direta, a Belair — e, cereja do bolo, o Canadá poderia ser laboratório para depois atacar os Estados Unidos.
 
 [pausa]
 
-Agora o retrato do alvo. Canadá, 1995: vinte e oito milhões e meio de habitantes, um trilhão de dólares em ativos financeiros. Os cinco grandes bancos controlavam setenta e dois por cento de tudo. E — escute isto — praticavam preços uniformes no país inteiro. Oligopólio de manual. Havia um esporte nacional chamado “bank-bashing”: todo mundo reclamava dos bancos… e continuava fiel a eles. Bancos estrangeiros — Citibank, Bank of America, BNP — tinham tentado o varejo canadense e fracassado, todos. O histórico jogava contra o ING.
+Agora o retrato do alvo. Canadá, 1995: vinte e oito milhões e meio de habitantes, um trilhão de dólares em ativos financeiros. Os cinco grandes bancos controlavam setenta e dois por cento dos ativos. E — escute isto — praticavam preços uniformes no país inteiro. Oligopólio de manual. Havia um esporte nacional chamado “bank-bashing”: todo mundo reclamava dos bancos… e continuava fiel a eles. Bancos estrangeiros — Citibank, Bank of America, BNP — tinham tentado o varejo canadense, todos com pouco ou nenhum sucesso. O histórico jogava contra o ING.
 
-Mas havia uma fresta, e ela é tecnológica. O canadense era early adopter: segunda maior densidade de caixas eletrônicos da OCDE, transações eletrônicas se aproximando de metade do total. E o número de ouro do caso, o Exhibit 4: uma transação na agência custa cerca de um dólar e oito. Por telefone, cinquenta e poucos centavos. Por internet, treze centavos. A agência custa oito vezes a internet. [pausa] Essa razão de oito para um é a física do modelo direto. Quem entende esse gráfico entende por que o ING pode pagar juros que os grandes não podem.
+Mas havia uma fresta, e ela é tecnológica. O canadense era early adopter: segunda maior densidade de caixas eletrônicos da OCDE, transações eletrônicas se aproximando de metade do total. E o número de ouro do caso, o Exhibit 4: uma transação na agência custa cerca de um dólar e oito. Por telefone, cinquenta e dois centavos. Por computador, vinte e seis. Por internet, treze centavos. A agência custa oito vezes a internet. [pausa] Essa razão de oito para um é a física do modelo direto. Quem entende esse gráfico entende por que o ING pode pagar juros que os grandes não podem.
 
 ## 3 — A estratégia do não
 
@@ -49,31 +49,33 @@ Alvo: canadenses de trinta a cinquenta e quatro anos, ensino superior, renda fam
 
 Posicionamento: instituição de poupança. Não é banco completo e não finge ser. Credível, competitiva, acessível, inovadora, confiável — os cinco adjetivos da pesquisa.
 
-Produtos: dois. Uma conta de poupança remunerada, a ISA, e certificados de investimento garantidos, os GICs — o equivalente aos nossos CDBs. Mais um empréstimo para previdência, o RRSP loan, como apoio. Só. A linha de crédito viria depois, e o caso é explícito no porquê: ela aumentaria o spread e anteciparia o ponto de equilíbrio. Primeiro passivo, depois ativo.
+Produtos: dois. Uma conta de poupança remunerada, a ISA, e certificados de investimento garantidos, os GICs — o equivalente aos nossos CDBs. Mais um empréstimo para previdência, o RRSP loan, como apoio. Só. E a régua declarada para o futuro: um produto novo por ano. Um. A linha de crédito viria depois, e o caso é explícito no porquê: ela aumentaria o spread e anteciparia o ponto de equilíbrio. Primeiro passivo, depois ativo.
 
-Preço: aqui está o soco. Os grandes bancos pagavam zero vírgula vinte e cinco a zero vírgula trinta e cinco por cento na poupança. O ING planejava pagar em torno de quatro por cento. Mais de dez vezes mais. Sem tarifa, sem saldo mínimo, sem pegadinha de faixas.
+Preço: aqui está o soco. Os grandes bancos pagavam zero vírgula vinte e cinco a zero vírgula trinta e cinco por cento na poupança — o Canada Trust, o mais generoso da praça, chegava a um por cento. O ING planejava pagar em torno de quatro por cento. Mais de dez vezes o que pagava o incumbente médio. Sem tarifa, sem saldo mínimo, sem pegadinha de faixas.
 
 [pausa]
 
 Distribuição — e aqui vêm os nãos mais corajosos. Correio e telefone, de um prédio suburbano barato em Toronto. Sem conta corrente. Sem talão de cheque. Sem cheque especial. E — o mais polêmico — sem acesso por caixa eletrônico no lançamento, num país que é vice-campeão mundial de caixas eletrônicos. Conectar-se às redes custaria trezentos mil mais vinte mil por ano, e o time disse não. Para sacar, o cliente liga, transfere para a conta corrente do banco dele, e o dinheiro chega no dia seguinte. Atrito deliberado: dificulta a saída do dinheiro de uma conta que é… de poupança. Depósitos garantidos pelo CDIC até sessenta mil por cliente. Voz interativa no fim de 97, internet em 99.
 
-Marketing: promover produtos, não o banco. Os botões quentes: juros altos, zero tarifa, sem agências, simplicidade. E uma agressividade rara: usar o ambiente de juros baixos para fazer o banco tradicional parecer, na expressão do caso, uma “má decisão de compra”. Poupar no ING seria um “ato positivo de consumismo”.
+Marketing: promover produtos, não o banco. Os botões quentes: juros altos, zero tarifa, sem agências, simplicidade. E uma agressividade rara: usar o ambiente de juros baixos para fazer o banco tradicional parecer, na expressão do caso, uma “má decisão de compra”. Poupar no ING seria um “ato positivo de consumismo”. E a meta era medida: cinquenta por cento de lembrança assistida da marca em um ano, oitenta por cento em cinco.
 
 [pausa]
 
 Operação — e aqui, se a sua vida é serviço de missão crítica, você vai se sentir em casa. Trinta atendentes, os Direct Associates, contratados por atitude, não por currículo bancário. Vinte e quatro horas, sete dias. Cento e vinte e cinco chamadas por dia por pessoa. Meta de nível de serviço: atender noventa por cento das chamadas em dez segundos. E a filosofia “one touch, only touch”: resolver na primeira ligação, sem transferir — com um sistema de contato que lembra até da nevasca que a cliente mencionou semanas atrás. Num banco sem agência, o call center não apoia o produto. O call center É o produto.
 
+E a doutrina de tecnologia, que vale anotar: “leading edge, not bleeding edge”. Ponta, sim; sangrando na ponta, não. Sistemas best-of-breed, escolhidos por funcionarem, e problemas corrigidos em voo — porque numa operação vinte e quatro sete qualquer falha vira publicidade negativa.
+
 ## 4 — A aritmética que decide tudo
 
 Este episódio é o mais importante. Pegue papel ou abra a calculadora mental, porque quem domina esta conta controla a discussão.
 
-O banco canadense médio ganha um spread de duzentos e cinquenta pontos-base — dois e meio por cento entre o que capta e o que aplica. O ING inverte a lógica: aplica a uns seis por cento em títulos e paga quatro na poupança. Spread de duzentos pontos. Tirando dezesseis pontos do seguro de depósito, sobram uns cento e oitenta. [pausa] Ou seja: o ING escolhe operar com MENOS margem que o incumbente. Como isso pode dar certo? Custo. Os grandes gastam sessenta a sessenta e cinco centavos para cada dólar de receita. A meta do ING: cinquenta.
+O banco canadense médio ganha um spread de duzentos e cinquenta pontos-base — dois e meio por cento entre o que capta e o que aplica. E atenção ao detalhe que quase todo mundo deixa passar: esse spread estava caindo, vinte e cinco pontos só no último ano. O chão já se movia debaixo do incumbente. O ING inverte a lógica: aplica a uns seis por cento em títulos e paga quatro na poupança. Spread de duzentos pontos. Tirando dezesseis pontos do seguro de depósito, sobram uns cento e oitenta. [pausa] Ou seja: o ING escolhe operar com MENOS margem que o incumbente. Como isso pode dar certo? Custo. Os grandes gastam sessenta a sessenta e cinco centavos para cada dólar de receita. A meta do ING: cinquenta.
 
 Agora as metas da matriz, porque elas amarram tudo: ponto de equilíbrio no ano quatro. Retorno sobre patrimônio de doze por cento no ano cinco. Oitenta e cinco mil clientes e trezentos e cinquenta milhões em depósitos no ano um. Quinhentos mil clientes e três vírgula sete bilhões no ano cinco.
 
 [pausa]
 
-Primeira conta: o ano um é deficitário por desenho. Trezentos e cinquenta milhões vezes um vírgula oito por cento dá uns seis milhões de margem. Os custos fixos do Exhibit 12 somam quase vinte e cinco milhões. Mais o marketing, de seis a quinze. Prejuízo de vinte e cinco a trinta e cinco milhões no primeiro ano. Isso não é falha do plano — é o preço do ingresso.
+Primeira conta: o ano um é deficitário por desenho. Trezentos e cinquenta milhões vezes um vírgula oito por cento dá uns seis milhões de margem. Os custos fixos do Exhibit 12 somam quase vinte e cinco milhões — e vale saber de onde vêm: onze vírgula dois de salários, quatro de depreciação, um vírgula dois de ocupação, zero vírgula oito de sede, e sete vírgula cinco de outros fixos. Mais o marketing, de seis a quinze. Prejuízo de vinte e cinco a trinta e cinco milhões no primeiro ano. Isso não é falha do plano — é o preço do ingresso.
 
 Segunda conta — a variável escondida: saldo médio. Trezentos e cinquenta milhões divididos por oitenta e cinco mil clientes: quatro mil e cem dólares por cliente. Já é mais que a poupança média do canadense, que era uns três mil. No ano cinco: três bilhões e setecentos divididos por quinhentos mil… sete mil e quatrocentos por cliente. [pausa] Percebeu? O plano não depende só de conquistar clientes. Depende de fazer cada cliente quase dobrar o que deposita. Quando alguém em aula disser “é só crescer a base”, essa é a sua deixa.
 
@@ -83,7 +85,29 @@ E agora o fecho, que conecta com a Pergunta Um da semana: banco precisa de capit
 
 Um alerta final: em fevereiro de 97, os juros caíram. O título de referência foi de seis para cinco e meio por cento. Se o ING mantiver os quatro pagos ao cliente, o spread encolhe de duzentos para cento e cinquenta antes do primeiro dia de operação. Leve esse contraponto você mesmo, antes que o usem contra você.
 
-## 5 — As cinco perguntas da semana
+## 5 — Quem mais está na mesa
+
+O caso tem um capítulo que quase todo mundo pula: contra quem, exatamente, esse banco vai jogar. E a resposta muda a leitura do dilema de marketing.
+
+[pausa]
+
+Comece pelo adversário mais sério. Outubro de 1996, o Bank of Montreal lança o mbanx. É o ataque mais ambicioso do mercado: uma unidade organizacionalmente separada da rede de agências, multicanal — telefone, fax, computador, internet, caixa eletrônico, correio —, vinte e quatro horas por dia, sete dias por semana. Só que o modelo é o oposto do ING: o mbanx cobra treze dólares por mês e devolve “recompensas” de dois centésimos por cento sobre os saldos. Traduzindo: serviço completo pago contra produto único gratuito.
+
+Guarde essa oposição, porque ela é a prova de que o incumbente escolheu não competir em preço. [pausa] E não escolheu por burrice. Igualar a taxa do ING sobre a base inteira de depósitos dos cinco grandes destruiria bilhões de margem. O mbanx é a canibalização recusada, em forma de produto.
+
+Mas o mbanx não está sozinho. Janeiro de 1997, o Citizens Bank, do grupo VanCity. Na primavera de 1997, o Royal Bank entra com banco por computador. A AGF, junto com o Citibank, monta um trust virtual. E corriam rumores de mais dois bancos virtuais de marca própria. A frase do caso é a que interessa: o cenário competitivo mudava quase diariamente. [pausa] Consequência prática, e essa é sua: o estudo de viabilidade que o ING fez em 1995 e 1996 já estava datado no dia em que o plano chegou à mesa. Quando alguém em aula defender esperar mais um ano para gastar menos, é essa a frase que você devolve.
+
+[pausa]
+
+Agora a outra metade do capítulo: os riscos. E o detalhe que dá autoridade à sua fala — eles não são meus, são a lista do próprio Kuhlmann. Um: o ING seria percebido como banco de verdade? Dois: a oferta de juro alto pareceria isca, um bait-and-switch? Três: dá para confiar em segurança pelo telefone? Quatro: como o cliente acessa o próprio dinheiro, num banco sem caixa eletrônico? Cinco: a linha de produtos é a certa? Seis: a reação dos incumbentes está subestimada? E, por cima de tudo isso, os reguladores em Ottawa apostavam que não ia funcionar.
+
+[pausa]
+
+Eu destacaria o quarto. O caso é explícito sobre a fricção de resgate: o cliente liga, transfere para a conta corrente do banco dele, e espera o dia seguinte. Para quem se posiciona por simplicidade, isso é atrito na hora errada — e num país que é vice-campeão mundial em caixas eletrônicos. A defesa é honesta: poupança é dinheiro de prazo, e o atrito até segura o saldo. Mas é argumento de dois gumes, e vale ouro em sala. Use-o para mostrar que você leu o risco, e não só a estratégia.
+
+E tem a frase de Kuhlmann que resume o resto: ele dizia estar contente por ter um acionista holandês — gente que sabe correr risco com a cabeça fria. Num plano que perde trinta milhões no primeiro ano, o acionista faz parte da estratégia.
+
+## 6 — As cinco perguntas da semana
 
 Agora, as cinco perguntas guias — que, atenção, misturam este caso com os casos do ING Direct americano e do INSEAD. Onde eu sair do documento, eu aviso.
 
@@ -99,19 +123,19 @@ Pergunta três: por que ‘foco e isolamento’ na TI, replicando infraestrutura
 
 [pausa]
 
-Pergunta quatro: a disciplina de dez a vinte produtos simples como barreira de entrada. A simplicidade não é limitação — é o motor financeiro. Produto simples permite contratar por atitude, treinar em duas semanas, pagar salário de quarenta e sete mil, atender cento e vinte e cinco chamadas por dia e resolver na primeira. Isso entrega os cinquenta por cento de cost-income, que financiam os quatro por cento de juros. A taxa alta É o produto — e só a simplicidade a paga. Cada produto adicionado quebra um elo. Contra os tradicionais, a barreira é a canibalização: igualar a taxa do ING sobre trezentos bilhões de depósitos destruiria bilhões de margem dos cinco grandes — por isso o mbanx preferiu cobrar treze dólares por mês por conveniência em vez de competir em preço. Contra os virtuais de linha completa, como o Egg britânico — referência externa ao caso —, oferecer tudo importa a complexidade do incumbente sem a receita dele: cost-income alto e prejuízo crônico. Dez a vinte produtos onde mora oitenta por cento do lucro; recusar o resto. Disciplina de portfólio é disciplina de custo, e disciplina de custo é a defesa competitiva.
+Pergunta quatro: a disciplina de dez a vinte produtos simples como barreira de entrada. A simplicidade não é limitação — é o motor financeiro. Produto simples permite contratar por atitude, treinar em duas a três semanas, pagar salário de quarenta e sete mil e quinhentos, atender cento e vinte e cinco chamadas por dia e resolver na primeira. Isso entrega os cinquenta por cento de cost-income, que financiam os quatro por cento de juros. A taxa alta É o produto — e só a simplicidade a paga. Cada produto adicionado quebra um elo. Contra os tradicionais, a barreira é a canibalização: igualar a taxa do ING sobre trezentos bilhões de depósitos destruiria bilhões de margem dos cinco grandes — por isso o mbanx preferiu cobrar treze dólares por mês por conveniência em vez de competir em preço. Contra os virtuais de linha completa, como o Egg britânico — referência externa ao caso —, oferecer tudo importa a complexidade do incumbente sem a receita dele: cost-income alto e prejuízo crônico. Dez a vinte produtos onde mora oitenta por cento do lucro; recusar o resto. Disciplina de portfólio é disciplina de custo, e disciplina de custo é a defesa competitiva. E leve o contraponto você mesmo, porque ele existe: monoproduto limita o share of wallet e mantém o cliente multibancarizado por definição — a própria pesquisa mostrou gente esperando banco completo e preocupada com acesso ao dinheiro. É uma barreira de modelo de custo, não de lealdade. Ela funciona enquanto a taxa for imbatível.
 
 [pausa]
 
 Pergunta cinco: takeaways para a nossa realidade. Sete, em fila rápida. Um: ataca-se oligopólio pela estrutura de custo, não por feature — a rede de agências que protege o incumbente é também a prisão dele; o paralelo com o varejo bancário brasileiro é imediato. Dois: passivo primeiro, com um produto-herói de captação transparente — pense no CDB de alta taxa como porta de entrada. Três: a aritmética antes da retórica — breakeven é saldo por cliente vezes spread vezes alavanca de custo, não é “crescer a base”. Quatro: marketing é decisão de investimento com CAC explícito — cento e oitenta, noventa, sessenta — e o maior risco pode ser gastar de menos numa janela que fecha. Cinco: inovação disruptiva exige separação organizacional — mbanx separado do BMO, ING isolado da matriz. Seis: num banco sem agência, o SLA é a proposta de valor — serviço é produto. Sete: dizer não é estratégia — não à conta corrente, não ao caixa eletrônico, não à complexidade.
 
-## 6 — Como brilhar na discussão
+## 7 — Como brilhar na discussão
 
-Último episódio: tática de sala, no formato Think-Pair-Share com oitenta minutos de plenária.
+Último episódio: tática de sala. O formato é Think-Pair-Share — cinco minutos de abertura, vinte e cinco em duplas, oitenta de plenária, dez de fechamento. É na plenária que você joga.
 
-Regra de ouro do briefing da casa: mover a conversa adiante. Nada de recontar o caso, nada de repetir o colega, nada de “na minha área a gente faz assim” como assunto — experiência entra como evidência, não como biografia.
+Regra de ouro do briefing da casa: mover a conversa adiante. Nada de recontar o caso, nada de repetir o colega, nada de “na minha área a gente faz assim” como assunto — experiência entra como evidência, não como biografia. E não puxe o Egg nem o caso americano antes de a turma chegar nas perguntas guias: fora de hora, vira mudança brusca de tópico.
 
-Planeje quatro intervenções, não quatorze.
+Planeje cinco intervenções, não quinze.
 
 Primeira, cedo, quando debaterem se o modelo para em pé: entregue a conta do episódio quatro. Entre com “Complementando o colega — se fizermos a conta de trás pra frente, os doze por cento de ROE fecham quase exatos…” e desfie: saldo médio, custo travado, trezentos milhões de capital. Você vira, nos primeiros vinte minutos, a pessoa que morou nos exhibits.
 
@@ -121,10 +145,14 @@ Segunda, no calor do dilema de marketing: reformule a pergunta. Não é “seis 
 
 Terceira — e esta é só sua, porque ninguém mais na sala tem duas décadas de operação de missão crítica: leia o ING como gestão de serviço. Diga algo como: “o que o ING fez foi transformar SLA em produto — noventa por cento em dez segundos, resolução na primeira chamada, vinte e quatro sete com correção em voo. E o Exhibit 4 é uma curva de migração de canal idêntica à que operamos hoje em aeroporto: balcão, quiosque, biometria — cada canal mais barato só se sustenta se a experiência não degradar.” É contribuição autêntica, conecta noventa e sete a hoje, e responde de quebra o porquê do isolamento operacional.
 
-Quarta, no wrap-up, quando pedirem o principal takeaway: “Vantagem sustentável aqui não é tecnologia nem taxa — é a coragem estrutural de NÃO ter custos. O ING só paga quatro por cento porque recusou agência, conta corrente e complexidade. E vale para nós: cada produto fora do core que adicionamos financia o concorrente disciplinado.”
+Quarta, quando a turma chegar na tensão entre o banco direto e a matriz: não responda com teoria, responda com evidência do texto. “O caso já mostra essa tensão antes mesmo do lançamento: a pesquisa indicou que o consumidor esperava um banco completo, e o time disse não. A disciplina de NÃO integrar era a estratégia.” E complete com a sinergia certa: capital, credibilidade da marca-mãe e know-how de venda direta — a Belair já era venda direta no Canadá. Sinergia no nível do grupo, nunca no nível do cliente.
 
 [pausa]
 
-E se vier o cold call, sua resposta de trinta segundos: “O dilema imediato é marketing; o real é provar que discount funciona em banco. Eu apostaria nos quinze milhões ou mais: o CAC exige, a janela competitiva fechava com o mbanx, e o modelo só remunera o capital em escala. Subinvestir é o único cenário sem cenário de vitória.”
+Quinta, no fechamento, quando pedirem o principal takeaway: “Vantagem sustentável aqui não é tecnologia nem taxa — é a coragem estrutural de NÃO ter custos. O ING só paga quatro por cento porque recusou agência, conta corrente e complexidade. E vale para nós: cada produto fora do core que adicionamos financia o concorrente disciplinado.”
+
+[pausa]
+
+E se vier o cold call, sua resposta de trinta segundos: “O dilema imediato é marketing; o real é provar que discount funciona em banco. Eu apostaria nos quinze milhões ou mais: o CAC exige, a janela competitiva fechava com o mbanx, e o modelo só remunera o capital em escala. Subinvestir é o único cenário sem vitória possível.”
 
 Boa aula. Você não vai à discussão para participar. Vai para elevá-la.
