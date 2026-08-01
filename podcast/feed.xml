@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>ING Direct: o banco que disse não</title>
+    <link>https://werneck22.github.io/pre-sales-hub-/podcast/</link>
+    <language>pt-BR</language>
+    <description>Seis episódios para dominar o caso ING Bank of Canada — não para recontá-lo, mas para decidir sobre ele: o dilema de marketing, a escolha do Canadá, a estratégia do não, a aritmética que fecha o ROE, as cinco perguntas da semana e a tática de sala.</description>
+    <itunes:author>Curso em áudio</itunes:author>
+    <itunes:subtitle>Curso em áudio para a discussão de caso</itunes:subtitle>
+    <itunes:summary>Seis episódios para dominar o caso ING Bank of Canada — não para recontá-lo, mas para decidir sobre ele: o dilema de marketing, a escolha do Canadá, a estratégia do não, a aritmética que fecha o ROE, as cinco perguntas da semana e a tática de sala.</itunes:summary>
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:type>serial</itunes:type>
+    <itunes:category text="Business"><itunes:category text="Management"/></itunes:category>
+    <itunes:image href="https://werneck22.github.io/pre-sales-hub-/podcast/cover.png"/>
+    <lastBuildDate>Sat, 01 Aug 2026 13:33:26 +0000</lastBuildDate>
+    <item>
+      <title>Episódio 1 — O dilema</title>
+      <description>O orçamento de marketing que não fecha com a própria meta — e o dilema maior embaixo dele: ninguém no mundo tinha provado que banco de desconto funciona.</description>
+      <itunes:summary>O orçamento de marketing que não fecha com a própria meta — e o dilema maior embaixo dele: ninguém no mundo tinha provado que banco de desconto funciona.</itunes:summary>
+      <itunes:episode>1</itunes:episode>
+      <itunes:duration>00:02:05</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <enclosure url="https://werneck22.github.io/pre-sales-hub-/podcast/audio/ep1.mp3" length="1246038" type="audio/mpeg"/>
+      <guid isPermaLink="false">ing-direct-1</guid>
+      <pubDate>Mon, 27 Jul 2026 13:33:26 +0000</pubDate>
+    </item>
+    <item>
+      <title>Episódio 2 — Por que o Canadá</title>
+      <description>Os três critérios de peneira que elegeram o Canadá, o oligopólio dos cinco grandes e a razão de oito para um entre agência e internet.</description>
+      <itunes:summary>Os três critérios de peneira que elegeram o Canadá, o oligopólio dos cinco grandes e a razão de oito para um entre agência e internet.</itunes:summary>
+      <itunes:episode>2</itunes:episode>
+      <itunes:duration>00:02:53</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <enclosure url="https://werneck22.github.io/pre-sales-hub-/podcast/audio/ep2.mp3" length="1635554" type="audio/mpeg"/>
+      <guid isPermaLink="false">ing-direct-2</guid>
+      <pubDate>Tue, 28 Jul 2026 13:33:26 +0000</pubDate>
+    </item>
+    <item>
+      <title>Episódio 3 — A estratégia do não</title>
+      <description>Posicionamento, dois produtos, juros dez vezes maiores e a lista de recusas: sem conta corrente, sem cheque, sem caixa eletrônico.</description>
+      <itunes:summary>Posicionamento, dois produtos, juros dez vezes maiores e a lista de recusas: sem conta corrente, sem cheque, sem caixa eletrônico.</itunes:summary>
+      <itunes:episode>3</itunes:episode>
+      <itunes:duration>00:03:28</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <enclosure url="https://werneck22.github.io/pre-sales-hub-/podcast/audio/ep3.mp3" length="1915585" type="audio/mpeg"/>
+      <guid isPermaLink="false">ing-direct-3</guid>
+      <pubDate>Wed, 29 Jul 2026 13:33:26 +0000</pubDate>
+    </item>
+    <item>
+      <title>Episódio 4 — A aritmética que decide tudo</title>
+      <description>A conta que decide a discussão: spread menor que o do incumbente, saldo médio por cliente e custos travados até quinhentas mil contas.</description>
+      <itunes:summary>A conta que decide a discussão: spread menor que o do incumbente, saldo médio por cliente e custos travados até quinhentas mil contas.</itunes:summary>
+      <itunes:episode>4</itunes:episode>
+      <itunes:duration>00:03:49</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <enclosure url="https://werneck22.github.io/pre-sales-hub-/podcast/audio/ep4.mp3" length="2083003" type="audio/mpeg"/>
+      <guid isPermaLink="false">ing-direct-4</guid>
+      <pubDate>Thu, 30 Jul 2026 13:33:26 +0000</pubDate>
+    </item>
+    <item>
+      <title>Episódio 5 — As cinco perguntas da semana</title>
+      <description>Capital regulatório, a tensão com a matriz, foco e isolamento na TI, a disciplina de produtos e sete transposições para hoje.</description>
+      <itunes:summary>Capital regulatório, a tensão com a matriz, foco e isolamento na TI, a disciplina de produtos e sete transposições para hoje.</itunes:summary>
+      <itunes:episode>5</itunes:episode>
+      <itunes:duration>00:05:56</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <enclosure url="https://werneck22.github.io/pre-sales-hub-/podcast/audio/ep5.mp3" length="3096745" type="audio/mpeg"/>
+      <guid isPermaLink="false">ing-direct-5</guid>
+      <pubDate>Fri, 31 Jul 2026 13:33:26 +0000</pubDate>
+    </item>
+    <item>
+      <title>Episódio 6 — Como brilhar na discussão</title>
+      <description>Tática de sala: quatro intervenções planejadas, como reformular o dilema de marketing e a resposta de trinta segundos para o cold call.</description>
+      <itunes:summary>Tática de sala: quatro intervenções planejadas, como reformular o dilema de marketing e a resposta de trinta segundos para o cold call.</itunes:summary>
+      <itunes:episode>6</itunes:episode>
+      <itunes:duration>00:02:43</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <enclosure url="https://werneck22.github.io/pre-sales-hub-/podcast/audio/ep6.mp3" length="1551355" type="audio/mpeg"/>
+      <guid isPermaLink="false">ing-direct-6</guid>
+      <pubDate>Sat, 01 Aug 2026 13:33:26 +0000</pubDate>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ING Direct: o banco que disse não — curso em áudio</title>
+<style>
+  :root {
+    --ink: #0b1520;
+    --ink-2: #10202e;
+    --line: rgba(242,239,233,.14);
+    --paper: #f2efe9;
+    --muted: rgba(242,239,233,.6);
+    --accent: #d65a3a;
+    --blue: #7fb4d8;
+    --bar: 92px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font: 16px/1.6 "Charter", "Bitstream Charter", Georgia, "Times New Roman", serif;
+    padding-bottom: calc(var(--bar) + 24px);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  header { padding: 56px 0 40px; display: flex; gap: 32px; align-items: flex-start; }
+  header img { width: 168px; height: 168px; border-radius: 10px; border: 1px solid var(--line); flex: none; }
+  .kicker {
+    font-family: system-ui, sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .26em; text-transform: uppercase; color: #d6905a;
+  }
+  h1 { font-size: 38px; line-height: 1.12; letter-spacing: -.02em; margin: 12px 0 14px; font-weight: 700; }
+  h1 span { color: var(--blue); }
+  header p { color: var(--muted); max-width: 52ch; }
+  .facts {
+    margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px;
+    font-family: system-ui, sans-serif; font-size: 12.5px;
+  }
+  .facts span { border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; color: var(--muted); }
+
+  .list { border-top: 1px solid var(--line); }
+  .ep { border-bottom: 1px solid var(--line); padding: 22px 0; }
+  .ep-head { display: flex; gap: 18px; align-items: baseline; cursor: pointer; }
+  .num {
+    font-family: system-ui, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .1em;
+    color: var(--accent); width: 26px; flex: none; padding-top: 4px;
+  }
+  .ep h2 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; line-height: 1.25; }
+  .ep-body { flex: 1; }
+  .ep p.sum { color: var(--muted); font-size: 15px; margin-top: 7px; }
+  .ep-meta {
+    font-family: system-ui, sans-serif; font-size: 12.5px; color: var(--muted);
+    white-space: nowrap; padding-top: 6px; display: flex; gap: 14px; align-items: center;
+  }
+  .ep.playing { background: linear-gradient(90deg, rgba(214,90,58,.10), transparent 60%); }
+  .ep.playing h2 { color: var(--blue); }
+  .ep-actions { display: flex; gap: 10px; margin: 14px 0 0 44px; font-family: system-ui, sans-serif; }
+  button, a.btn {
+    font: inherit; font-size: 13px; background: transparent; color: var(--paper);
+    border: 1px solid var(--line); border-radius: 7px; padding: 6px 13px; cursor: pointer;
+    text-decoration: none; transition: border-color .15s, background .15s;
+  }
+  button:hover, a.btn:hover { border-color: rgba(242,239,233,.42); background: rgba(242,239,233,.05); }
+  button.primary { background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { background: #e06848; }
+  .progress-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+  .transcript {
+    display: none; margin: 18px 0 0 44px; padding: 18px 22px;
+    border-left: 2px solid var(--line); color: rgba(242,239,233,.82); font-size: 15.5px;
+  }
+  .transcript.open { display: block; }
+  .transcript p + p { margin-top: 14px; }
+
+  .player {
+    position: fixed; left: 0; right: 0; bottom: 0; height: var(--bar);
+    background: rgba(9,17,25,.96); backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line); display: flex; align-items: center;
+  }
+  .player .wrap { display: flex; align-items: center; gap: 16px; width: 100%; }
+  .pbtn {
+    width: 46px; height: 46px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    background: var(--paper); color: var(--ink); border: 0; font-size: 17px; padding: 0;
+  }
+  .pbtn:hover { background: #fff; }
+  .skip { font-family: system-ui, sans-serif; font-size: 12px; padding: 5px 9px; flex: none; }
+  .now { flex: 1; min-width: 0; }
+  .now .title {
+    font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px;
+  }
+  .seek { display: flex; align-items: center; gap: 10px; font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--muted); }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; flex: 1; height: 4px; border-radius: 3px;
+    background: rgba(242,239,233,.2); outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border: 0; border-radius: 50%; background: var(--accent); cursor: pointer; }
+  select {
+    font: inherit; font-family: system-ui, sans-serif; font-size: 12.5px; background: transparent;
+    color: var(--paper); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; flex: none;
+  }
+  select option { background: var(--ink-2); }
+
+  footer { padding: 44px 0 60px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); margin-top: 12px; }
+  footer code { font-family: ui-monospace, "DejaVu Sans Mono", monospace; font-size: 13px; color: var(--blue); }
+  footer a { color: var(--blue); }
+
+  @media (max-width: 720px) {
+    header { flex-direction: column; gap: 22px; padding-top: 34px; }
+    header img { width: 128px; height: 128px; }
+    h1 { font-size: 29px; }
+    .ep-head { flex-wrap: wrap; }
+    .ep-meta { width: 100%; padding-left: 44px; }
+    .ep-actions, .transcript { margin-left: 0; }
+    .skip { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <img src="cover.png" alt="Capa do curso">
+    <div>
+      <div class="kicker">Curso em áudio</div>
+      <h1>ING Direct<br><span>o banco que disse não</span></h1>
+      <p id="show-desc"></p>
+      <div class="facts" id="facts"></div>
+    </div>
+  </header>
+
+  <div class="list" id="list"></div>
+
+  <footer>
+    <p>Áudio sintetizado localmente com Piper (VITS ONNX), voz <span id="voice-name">—</span>.
+       Nenhum trecho do roteiro foi enviado para serviços externos.</p>
+    <p style="margin-top:10px">Para regerar: <code>./.venv/bin/python build_podcast.py</code> ·
+       trocar de voz: <code>--voice pt_BR-cadu-medium</code> ·
+       feed RSS: <a href="feed.xml">feed.xml</a></p>
+  </footer>
+</div>
+
+<div class="player">
+  <div class="wrap">
+    <button class="pbtn" id="play" aria-label="Tocar">▶</button>
+    <button class="skip" id="back" title="Voltar 15s">↺ 15</button>
+    <button class="skip" id="fwd" title="Avançar 30s">30 ↻</button>
+    <div class="now">
+      <div class="title" id="now-title">Selecione um episódio</div>
+      <div class="seek">
+        <span id="cur">0:00</span>
+        <input type="range" id="seek" value="0" min="0" max="1000" step="1" aria-label="Posição">
+        <span id="dur">0:00</span>
+      </div>
+    </div>
+    <select id="rate" aria-label="Velocidade">
+      <option value="0.9">0,9×</option>
+      <option value="1" selected>1×</option>
+      <option value="1.15">1,15×</option>
+      <option value="1.3">1,3×</option>
+      <option value="1.5">1,5×</option>
+      <option value="1.75">1,75×</option>
+    </select>
+  </div>
+</div>
+
+<audio id="audio" preload="metadata"></audio>
+<script src="episodes.js"></script>
+<script>
+(() => {
+  const data = window.PODCAST;
+  if (!data) {
+    document.getElementById('list').innerHTML =
+      '<p style="padding:40px 0;color:#f2efe9aa">Rode <code>build_podcast.py</code> para gerar os episódios.</p>';
+    return;
+  }
+
+  const STORE = 'ingdirect.podcast.v1';
+  const state = JSON.parse(localStorage.getItem(STORE) || '{}');
+  const save = () => localStorage.setItem(STORE, JSON.stringify(state));
+
+  const audio = document.getElementById('audio');
+  const el = id => document.getElementById(id);
+  const fmt = s => {
+    if (!isFinite(s)) return '0:00';
+    s = Math.floor(s);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  };
+
+  el('show-desc').textContent = data.show.description;
+  el('voice-name').textContent = data.show.voice;
+  el('facts').innerHTML = [
+    `${data.episodes.length} episódios`,
+    data.show.total_duration_hhmmss.replace(/^00:/, '') + ' no total',
+    'Português do Brasil',
+    'Gerado offline'
+  ].map(t => `<span>${t}</span>`).join('');
+
+  const list = el('list');
+  data.episodes.forEach(ep => {
+    const node = document.createElement('article');
+    node.className = 'ep';
+    node.id = 'ep' + ep.number;
+    node.innerHTML = `
+      <div class="ep-head">
+        <div class="num">0${ep.number}</div>
+        <div class="ep-body">
+          <h2>${ep.short_title}</h2>
+          <p class="sum">${ep.summary}</p>
+        </div>
+        <div class="ep-meta"><span class="dot"></span>${ep.duration_hhmmss.replace(/^00:/, '')}</div>
+      </div>
+      <div class="ep-actions">
+        <button class="primary" data-play="${ep.number}">Tocar</button>
+        <button data-transcript="${ep.number}">Roteiro</button>
+        <a class="btn" href="audio/${ep.file}" download>Baixar MP3</a>
+      </div>
+      <div class="transcript" id="tr${ep.number}">
+        ${ep.transcript.map(p => `<p>${p}</p>`).join('')}
+      </div>`;
+    list.appendChild(node);
+  });
+
+  let current = null;
+
+  function markProgress() {
+    data.episodes.forEach(ep => {
+      const pos = state[ep.number];
+      const dot = document.querySelector(`#ep${ep.number} .dot`);
+      if (!dot) return;
+      if (pos && pos > 5 && pos < ep.duration_seconds - 20) {
+        dot.innerHTML = '<span class="progress-dot"></span> ';
+        dot.title = 'Em andamento';
+      } else if (pos && pos >= ep.duration_seconds - 20) {
+        dot.textContent = '✓ ';
+      } else {
+        dot.textContent = '';
+      }
+    });
+  }
+
+  function load(number, autoplay = true) {
+    const ep = data.episodes.find(e => e.number === number);
+    if (!ep) return;
+    if (current !== number) {
+      current = number;
+      audio.src = 'audio/' + ep.file;
+      audio.currentTime = state[number] && state[number] < ep.duration_seconds - 15 ? state[number] : 0;
+      el('now-title').textContent = ep.title;
+      document.querySelectorAll('.ep').forEach(n => n.classList.remove('playing'));
+      document.getElementById('ep' + number).classList.add('playing');
+      document.querySelectorAll('[data-play]').forEach(b => {
+        b.textContent = Number(b.dataset.play) === number ? 'Tocando' : 'Tocar';
+      });
+    }
+    if (autoplay) audio.play();
+  }
+
+  list.addEventListener('click', e => {
+    const play = e.target.closest('[data-play]');
+    if (play) {
+      const n = Number(play.dataset.play);
+      if (current === n && !audio.paused) { audio.pause(); } else { load(n); }
+      return;
+    }
+    const tr = e.target.closest('[data-transcript]');
+    if (tr) {
+      const panel = el('tr' + tr.dataset.transcript);
+      panel.classList.toggle('open');
+      tr.textContent = panel.classList.contains('open') ? 'Fechar roteiro' : 'Roteiro';
+      return;
+    }
+    const head = e.target.closest('.ep-head');
+    if (head) load(Number(head.closest('.ep').id.replace('ep', '')));
+  });
+
+  el('play').onclick = () => {
+    if (!current) return load(data.episodes[0].number);
+    audio.paused ? audio.play() : audio.pause();
+  };
+  el('back').onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 15);
+  el('fwd').onclick = () => audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 30);
+  el('rate').onchange = e => { audio.playbackRate = Number(e.target.value); state.rate = e.target.value; save(); };
+  if (state.rate) { el('rate').value = state.rate; audio.playbackRate = Number(state.rate); }
+
+  const seek = el('seek');
+  let scrubbing = false;
+  seek.oninput = () => { scrubbing = true; el('cur').textContent = fmt(seek.value / 1000 * (audio.duration || 0)); };
+  seek.onchange = () => { audio.currentTime = seek.value / 1000 * (audio.duration || 0); scrubbing = false; };
+
+  audio.addEventListener('timeupdate', () => {
+    if (!scrubbing && audio.duration) seek.value = audio.currentTime / audio.duration * 1000;
+    el('cur').textContent = fmt(audio.currentTime);
+    el('dur').textContent = fmt(audio.duration);
+    if (current) { state[current] = audio.currentTime; if (Math.floor(audio.currentTime) % 5 === 0) { save(); markProgress(); } }
+  });
+  audio.addEventListener('play', () => el('play').textContent = '❚❚');
+  audio.addEventListener('pause', () => { el('play').textContent = '▶'; save(); });
+  audio.addEventListener('ended', () => {
+    state[current] = data.episodes.find(e => e.number === current).duration_seconds;
+    save(); markProgress();
+    const next = data.episodes.find(e => e.number === current + 1);
+    if (next) load(next.number);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input, select, textarea')) return;
+    if (e.code === 'Space') { e.preventDefault(); el('play').click(); }
+    if (e.code === 'ArrowLeft') el('back').click();
+    if (e.code === 'ArrowRight') el('fwd').click();
+  });
+
+  markProgress();
+  const resume = Object.keys(state).filter(k => k !== 'rate').map(Number).sort((a, b) => b - a)[0];
+  if (resume) load(resume, false);
+})();
+</script>
+</body>
+</html>

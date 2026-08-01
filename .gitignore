@@ -1,0 +1,13 @@
+# Podcast: artefatos gerados localmente pelo build.
+# Os modelos de voz (~63 MB cada) vêm de fetch_voices.sh.
+podcast/voices/
+podcast/.venv/
+podcast/.work/
+
+# MP3s ficam de fora porque este repositório é público — veja podcast/README.md
+# se quiser publicá-los para assinar o feed no celular.
+podcast/audio/
+
+# Python
+__pycache__/
+*.pyc
